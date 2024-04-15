@@ -1,6 +1,6 @@
 
 
-rl_baseline/Learned-BMtree/
+rl_baseline/Learned-BMtree_/
 
 TODO.md
 
@@ -9,6 +9,5 @@ data/
 result/
 
 benchmark/libspatialindex/
-benchmark/geos/
 
 *.pyc

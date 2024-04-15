@@ -2,7 +2,6 @@
 
 declare -A libraries=(
     [spatialindex]="/home/$(whoami)/usr"
-    [geos]="/usr/local"
 )
 
 # Iterate through the libraries associative array

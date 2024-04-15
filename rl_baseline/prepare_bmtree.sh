@@ -3,7 +3,8 @@
 # Define the paths for the project directory, data directory, and the subdirectory where you'll work with Learned-BMTree
 data_dir="./data"  # Data directory relative to the current directory
 sub_dir="./rl_baseline"  # Subdirectory for Learned-BMTree relative to the current directory
-repo_url="https://github.com/gravesprite/Learned-BMTree.git"
+# repo_url="https://github.com/gravesprite/Learned-BMTree.git"
+repo_url="git@github.com:AI-DB-UoM/Learned-BMTree.git"
 env_name="base"  # Your existing conda environment name
 
 # Attempt to clone the Learned-BMTree repository into the specified subdirectory
