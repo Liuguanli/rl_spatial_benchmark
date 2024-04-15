@@ -1,0 +1,269 @@
+{
+    "experiments": [
+      {
+        "data": {
+          "size": 100000000,
+          "dimensions": 2,
+          "distribution": "skewed",
+          "skewness": 1,
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        "query": [
+          {
+            "type": "range",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "query_range": [[0.01, 0.01]],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          },
+          {
+            "type": "knn",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "k": [25],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          }
+        ],
+        "baseline": [
+          {
+            "name": "rtree",
+            "config": {
+              "page_size": 100,
+              "fill_factor": 0.9,
+              "rtree_variant": "rstar"
+            }
+          },
+          {
+            "name": "zorder",
+            "config": {
+              "bits": 20,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          },
+          {
+            "name": "bmtree",
+            "config": {
+              "bits": 20,
+              "tree_depth": 4,
+              "sampling": 10000,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          }
+        ]
+      },
+      {
+        "data": {
+          "size": 100000000,
+          "dimensions": 2,
+          "distribution": "skewed",
+          "skewness": 2,
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        "query": [
+          {
+            "type": "range",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "query_range": [[0.01, 0.01]],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          },
+          {
+            "type": "knn",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "k": [25],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          }
+        ],
+        "baseline": [
+          {
+            "name": "rtree",
+            "config": {
+              "page_size": 100,
+              "fill_factor": 0.9,
+              "rtree_variant": "rstar"
+            }
+          },
+          {
+            "name": "zorder",
+            "config": {
+              "bits": 20,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          },
+          {
+            "name": "bmtree",
+            "config": {
+              "bits": 20,
+              "tree_depth": 4,
+              "sampling": 10000,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          }
+        ]
+      },
+      {
+        "data": {
+          "size": 100000000,
+          "dimensions": 2,
+          "distribution": "skewed",
+          "skewness": 4,
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        "query": [
+          {
+            "type": "range",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "query_range": [[0.01, 0.01]],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          },
+          {
+            "type": "knn",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "k": [25],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          }
+        ],
+        "baseline": [
+          {
+            "name": "rtree",
+            "config": {
+              "page_size": 100,
+              "fill_factor": 0.9,
+              "rtree_variant": "rstar"
+            }
+          },
+          {
+            "name": "zorder",
+            "config": {
+              "bits": 20,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          },
+          {
+            "name": "bmtree",
+            "config": {
+              "bits": 20,
+              "tree_depth": 4,
+              "sampling": 10000,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          }
+        ]
+      },
+      {
+        "data": {
+          "size": 100000000,
+          "dimensions": 2,
+          "distribution": "skewed",
+          "skewness": 5,
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        "query": [
+          {
+            "type": "range",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "query_range": [[0.01, 0.01]],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          },
+          {
+            "type": "knn",
+            "size": 1000,
+            "dimensions": 2,
+            "distribution": "normal",
+            "skewness": 1,
+            "k": [25],
+            "bounds": [
+              [0, 1],
+              [0, 1]
+            ]
+          }
+        ],
+        "baseline": [
+          {
+            "name": "rtree",
+            "config": {
+              "page_size": 100,
+              "fill_factor": 0.9,
+              "rtree_variant": "rstar"
+            }
+          },
+          {
+            "name": "zorder",
+            "config": {
+              "bits": 20,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          },
+          {
+            "name": "bmtree",
+            "config": {
+              "bits": 20,
+              "tree_depth": 4,
+              "sampling": 10000,
+              "page_size": 100,
+              "fill_factor": 0.9
+            }
+          }
+        ]
+      }
+    ]
+  }
+  

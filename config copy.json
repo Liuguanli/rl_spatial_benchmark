@@ -1,0 +1,59 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 100000,
+        "dimensions": 2,
+        "distribution": "uniform",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "query_range": [[0.01, 0.01],[0.02, 0.02],[0.04, 0.04],[0.08, 0.08],[0.16, 0.16]],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        {
+          "type": "knn",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "k": [1, 5, 25, 125, 625],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "tree_depth": 1,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        }
+      ]
+    }
+  ]
+}

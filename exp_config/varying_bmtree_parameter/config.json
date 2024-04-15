@@ -1,0 +1,259 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "normal",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "normal",
+          "skewness": 1,
+          "query_range": [[0.01, 0.01]],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        {
+          "type": "knn",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "normal",
+          "skewness": 1,
+          "k": [1, 5, 25, 125, 625],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 4,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 100000000,
+        "distribution": "OSM"
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "normal",
+          "skewness": 1,
+          "query_range": [[0.01, 0.01]],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        {
+          "type": "knn",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "normal",
+          "skewness": 1,
+          "k": [1, 5, 25, 125, 625],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 1,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 2,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 3,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 4,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 5,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 4,
+            "sampling": 1000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 4,
+            "sampling": 100000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 4,
+            "sampling": 1000000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 20,
+            "tree_depth": 4,
+            "sampling": 10000000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "zorder",
+          "config": {
+            "bits": 16,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 16,
+            "tree_depth": 4,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "zorder",
+          "config": {
+            "bits": 20,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "zorder",
+          "config": {
+            "bits": 24,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 24,
+            "tree_depth": 4,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "zorder",
+          "config": {
+            "bits": 28,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 28,
+            "tree_depth": 4,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "zorder",
+          "config": {
+            "bits": 32,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        },
+        {
+          "name": "bmtree",
+          "config": {
+            "bits": 32,
+            "tree_depth": 4,
+            "sampling": 10000,
+            "page_size": 100,
+            "fill_factor": 0.9
+          }
+        }
+      ]
+    }
+  ]
+}
+
