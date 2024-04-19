@@ -1105,7 +1105,7 @@ class SplitLearner:
                 # split_trange = trange(objects_for_train, desc="Training", leave=False)
                 # print("No. of obj to train: ", objects_for_train)
                 for training_id in range(objects_for_train):
-                    print(["Epoch", epoch, "Parts", part, "Training obj ID", training_id, "Total training obj", objects_for_train])
+                    # print(["Epoch", epoch, "Parts", part, "Training obj ID", training_id, "Total training obj", objects_for_train])
                     # line = fin.readline()
                     # object_boundary = [float(v) for v in line.strip().split()]
                     self.reference_tree.DefaultInsert(train_obj[training_id])

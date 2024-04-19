@@ -1,0 +1,174 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "OSM"
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "query_range": [
+            [0.01, 0.01]
+          ],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "qdtree",
+          "config": {
+            "episode": 1,
+            "page_size": 100,
+            "fill_factor": 0.9,
+            "sampling_ratio": 0.1,
+            "action_sampling_size": 200
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 100000,
+        "distribution": "OSM"
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "query_range": [
+            [0.01, 0.01]
+          ],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "qdtree",
+          "config": {
+            "episode": 1,
+            "page_size": 100,
+            "fill_factor": 0.9,
+            "sampling_ratio": 0.01,
+            "action_sampling_size": 200
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 1000000,
+        "distribution": "OSM"
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "query_range": [
+            [0.01, 0.01]
+          ],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "qdtree",
+          "config": {
+            "episode": 1,
+            "page_size": 100,
+            "fill_factor": 0.9,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 200
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 10000000,
+        "distribution": "OSM"
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "query_range": [
+            [0.01, 0.01]
+          ],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "qdtree",
+          "config": {
+            "episode": 1,
+            "page_size": 100,
+            "fill_factor": 0.9,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 100000000,
+        "distribution": "OSM"
+      },
+      "query": [
+        {
+          "type": "range",
+          "size": 1000,
+          "dimensions": 2,
+          "distribution": "uniform",
+          "skewness": 1,
+          "query_range": [
+            [0.01, 0.01]
+          ],
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        }
+      ],
+      "baseline": [
+        {
+          "name": "qdtree",
+          "config": {
+            "episode": 1,
+            "page_size": 100,
+            "fill_factor": 0.9,
+            "sampling_ratio": 0.00001,
+            "action_sampling_size": 200
+          }
+        }
+      ]
+    }
+  ]
+}

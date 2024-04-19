@@ -1207,10 +1207,10 @@ if __name__ == '__main__':
                                                     ind = ind + 1
                                                     # count_steps_diff = count_steps_diff * mcdr
                                                     
-                                    print("Epoch number:" + "" + str(epo))
-                                    print(i+1)
-                                    print(avg_access_rate/(rf))
-                                    print("")
+                                #     print("Epoch number:" + "" + str(epo))
+                                #     print(i+1)
+                                #     print(avg_access_rate/(rf))
+                                #     print("")
 
                                     brain.learn()
                                     brain.state_action_pairs = []

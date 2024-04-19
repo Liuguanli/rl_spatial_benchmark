@@ -104,7 +104,7 @@ python run_exp_from_config.py
 # print_step $YELLOW "Step 4: Learn RL-Spatial Indices"
 # print_sub_step $GREEN "Step 4.1: Run Z-order"
 
-# python tools/zorder.py data/synthetic/dataset/data_1000_2_normal.csv z-order_data.csv
+# python tools/zorder.py data/synthetic/dataset/data_1000_2_normal.csv z_order_data.csv
 
 # print_sub_step $GREEN "Step 4.2: Learn BMTree"
 
@@ -120,7 +120,7 @@ python run_exp_from_config.py
 
 # print_sub_step $YELLOW "Step 5.1: Format Data and Query"
 
-# python tools/libspatialindex_data_adapter.py --type data --input z-order_data.csv --output benchmark/libspatialindex/z_sorted_data
+# python tools/libspatialindex_data_adapter.py --type data --input z_order_data.csv --output benchmark/libspatialindex/z_sorted_data
 
 # python tools/libspatialindex_data_adapter.py --type data --is_scaled --input rl_baseline/Learned-BMTree/sorted_data_with_sfc.csv --output benchmark/libspatialindex/bmtree_sorted_data
 

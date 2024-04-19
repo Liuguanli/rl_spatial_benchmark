@@ -94,7 +94,7 @@ def main():
     parser = argparse.ArgumentParser(description='Sort data based on Z-order curve.')
     parser.add_argument('input_file', type=str, help='Path to the input CSV file.')
     parser.add_argument('output_file', type=str, help='Path to save the sorted CSV file.')
-    parser.add_argument('--bits', type=int, default=20, help='Number of bits per dimension for Z-order calculation.')
+    parser.add_argument('bits', type=int, default=20, help='Number of bits per dimension for Z-order calculation.')
     
     args = parser.parse_args()
 

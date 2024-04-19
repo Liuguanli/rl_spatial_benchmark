@@ -3,8 +3,8 @@
 sub_dir="./rl_baseline"
 
 # Check if two arguments are passed
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <data_file_name> <query_file_name>"
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <data_file_name> <query_file_name> <epoch>"
     exit 1
 fi
 
@@ -14,14 +14,15 @@ fi
 # query_file="${current_dir}/$2"
 data_file=$1
 query_file=$2
+epoch=$3
 
 train_choose_subtree="model_ChooseSubtree.py"
 train_split="model_Split.py"
 compile_sh="compile.sh"
 
 compile_rtree_command="sh $compile_sh"
-train_choose_subtree_command="python $sub_dir/RLRTree/$train_choose_subtree -dataset_filename $data_file -queryset_filename $query_file -epoch 1"
-train_train_split_command="python $sub_dir/RLRTree/$train_split -dataset_filename $data_file -queryset_filename $query_file -epoch 1"
+train_choose_subtree_command="python $sub_dir/RLRTree/$train_choose_subtree -dataset_filename $data_file -queryset_filename $query_file -epoch $epoch"
+train_train_split_command="python $sub_dir/RLRTree/$train_split -dataset_filename $data_file -queryset_filename $query_file -epoch $epoch"
 
 # Execute the training command
 # cd "${sub_dir}/RLRTree" 

@@ -86,10 +86,11 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         data_file_prefix = data_file_name.rstrip('.csv')
 
-        page_size = baseline_config.get("page_size", None)
-        fill_factor = baseline_config.get("fill_factor", None)
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 1.0)
+        bit_num = baseline_config.get("bit_num", 20)
 
-        transform_command = f"python tools/zorder.py {ablosute_data_file_name} {Z_ORDER_OUTPUT}"
+        transform_command = f"python tools/zorder.py {ablosute_data_file_name} {Z_ORDER_OUTPUT} {bit_num}"
         elapsed_time_ns_order = execute_command(transform_command)
 
         data_file = Z_ORDER_SORTED_OUTPUT
@@ -105,7 +106,10 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
 
         build_output_path = Z_BUILD_OUTPUT_PATH.format(
             data_file_prefix=data_file_prefix,
+            bit_num=bit_num
         )
+
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
         with open(build_output_path, "w") as f:
             f.write(result.stderr)
@@ -126,10 +130,14 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             range_query_output_path = Z_RANGE_QUERY_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
             )
 
             # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
             result, elapsed_time_ns_range = execute_command_with_err(command)
+            
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
             with open(range_query_output_path, "w") as f:
                 f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
@@ -158,10 +166,13 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                 knn_query_output_path = Z_KNN_QUERY_OUTPUT_PATH.format(
                     data_file_prefix=data_file_prefix,
                     knn_query_prefix=file_name_prefix,
+                    bit_num=bit_num,
                     k=k
                 )
                 # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
                 result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
 
                 with open(knn_query_output_path, "w") as f:
                     f.write(result.stderr)
@@ -180,6 +191,119 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         cleanup_intermediate_files()
         save_remove(Z_ORDER_SORTED_OUTPUT)
 
+def run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
+    try:
+        if data_file_name.startswith("data"):
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
+
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 1.0)
+        bit_num = baseline_config.get("bit_num", 20)
+
+        transform_command = f"python tools/rank_space_z.py {ablosute_data_file_name} {RANK_SPACE_Z_ORDER_OUTPUT} {bit_num}"
+        elapsed_time_ns_order = execute_command(transform_command)
+
+        data_file = RANK_SPACE_Z_ORDER_SORTED_OUTPUT
+
+        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file}"
+        execute_command(format_data_command)
+
+        print(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
+        
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} tree {page_size} {fill_factor}"
+
+        result, elapsed_time_ns_build = execute_command_with_err(command)
+
+        build_output_path = RANK_SPACE_Z_BUILD_OUTPUT_PATH.format(
+            data_file_prefix=data_file_prefix,
+            bit_num=bit_num,
+        )
+
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+        with open(build_output_path, "w") as f:
+            f.write(result.stderr)
+            f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
+
+        print("Querying SFC Rtree (Range)")
+
+        for file_name in range_queries:
+            file_name_prefix = file_name.rstrip('.csv')
+            
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                command = f"test-rtree-RTreeQuery {query_file} tree intersection > res"
+            else:
+                command = f"test-rtree-RTreeQuery {query_file} tree intersection"
+
+            range_query_output_path = RANK_SPACE_Z_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
+            )
+
+            # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+            result, elapsed_time_ns_range = execute_command_with_err(command)
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
+            with open(range_query_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                run_exhaustive_search(data_file, query_file, query_type="range")
+
+        print("Finish range query")
+
+        print("Querying SFC Rtree (knn)")
+
+        for file_name in knn_queries:
+
+            ks = ks_map.get(file_name)
+
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            for k in ks:
+                if RUN_EXHAUSTIVE_SEARCH:
+                    command = f"test-rtree-RTreeQuery {query_file} tree {k}NN > res"
+                else:
+                    command = f"test-rtree-RTreeQuery {query_file} tree {k}NN"
+                
+                # knn_query_output_path = f"result/libspatialindex/zorder/knn/{data_file_prefix}_{file_name_prefix}_k_{k}.txt"
+                knn_query_output_path = RANK_SPACE_Z_KNN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    knn_query_prefix=file_name_prefix,
+                    bit_num=bit_num,
+                    k=k
+                )
+                # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+                result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
+                with open(knn_query_output_path, "w") as f:
+                    f.write(result.stderr)
+                    f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
+
+                if RUN_EXHAUSTIVE_SEARCH:
+                    run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
+
+        print("Finish knn query")
+
+    except subprocess.CalledProcessError as e:
+        print(f"fail: {e}")
+    
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files()
+        save_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
+
 def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
     try:
         is_real_data = data_file_name.startswith("data")
@@ -189,8 +313,11 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         data_file_prefix = data_file_name.rstrip('.csv')
 
-        page_size = baseline_config.get("page_size", None)
-        fill_factor = baseline_config.get("fill_factor", None)
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 1.0)
+        tree_depth = baseline_config.get("tree_depth", 1)
+        sample_size = baseline_config.get("sampling", 10000)
+        bit_num = baseline_config.get("bit_num", 20)
 
         for range_file_name in range_queries:
 
@@ -206,9 +333,7 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
             execute_command(data_transfer_command)
 
-            tree_depth = baseline_config.get("tree_depth", 1)
-            sample_size = baseline_config.get("sampling", 10000)
-            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size}"
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num}"
             elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
             data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
@@ -222,12 +347,17 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             build_output_path = BMTREE_BUILD_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
                 query=file_name_prefix,
-                tree_depth=tree_depth
+                bit_num=bit_num,
+                tree_depth=tree_depth,
+                sample_size=sample_size,
             )
+
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
             with open(build_output_path, "w") as f:
                 f.write(result.stderr)
-                f.write(f"Elapsed Time: {elapsed_time_ns_learn + elapsed_time_ns_build}\n")
+                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
 
             data_file = BMTREE_OUTPUT
 
@@ -243,11 +373,16 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             range_query_output_path = BMTREE_RANGE_QUERY_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix,
-                tree_depth=tree_depth
+                bit_num=bit_num,
+                tree_depth=tree_depth,
+                sample_size=sample_size,
             )
 
             # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
             result, elapsed_time_ns_range = execute_command_with_err(command)
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
             with open(range_query_output_path, "w") as f:
                 f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
@@ -277,13 +412,17 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                     knn_query_output_path = BMTREE_KNN_QUERY_OUTPUT_PATH.format(
                         data_file_prefix=data_file_prefix,
                         range_query_prefix=file_name_prefix,
+                        bit_num=bit_num,
                         tree_depth=tree_depth,
+                        sample_size=sample_size,
                         knn_query_prefix=knn_file_name_prefix,
                         k=k
                     )
 
                     # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
                     result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                    os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
 
                     with open(knn_query_output_path, "w") as f:
                         f.write(result.stderr)
@@ -302,9 +441,6 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         cleanup_intermediate_files()
         save_remove(BMTREE_OUTPUT)
 
-def run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
-    pass
-
 def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
 
     try:
@@ -314,9 +450,9 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
             ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         data_file_prefix = data_file_name.rstrip('.csv')
 
-        page_size = baseline_config.get("page_size", None)
-        fill_factor = baseline_config.get("fill_factor", None)
-        rtree_variant = baseline_config.get("rtree_variant", None)
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 0.4)
+        rtree_variant = baseline_config.get("rtree_variant", "quadratic")
         data_file = RTREE_DATA
 
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
@@ -332,6 +468,8 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
             data_file_prefix=data_file_prefix,
             variant=rtree_variant
         )
+                
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
         with open(build_output_path, "w") as f:
             f.write(result.stderr)
@@ -354,6 +492,8 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant
             )
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
 
             # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
             result, elapsed_time_ns_range = execute_command_with_err(command)
@@ -391,6 +531,8 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
                 # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
                 result, elapsed_time_ns_knn = execute_command_with_err(command)
 
+                os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
                 with open(knn_query_output_path, "w") as f:
                     f.write(result.stderr)
                     f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
@@ -409,8 +551,114 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
         save_remove(RTREE_DATA)
 
 def run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
-    pass
+    
+    try:
+        if data_file_name.startswith("data"):
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
 
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 0.4)
+        
+        rtree_variant = baseline_config.get("rtree_variant", "rstar")
+        data_file = R_STAR_TREE_DATA
+
+        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
+        execute_command(format_data_command)
+
+        print(f"Start building rstartree ({rtree_variant}): {data_file}")
+        
+        command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant}"
+
+        result, elapsed_time_ns_build = execute_command_with_err(command)
+
+        build_output_path = R_STAR_TREE_BUILD_OUTPUT_PATH.format(
+            data_file_prefix=data_file_prefix,
+            variant=rtree_variant
+        )
+
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+        with open(build_output_path, "w") as f:
+            f.write(result.stderr)
+            f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+
+        print("Querying Rtree (Range)")
+
+        for file_name in range_queries:
+            file_name_prefix = file_name.rstrip('.csv')
+            
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                command = f"test-rtree-RTreeQuery {query_file} tree intersection > res"
+            else:
+                command = f"test-rtree-RTreeQuery {query_file} tree intersection"
+
+            range_query_output_path = R_STAR_TREE_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant
+            )
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
+            # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+            result, elapsed_time_ns_range = execute_command_with_err(command)
+            with open(range_query_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                run_exhaustive_search(data_file, query_file, query_type="range")
+
+        print("Finish range query")
+
+        print("Querying Rtree (knn)")
+
+        for file_name in knn_queries:
+
+            ks = ks_map.get(file_name)
+
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            for k in ks:
+                if RUN_EXHAUSTIVE_SEARCH:
+                    command = f"test-rtree-RTreeQuery {query_file} tree {k}NN > res"
+                else:
+                    command = f"test-rtree-RTreeQuery {query_file} tree {k}NN"
+
+                # knn_query_output_path = f"result/libspatialindex/zorder/knn/{data_file_prefix}_{file_name_prefix}_k_{k}.txt"
+                knn_query_output_path = R_STAR_TREE_KNN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    knn_query_prefix=file_name_prefix,
+                    k=k,
+                    variant=rtree_variant
+                )
+                # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+                result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
+                with open(knn_query_output_path, "w") as f:
+                    f.write(result.stderr)
+                    f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
+
+                if RUN_EXHAUSTIVE_SEARCH:
+                    run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
+
+        print("Finish knn query")
+
+    except subprocess.CalledProcessError as e:
+        print(f"fail: {e}")
+    
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files()
+        save_remove(RTREE_DATA)
 
 def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
 
@@ -422,8 +670,16 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
             ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         data_file_prefix = data_file_name.rstrip('.csv')
 
-        page_size = baseline_config.get("page_size", None)
-        fill_factor = baseline_config.get("fill_factor", None)
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 0.4)
+        epoch = baseline_config.get("epoch", 10)
+        rtree_variant = baseline_config.get("rtree_variant", "rlrtree")
+        model_path = baseline_config.get("model_path", RLRTREE_MODEL_PATH)
+
+        data_file = RLRTREE_DATA
+
+        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
+        execute_command(format_data_command)
 
         for range_file_name in range_queries:
 
@@ -439,13 +695,91 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
             # data_transfer_command = f"cp {ablosute_data_file_name} {ablosute_query_file_name}"
             # execute_command(data_transfer_command)
 
-            # tree_depth = baseline_config.get("tree_depth", 1)
-            # sample_size = baseline_config.get("sampling", 10000)
-            learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name}"
+            learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch}"
             elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
 
-            # data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
-            # execute_command(data_adapter_command)
+            command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant} {model_path}"
+            result, elapsed_time_ns_build = execute_command_with_err(command)
+
+            build_output_path = RLRTREE_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+            )
+
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+            with open(build_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+
+            print("Querying RLRtree (Range)")
+
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                command = f"test-rtree-RTreeQuery {query_file} tree intersection > res"
+            else:
+                command = f"test-rtree-RTreeQuery {query_file} tree intersection"
+
+            range_query_output_path = RLRTREE_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+            )
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
+            # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+            result, elapsed_time_ns_range = execute_command_with_err(command)
+            with open(range_query_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                run_exhaustive_search(data_file, query_file, query_type="range")
+
+            print("Finish range query")
+
+            print("Querying RLRtree (knn)")
+
+            for file_name in knn_queries:
+
+                ks = ks_map.get(file_name)
+
+                knn_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
+
+                for k in ks:
+                    if RUN_EXHAUSTIVE_SEARCH:
+                        command = f"test-rtree-RTreeQuery {query_file} tree {k}NN > res"
+                    else:
+                        command = f"test-rtree-RTreeQuery {query_file} tree {k}NN"
+
+                    # knn_query_output_path = f"result/libspatialindex/zorder/knn/{data_file_prefix}_{file_name_prefix}_k_{k}.txt"
+                    knn_query_output_path = RLRTREE_KNN_QUERY_OUTPUT_PATH.format(
+                        data_file_prefix=data_file_prefix,
+                        range_query_prefix=file_name_prefix,
+                        knn_query_prefix=knn_file_name_prefix,
+                        epoch=epoch,
+                        k=k,
+                        variant=rtree_variant
+                    )
+                    # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+                    result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                    os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
+                    with open(knn_query_output_path, "w") as f:
+                        f.write(result.stderr)
+                        f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
+
+                    if RUN_EXHAUSTIVE_SEARCH:
+                        run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
+
+            print("Finish knn query")
 
     except subprocess.CalledProcessError as e:
         print(f"fail: {e}")
@@ -464,7 +798,7 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         data_file_prefix = data_file_name.rstrip('.csv')
 
-        page_size = baseline_config.get("page_size", None)
+        page_size = baseline_config.get("page_size", 100)
         # fill_factor = baseline_config.get("fill_factor", None)
         # rtree_variant = baseline_config.get("rtree_variant", None)
         data_file = KDTREE_DATA
@@ -476,7 +810,7 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
-        command = f"test-kdtree-KDTreeBulkLoad {data_file} path tree {page_size} 1.0"  
+        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path tree {page_size} 1.0"  
 
         print(f"Start building kdtree: {command}")
 
@@ -486,6 +820,8 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         build_output_path = KDTREE_BUILD_OUTPUT_PATH.format(
             data_file_prefix=data_file_prefix
         )
+
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
         with open(build_output_path, "w") as f:
             f.write(result.stderr)
@@ -507,6 +843,8 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix
             )
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
 
             result, elapsed_time_ns_range = execute_command_with_err(command)
             with open(range_query_output_path, "w") as f:
@@ -540,6 +878,8 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                 )
                 result, elapsed_time_ns_knn = execute_command_with_err(command)
 
+                os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
                 with open(knn_query_output_path, "w") as f:
                     f.write(result.stderr)
                     f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
@@ -557,7 +897,9 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         cleanup_intermediate_files()
         save_remove(KDTREE_DATA)
 
-def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
+
+def run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
+    
     try:
         is_real_data = data_file_name.startswith("data")
         if is_real_data:
@@ -566,32 +908,237 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         data_file_prefix = data_file_name.rstrip('.csv')
 
-        page_size = baseline_config.get("page_size", None)
-        fill_factor = baseline_config.get("fill_factor", None)
+        page_size = baseline_config.get("page_size", 100)
+        data_file = KDTREE_GREEDY_DATA
+
+        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
+        execute_command(format_data_command)
 
         for range_file_name in range_queries:
 
             file_name_prefix = range_file_name.rstrip('.csv')
+
+            # if is_real_data:
+            #     ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
+            # else:
+            #     ablosute_query_file_name = f"data/real/query/{range_file_name}"
+
+            print(f"Start building greedy_kdtree: {data_file}")
             
+            # query_adapter_command = f"python tools/libspatialindex_data_adapter.py --type range --input {ablosute_query_file_name} --output {KDTREE_GREEDY_QUERY}"
+            # execute_command(query_adapter_command)
+
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} tree {page_size} 1.0"  
+
+            print(f"Start building kdtree: {command}")
+
+
+            result, elapsed_time_ns_build = execute_command_with_err(command)
+
+            build_output_path = KDTREE_GREEDY_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix
+            )
+
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+            with open(build_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+
+
+            print("Querying KDtree Greddy (Range)")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                command = f"test-kdtree-KDTreeQuery {query_file} tree intersection > res"
+            else:
+                command = f"test-kdtree-KDTreeQuery {query_file} tree intersection"
+
+            range_query_output_path = KDTREE_GREEDY_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix
+            )
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
+            result, elapsed_time_ns_range = execute_command_with_err(command)
+            with open(range_query_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                run_exhaustive_search(data_file, query_file, query_type="range")
+
+            print("Finish range query")
+
+            print("Querying KDtree Greddy (knn)")
+
+            for file_name in knn_queries:
+
+                ks = ks_map.get(file_name)
+
+                knn_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
+
+                for k in ks:
+                    if RUN_EXHAUSTIVE_SEARCH:
+                        command = f"test-kdtree-KDTreeQuery {query_file} tree {k}NN > res"
+                    else:
+                        command = f"test-kdtree-KDTreeQuery {query_file} tree {k}NN"
+
+                    knn_query_output_path = KDTREE_GREEDY_KNN_QUERY_OUTPUT_PATH.format(
+                        data_file_prefix=data_file_prefix,
+                        range_query_prefix=file_name_prefix,
+                        knn_query_prefix=knn_file_name_prefix,
+                        k=k
+                    )
+                    result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                    os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
+                    with open(knn_query_output_path, "w") as f:
+                        f.write(result.stderr)
+                        f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
+
+                    if RUN_EXHAUSTIVE_SEARCH:
+                        run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
+
+            print("Finish knn query")
+
+    except subprocess.CalledProcessError as e:
+        print(f"fail: {e}")
+    
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files()
+        save_remove(KDTREE_GREEDY_DATA)
+        # save_remove(KDTREE_GREEDY_QUERY)
+
+
+def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
+    
+    try:
+        is_real_data = data_file_name.startswith("data")
+        if is_real_data:
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
+
+        page_size = baseline_config.get("page_size", 100)
+        episode = baseline_config.get("episode", 10)
+        sampling_ratio = baseline_config.get("sampling_ratio", 0.01)
+        model_path = baseline_config.get("model_path", QDTREE_MODEL_PATH)
+        action_sampling_size = baseline_config.get("action_sampling_size", None)
+        data_file = QDTREE_DATA
+
+        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
+        execute_command(format_data_command)
+
+        for range_file_name in range_queries:
+
+            file_name_prefix = range_file_name.rstrip('.csv')
+
             if is_real_data:
                 ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
             else:
                 ablosute_query_file_name = f"data/real/query/{range_file_name}"
 
-            print("Prepare QdTree")
-            
-            # data_transfer_command = f"cp {ablosute_data_file_name} {ablosute_query_file_name}"
-            # execute_command(data_transfer_command)
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            episode = baseline_config.get("episode", 100)
-            sampling_ratio = baseline_config.get("sampling_ratio", 0.01)
-            action_sampling_size = baseline_config.get("action_sampling_size", 200)
-            
-            learn_rlrtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
-            elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
+            learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
+            elapsed_time_ns_learn = execute_command(learn_qdtree_command)
 
-            # data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
-            # execute_command(data_adapter_command)
+            print(f"Start building qdtree_kdtree: {data_file}")
+            
+            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} tree {page_size} 1.0 {model_path} {action_sampling_size}"  
+
+            print(f"Start building kdtree: {command}")
+
+            result, elapsed_time_ns_build = execute_command_with_err(command)
+
+            build_output_path = QDTREE_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                episode=episode,
+                sampling_ratio=sampling_ratio,
+                action_sampling_size=action_sampling_size,
+            )
+
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+            with open(build_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+
+            print("Querying KDtree Greddy (Range)")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                command = f"test-kdtree-KDTreeQuery {query_file} tree intersection > res"
+            else:
+                command = f"test-kdtree-KDTreeQuery {query_file} tree intersection"
+
+            range_query_output_path = QDTREE_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                episode=episode,
+                sampling_ratio=sampling_ratio,
+                action_sampling_size=action_sampling_size,
+            )
+
+            os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
+
+            result, elapsed_time_ns_range = execute_command_with_err(command)
+            with open(range_query_output_path, "w") as f:
+                f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
+
+            if RUN_EXHAUSTIVE_SEARCH:
+                run_exhaustive_search(data_file, query_file, query_type="range")
+
+            print("Finish range query")
+
+            print("Querying KDtree Greddy (knn)")
+
+            for file_name in knn_queries:
+
+                ks = ks_map.get(file_name)
+
+                knn_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
+
+                for k in ks:
+                    if RUN_EXHAUSTIVE_SEARCH:
+                        command = f"test-kdtree-KDTreeQuery {query_file} tree {k}NN > res"
+                    else:
+                        command = f"test-kdtree-KDTreeQuery {query_file} tree {k}NN"
+
+                    knn_query_output_path = QDTREE_KNN_QUERY_OUTPUT_PATH.format(
+                        data_file_prefix=data_file_prefix,
+                        range_query_prefix=file_name_prefix,
+                        knn_query_prefix=knn_file_name_prefix,
+                        episode=episode,
+                        sampling_ratio=sampling_ratio,
+                        action_sampling_size=action_sampling_size,
+                        k=k
+                    )
+                    result, elapsed_time_ns_knn = execute_command_with_err(command)
+
+                    os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
+
+                    with open(knn_query_output_path, "w") as f:
+                        f.write(result.stderr)
+                        f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
+
+                    if RUN_EXHAUSTIVE_SEARCH:
+                        run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
+
+            print("Finish knn query")
 
     except subprocess.CalledProcessError as e:
         print(f"fail: {e}")
@@ -600,9 +1147,8 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
         # clean up intermediate files
         cleanup_intermediate_files()
         save_remove(QDTREE_DATA)
+        # save_remove(QDTREE_QUERY)
 
-def run_qdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
-    pass
 
 def process_experiment(experiment):
 
@@ -781,21 +1327,21 @@ def process_experiment(experiment):
             run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
         elif baseline_name == "bmtree":
             run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-        elif baseline_name == "rtree":
-            run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-        elif baseline_name == "kdtree":
-            run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-        elif baseline_name == "rlrtree":
-            run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-        elif baseline_name == "qdtree":
-            run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-        elif baseline_name == "greedy":
-            run_qdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-        elif baseline_name == "rstar":
-            run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
         elif baseline_name == "rankspace":
             run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
-
+        elif baseline_name == "rtree":
+            run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
+        elif baseline_name == "rstar":
+            run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
+        elif baseline_name == "rlrtree":
+            run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
+        elif baseline_name == "kdtree":
+            run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
+        elif baseline_name == "kdgreedy":
+            run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
+        elif baseline_name == "qdtree":
+            run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
+       
 
 def remove_and_create_directory(directory_path):
     try:
@@ -808,7 +1354,11 @@ def main():
 
     configs = []
     if RUN_EXAMPLE:
-        configs = ["example_config.json"]
+        if RUN_ALL_BASELINE_EXAMPLE:
+            configs = ["example_config_all_baselines.json"]
+        else:
+            # configs = ["example_config.json"]
+            configs = ["verify_qdtree.json"]
     else:
         directory = CONFIG_DIR
         for root, dirs, files in os.walk(directory):

@@ -113,8 +113,8 @@ def train_model(args):
         },
         "num_workers": 1,
         "num_envs_per_worker": 1,
-        "rollout_fragment_length": 200,
-        "train_batch_size": 4000,
+        "rollout_fragment_length": 10000,
+        "train_batch_size": 10000,
         "framework": "torch",
         "lr": 5e-3,
     }
@@ -122,7 +122,7 @@ def train_model(args):
     trainer = PPOTrainer(config=config)
     for i in range(args.episode):
         result = trainer.train()
-        print(f"Iteration: {i}, reward: {result['episode_reward_mean']}")
+        print(f"Episode: {i}, reward: {result['episode_reward_mean']}")
 
         # if i % 10 == 0:
         #     checkpoint = trainer.save()

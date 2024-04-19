@@ -3,8 +3,8 @@
 sub_dir="./rl_baseline"
 
 # Check if two arguments are passed
-if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size>"
+if [ "$#" -ne 5 ]; then
+    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num>"
     exit 1
 fi
 
@@ -13,10 +13,11 @@ data_file=$1
 query_file=$2
 tree_depth=$3
 sample_size=$4
+bit_num=$5
 
 python_file="exp_opt_fast.py"
 
-train_command="python $python_file --data $data_file --query $query_file --action_depth $tree_depth --data_sample_points $sample_size"
+train_command="python $python_file --data $data_file --query $query_file --action_depth $tree_depth --data_sample_points $sample_size --bit_length $bit_num $bit_num"
 
 # Execute the training command
 cd "${sub_dir}/Learned-BMTree" 

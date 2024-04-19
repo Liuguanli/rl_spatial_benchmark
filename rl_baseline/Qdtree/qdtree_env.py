@@ -171,7 +171,7 @@ class QdtreeEnv(MultiAgentEnv):
                 # next_obs[agent_id] = np.zeros(self.observation_space.shape)  # Assuming all agents share the same observation space
                 infos[agent_id] = {}
             dones["__all__"] = True
-            # print("_, reward", _, reward)
+            # print("rewards", rewards)
             return next_obs, rewards, dones, infos
 
         node = self.node_queue[0]
