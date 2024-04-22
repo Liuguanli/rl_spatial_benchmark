@@ -53,6 +53,8 @@ echo -e "${GREEN}BMTree is installed.${NC}"
 print_sub_step $YELLOW "Step 2.2: Prepare RLRtree"
 print_sub_step $YELLOW "Step 2.3: Prepare Qd-tree"
 
+export LD_LIBRARY_PATH=/home/liuguanli/Documents/libtorch/lib:$LD_LIBRARY_PATH
+
 print_step $YELLOW "Step 3: Start Experiments"
 
 

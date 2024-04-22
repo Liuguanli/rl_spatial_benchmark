@@ -11,3 +11,7 @@ result/
 benchmark/libspatialindex/
 
 *.pyc
+
+tree.dat
+
+tree.idx

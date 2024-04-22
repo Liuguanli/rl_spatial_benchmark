@@ -1051,11 +1051,11 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
             elapsed_time_ns_learn = execute_command(learn_qdtree_command)
 
-            print(f"Start building qdtree_kdtree: {data_file}")
+            print(f"Start building qdtree: {data_file}")
             
             command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} tree {page_size} 1.0 {model_path} {action_sampling_size}"  
 
-            print(f"Start building kdtree: {command}")
+            print(f"Start building qdtree: {command}")
 
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -1076,7 +1076,7 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            print("Querying KDtree Greddy (Range)")
+            print("Querying QDtree (Range)")
 
             if RUN_EXHAUSTIVE_SEARCH:
                 command = f"test-kdtree-KDTreeQuery {query_file} tree intersection > res"
@@ -1093,6 +1093,8 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
 
             os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
 
+            print("Querying QDtree (Range)", command)
+
             result, elapsed_time_ns_range = execute_command_with_err(command)
             with open(range_query_output_path, "w") as f:
                 f.write(result.stderr)
@@ -1103,7 +1105,7 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
 
             print("Finish range query")
 
-            print("Querying KDtree Greddy (knn)")
+            print("Querying QDtree (knn)")
 
             for file_name in knn_queries:
 

@@ -124,10 +124,6 @@ def train_model(args):
         result = trainer.train()
         print(f"Episode: {i}, reward: {result['episode_reward_mean']}")
 
-        # if i % 10 == 0:
-        #     checkpoint = trainer.save()
-        #     print(f"Checkpoint saved at {checkpoint}")
-
     save_model(trainer, args)
 
 if __name__ == "__main__":
