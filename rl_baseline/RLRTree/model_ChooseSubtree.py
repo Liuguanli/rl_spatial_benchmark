@@ -8,6 +8,8 @@ from torch.autograd import Variable
 
 import hashlib
 
+import logging
+
 import random
 from random import randint
 import math
@@ -22,6 +24,16 @@ import csv
 
 random.seed(42)
 
+logger = logging.getLogger('rlrtree_choosesubtree')
+logger.setLevel(logging.DEBUG) 
+
+file_handler = logging.FileHandler('rlrtree_choosesubtree.log', mode='a')
+file_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
 
 from RTree import RTree
 
@@ -67,6 +79,7 @@ parser.add_argument('-reference_tree_type', choices=['rtree', 'rrstar'], help='w
 
 # NEW ADDED above the original RLRTree
 parser.add_argument('-dataset_filename', help='data set', required=True, default='')
+parser.add_argument('-sample_size', help='the number of sampled data points that used to train model', type=int, required=False, default=10000)
 parser.add_argument('-queryset_filename', help='query set', required=True, default='')
 
 # one_layer_nn and Agent are for insertion
@@ -991,10 +1004,16 @@ class SplitLearner:
 #               spl_learner.Initialize(args)
 #               spl_learner.Test10_2()
 
+
 if __name__ == '__main__':
+
         args = parser.parse_args()
         torch.manual_seed(0)
         np.random.seed(0)
+
+        logger.info("--------------------------------")
+        logger.info("args:", args)
+        logger.info("--------------------------------")
         
         # init agent
         action_space_size = int(args.action_space_size)
@@ -1104,7 +1123,10 @@ if __name__ == '__main__':
                         model_dataset.append([float(item) for item in row])
                         model_dataset[-1].extend(model_dataset[-1])
 
-        training_dataset = model_dataset
+        if len(model_dataset) > args.sample_size:
+                training_dataset = random.sample(model_dataset, args.sample_size)
+        else:
+                training_dataset = model_dataset 
 
         query_rectangles = []
         with open(args.queryset_filename, newline='') as csvfile:
@@ -1145,7 +1167,7 @@ if __name__ == '__main__':
                                 reference_tree.DirectRRInsert(insert_obj)
                                 reference_tree.DirectRRSplit()
                                 #print('inserted into ref tree')
-
+training
                             tree.PrepareRectangle(insert_obj[0], insert_obj[1] ,insert_obj[2] ,insert_obj[3]) # set the ptr to the root
                             states = tree.RetrieveSortedInsertStates(action_space_size, RL_method) # states for insertion
                             # states = tree.RetrieveSpecialInsertStates4()
@@ -1207,10 +1229,10 @@ if __name__ == '__main__':
                                                     ind = ind + 1
                                                     # count_steps_diff = count_steps_diff * mcdr
                                                     
-                                #     print("Epoch number:" + "" + str(epo))
-                                #     print(i+1)
-                                #     print(avg_access_rate/(rf))
-                                #     print("")
+                                    logger.info("Epoch number:" + "" + str(epo))
+                                    logger.info(i+1)
+                                    logger.info(avg_access_rate/(rf))
+                                    logger.info("")
 
                                     brain.learn()
                                     brain.state_action_pairs = []
@@ -1234,8 +1256,8 @@ if __name__ == '__main__':
         #     torch.save(brain_final.Q_eval.state_dict(), 'choose_subtree.pth')
             # print("model saved!")
 
-        print(str(args.training_set_size))
-        print("Model training time: ", time.time() - start_time)
+        logger.info(str(args.training_set_size))
+        logger.info("Model training time: ", time.time() - start_time)
 
 
         # COMMENT TESTING

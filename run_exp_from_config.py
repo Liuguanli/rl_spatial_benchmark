@@ -4,6 +4,8 @@ import os
 import time
 import shutil
 
+import logging
+
 from constants import *
 
 def execute_command(command):
@@ -12,7 +14,7 @@ def execute_command(command):
     try:
         subprocess.run(command, check=True, shell=True)
     except subprocess.CalledProcessError as e:
-        print(f"Command failed: {e}")
+        logging.error(f"Command failed: {e}")
 
     end_time_ns = time.perf_counter_ns()
 
@@ -24,7 +26,7 @@ def execute_command_with_err(command):
     try:
         retult = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
     except subprocess.CalledProcessError as e:
-        print(f"Command failed: {e}")
+        logging.error(f"Command failed: {e}")
         retult = None
 
     end_time_ns = time.perf_counter_ns()
@@ -57,25 +59,25 @@ def run_exhaustive_search(data_file, query_file, query_type="range", k=None):
         with open(query_file, 'r') as queries:
             t_file.write(queries.read())
 
-    print(f"Running exhaustive search: {query_type}")
+    logging.info(f"Running exhaustive search: {query_type}")
     if query_type == "range":
         subprocess.run("test-rtree-Exhaustive .t intersection > res2", shell=True, check=True)
     else:
         if k:
             subprocess.run(f"test-rtree-Exhaustive .t {k}NN > res2", shell=True, check=True)
 
-    print("Comparing results")
+    logging.info("Comparing results")
     subprocess.run("sort -n res > a", shell=True)
     subprocess.run("sort -n res2 > b", shell=True)
 
     diff_result = subprocess.run("diff a b", shell=True)
     if diff_result.returncode == 0:
-        print("Same results with exhaustive search. Everything seems fine.")
+        logging.info("Same results with exhaustive search. Everything seems fine.")
     else:
-        print("PROBLEM! We got different results from exhaustive search!")
+        logging.info("PROBLEM! We got different results from exhaustive search!")
 
     wc_result = subprocess.run("wc -l a", shell=True, capture_output=True, text=True)
-    print(f"Results: {wc_result.stdout}")
+    logging.info(f"Results: {wc_result.stdout}")
 
 def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_config):
     try:
@@ -98,7 +100,7 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {Z_ORDER_OUTPUT} --output {data_file}"
         execute_command(format_data_command)
 
-        print(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
+        logging.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
         command = f"test-rtree-SFCRTreeBulkLoad {data_file} tree {page_size} {fill_factor}"
 
@@ -115,7 +117,7 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             f.write(result.stderr)
             f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
 
-        print("Querying SFC Rtree (Range)")
+        logging.info("Querying SFC Rtree (Range)")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -145,9 +147,9 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-        print("Finish range query")
+        logging.info("Finish range query")
 
-        print("Querying SFC Rtree (knn)")
+        logging.info("Querying SFC Rtree (knn)")
 
         for file_name in knn_queries:
 
@@ -181,10 +183,10 @@ def run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                 if RUN_EXHAUSTIVE_SEARCH:
                     run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-        print("Finish knn query")
+        logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -211,7 +213,7 @@ def run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_c
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file}"
         execute_command(format_data_command)
 
-        print(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
+        logging.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
         command = f"test-rtree-SFCRTreeBulkLoad {data_file} tree {page_size} {fill_factor}"
 
@@ -228,7 +230,7 @@ def run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             f.write(result.stderr)
             f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
 
-        print("Querying SFC Rtree (Range)")
+        logging.info("Querying SFC Rtree (Range)")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -258,9 +260,9 @@ def run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-        print("Finish range query")
+        logging.info("Finish range query")
 
-        print("Querying SFC Rtree (knn)")
+        logging.info("Querying SFC Rtree (knn)")
 
         for file_name in knn_queries:
 
@@ -294,10 +296,10 @@ def run_rankspace(data_file_name, range_queries, knn_queries, ks_map, baseline_c
                 if RUN_EXHAUSTIVE_SEARCH:
                     run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-        print("Finish knn query")
+        logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -328,7 +330,7 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             else:
                 ablosute_query_file_name = f"data/real/query/{range_file_name}"
 
-            print("Prepare BMTree")
+            logging.info("Prepare BMTree")
             
             data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
             execute_command(data_transfer_command)
@@ -361,7 +363,7 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
 
             data_file = BMTREE_OUTPUT
 
-            print("Start range query")
+            logging.info("Start range query")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
             
@@ -390,15 +392,15 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-            print("Finish range query")
+            logging.info("Finish range query")
 
-            print("Start knn query")
+            logging.info("Start knn query")
 
             for knn_file_name in knn_queries:
 
                 ks = ks_map.get(knn_file_name)
 
-                print("ks: ", ks)
+                logging.info("ks: ", ks)
 
                 knn_file_name_prefix = knn_file_name.rstrip('.csv')
                 knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
@@ -431,10 +433,10 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                     if RUN_EXHAUSTIVE_SEARCH:
                         run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-            print("Finish knn query")
+            logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -458,7 +460,7 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
         execute_command(format_data_command)
 
-        print(f"Start building rtree ({rtree_variant}): {data_file}")
+        logging.info(f"Start building rtree ({rtree_variant}): {data_file}")
         
         command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant}"
 
@@ -475,7 +477,7 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
             f.write(result.stderr)
             f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
 
-        print("Querying Rtree (Range)")
+        logging.info("Querying Rtree (Range)")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -504,9 +506,9 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-        print("Finish range query")
+        logging.info("Finish range query")
 
-        print("Querying Rtree (knn)")
+        logging.info("Querying Rtree (knn)")
 
         for file_name in knn_queries:
 
@@ -540,10 +542,10 @@ def run_rtree(data_file_name, range_queries, knn_queries, ks_map, baseline_confi
                 if RUN_EXHAUSTIVE_SEARCH:
                     run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-        print("Finish knn query")
+        logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -568,7 +570,7 @@ def run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_c
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
         execute_command(format_data_command)
 
-        print(f"Start building rstartree ({rtree_variant}): {data_file}")
+        logging.info(f"Start building rstartree ({rtree_variant}): {data_file}")
         
         command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant}"
 
@@ -585,7 +587,7 @@ def run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             f.write(result.stderr)
             f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
 
-        print("Querying Rtree (Range)")
+        logging.info("Querying Rtree (Range)")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -614,9 +616,9 @@ def run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-        print("Finish range query")
+        logging.info("Finish range query")
 
-        print("Querying Rtree (knn)")
+        logging.info("Querying Rtree (knn)")
 
         for file_name in knn_queries:
 
@@ -650,10 +652,10 @@ def run_rstartree(data_file_name, range_queries, knn_queries, ks_map, baseline_c
                 if RUN_EXHAUSTIVE_SEARCH:
                     run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-        print("Finish knn query")
+        logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -674,6 +676,7 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
         fill_factor = baseline_config.get("fill_factor", 0.4)
         epoch = baseline_config.get("epoch", 10)
         rtree_variant = baseline_config.get("rtree_variant", "rlrtree")
+        sample_size = baseline_config.get("sample_size", 10000)
         model_path = baseline_config.get("model_path", RLRTREE_MODEL_PATH)
 
         data_file = RLRTREE_DATA
@@ -690,12 +693,12 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
             else:
                 ablosute_query_file_name = f"data/real/query/{range_file_name}"
 
-            print("Prepare RLRTree")
+            logging.info("Prepare RLRTree")
             
             # data_transfer_command = f"cp {ablosute_data_file_name} {ablosute_query_file_name}"
             # execute_command(data_transfer_command)
 
-            learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch}"
+            learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch} {sample_size}"
             elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
 
             command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant} {model_path}"
@@ -714,7 +717,7 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
                 f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                 f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
 
-            print("Querying RLRtree (Range)")
+            logging.info("Querying RLRtree (Range)")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
@@ -741,9 +744,9 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-            print("Finish range query")
+            logging.info("Finish range query")
 
-            print("Querying RLRtree (knn)")
+            logging.info("Querying RLRtree (knn)")
 
             for file_name in knn_queries:
 
@@ -779,10 +782,10 @@ def run_rlrtree(data_file_name, range_queries, knn_queries, ks_map, baseline_con
                     if RUN_EXHAUSTIVE_SEARCH:
                         run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-            print("Finish knn query")
+            logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -806,13 +809,13 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
         execute_command(format_data_command)
 
-        print(f"Start building kdtree: {data_file}")
+        logging.info(f"Start building kdtree: {data_file}")
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
         command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path tree {page_size} 1.0"  
 
-        print(f"Start building kdtree: {command}")
+        logging.info(f"Start building kdtree: {command}")
 
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
@@ -827,7 +830,7 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             f.write(result.stderr)
             f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
 
-        print("Querying KDtree (Range)")
+        logging.info("Querying KDtree (Range)")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -854,9 +857,9 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-        print("Finish range query")
+        logging.info("Finish range query")
 
-        print("Querying KDtree (knn)")
+        logging.info("Querying KDtree (knn)")
 
         for file_name in knn_queries:
 
@@ -887,10 +890,10 @@ def run_kdtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
                 if RUN_EXHAUSTIVE_SEARCH:
                     run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-        print("Finish knn query")
+        logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -923,7 +926,7 @@ def run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseli
             # else:
             #     ablosute_query_file_name = f"data/real/query/{range_file_name}"
 
-            print(f"Start building greedy_kdtree: {data_file}")
+            logging.info(f"Start building greedy_kdtree: {data_file}")
             
             # query_adapter_command = f"python tools/libspatialindex_data_adapter.py --type range --input {ablosute_query_file_name} --output {KDTREE_GREEDY_QUERY}"
             # execute_command(query_adapter_command)
@@ -932,7 +935,7 @@ def run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseli
 
             command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} tree {page_size} 1.0"  
 
-            print(f"Start building kdtree: {command}")
+            logging.info(f"Start building kdtree: {command}")
 
 
             result, elapsed_time_ns_build = execute_command_with_err(command)
@@ -949,7 +952,7 @@ def run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseli
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
 
 
-            print("Querying KDtree Greddy (Range)")
+            logging.info("Querying KDtree Greddy (Range)")
 
             if RUN_EXHAUSTIVE_SEARCH:
                 command = f"test-kdtree-KDTreeQuery {query_file} tree intersection > res"
@@ -971,9 +974,9 @@ def run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseli
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-            print("Finish range query")
+            logging.info("Finish range query")
 
-            print("Querying KDtree Greddy (knn)")
+            logging.info("Querying KDtree Greddy (knn)")
 
             for file_name in knn_queries:
 
@@ -1005,10 +1008,10 @@ def run_kdtree_greedy(data_file_name, range_queries, knn_queries, ks_map, baseli
                     if RUN_EXHAUSTIVE_SEARCH:
                         run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-            print("Finish knn query")
+            logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.info(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -1051,11 +1054,11 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
             elapsed_time_ns_learn = execute_command(learn_qdtree_command)
 
-            print(f"Start building qdtree: {data_file}")
+            logging.info(f"Start building qdtree: {data_file}")
             
             command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} tree {page_size} 1.0 {model_path} {action_sampling_size}"  
 
-            print(f"Start building qdtree: {command}")
+            logging.info(f"Start building qdtree: {command}")
 
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -1076,7 +1079,7 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            print("Querying QDtree (Range)")
+            logging.info("Querying QDtree (Range)")
 
             if RUN_EXHAUSTIVE_SEARCH:
                 command = f"test-kdtree-KDTreeQuery {query_file} tree intersection > res"
@@ -1093,7 +1096,7 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
 
             os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
 
-            print("Querying QDtree (Range)", command)
+            logging.info("Querying QDtree (Range)", command)
 
             result, elapsed_time_ns_range = execute_command_with_err(command)
             with open(range_query_output_path, "w") as f:
@@ -1103,9 +1106,9 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
             if RUN_EXHAUSTIVE_SEARCH:
                 run_exhaustive_search(data_file, query_file, query_type="range")
 
-            print("Finish range query")
+            logging.info("Finish range query")
 
-            print("Querying QDtree (knn)")
+            logging.info("Querying QDtree (knn)")
 
             for file_name in knn_queries:
 
@@ -1140,10 +1143,10 @@ def run_qdtree_rl(data_file_name, range_queries, knn_queries, ks_map, baseline_c
                     if RUN_EXHAUSTIVE_SEARCH:
                         run_exhaustive_search(data_file, query_file, query_type="knn", k=k)
 
-            print("Finish knn query")
+            logging.info("Finish knn query")
 
     except subprocess.CalledProcessError as e:
-        print(f"fail: {e}")
+        logging.error(f"fail: {e}")
     
     finally:
         # clean up intermediate files
@@ -1165,14 +1168,25 @@ def process_experiment(experiment):
     data_bounds = experiment['data'].get('bounds', [[]])
     data_bounds_params = ' '.join([f"--range {' '.join(map(str, bound))}" for bound in data_bounds])
 
+    logging.info(f"data distribution: {data_distribution}")
+
+    is_real_data = True
+
     if data_distribution in ["uniform", "normal", "skewed"]:
+
+        is_real_data = False
+
         data_file_name = SYNTHETIC_DATA_FILENAME_TEMPLATE.format(
             size=data_size,
             dimensions=data_dimensions,
             distribution=data_distribution,
             skewness=data_skewness
         )
+
         data_command = f"python tools/synthetic_data_generator.py --size {data_size} --dimensions {data_dimensions} --distribution {data_distribution} --skewness {data_skewness} {data_bounds_params}"
+
+        logging.info(data_command)
+
         execute_command(data_command)
 
         # Queries Section
@@ -1205,7 +1219,7 @@ def process_experiment(experiment):
                     range_queries.append(file_name)
                                     
                     if os.path.exists(os.path.join(SYNTHETIC_QUERY_PATH, file_name)):
-                        print(f"File {file_name} already exists. Skipping command execution.")
+                        logging.info(f"File {file_name} already exists. Skipping command execution.")
                     else:
                         query_command = f"python tools/synthetic_query_generator.py --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness} {query_bounds_params} --query_range {query_range_params}"
                         execute_command(query_command)
@@ -1225,7 +1239,7 @@ def process_experiment(experiment):
                 ks_map[file_name] = ks
 
                 if os.path.exists(os.path.join(SYNTHETIC_QUERY_PATH, file_name)):
-                    print(f"File {file_name} already exists. Skipping command execution.")
+                    logging.info(f"File {file_name} already exists. Skipping command execution.")
                 else:
                     query_command = f"python tools/synthetic_query_generator.py --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness} {query_bounds_params}"
                     execute_command(query_command)
@@ -1272,7 +1286,7 @@ def process_experiment(experiment):
                     range_queries.append(file_name)
 
                     if os.path.exists(os.path.join(REAL_QUERY_PATH, file_name)):
-                        print(f"File {file_name} already exists. Skipping command execution.")
+                        logging.info(f"File {file_name} already exists. Skipping command execution.")
                     else:
                         query_command = f"python tools/real_query_generator.py --data {absolute_data_file_name} --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness} --query_range {query_range_params}"
                         execute_command(query_command)
@@ -1293,29 +1307,31 @@ def process_experiment(experiment):
                 ks_map[file_name] = ks
 
                 if os.path.exists(os.path.join(REAL_QUERY_PATH, file_name)):
-                    print(f"File {file_name} already exists. Skipping command execution.")
+                    logging.info(f"File {file_name} already exists. Skipping command execution.")
                 else:
                     query_command = f"python tools/real_query_generator.py --data {absolute_data_file_name} --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness}"
                     execute_command(query_command)
 
-        # print(range_queries)
+    query_path = REAL_QUERY_PATH if is_real_data else SYNTHETIC_QUERY_PATH
 
     for file_name in range_queries:
         file_name_prefix = file_name.rstrip('.csv')
-        file_name = os.path.join(REAL_QUERY_PATH, file_name)
+        file_name = os.path.join(query_path, file_name)
+
+        logging.info(f"File: {file_name}")
         
         if os.path.exists(os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)):
-            print(f"File {file_name_prefix} already exists. Skipping command execution.")
+            logging.info(f"File {file_name_prefix} already exists. Skipping command execution.")
         else:
             format_query_command = f"python tools/libspatialindex_data_adapter.py --type range_query --input {file_name} --output {BENCHMARK_LIBSPATIALINDEX}/{file_name_prefix}"
             execute_command(format_query_command)
 
     for file_name in knn_queries:
         file_name_prefix = file_name.rstrip('.csv')
-        file_name = os.path.join(REAL_QUERY_PATH, file_name)
+        file_name = os.path.join(query_path, file_name)
 
         if os.path.exists(os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)):
-            print(f"File {file_name_prefix} already exists. Skipping command execution.")
+            logging.info(f"File {file_name_prefix} already exists. Skipping command execution.")
         else:
             format_query_command = f"python tools/libspatialindex_data_adapter.py --type knn_query --input {file_name} --output {BENCHMARK_LIBSPATIALINDEX}/{file_name_prefix}"
             execute_command(format_query_command)
@@ -1325,6 +1341,10 @@ def process_experiment(experiment):
         baseline_name = baseline['name']
         # config of a specific baseline
         baseline_config = baseline["config"]
+
+        logging.info(f"-----------------Baseline name: {baseline_name}-----------------")
+        logging.info(f"-----------------Baseline config: {baseline_config}-----------------")
+
         if baseline_name == "zorder":
             run_zorder(data_file_name, range_queries, knn_queries, ks_map, baseline_config)
         elif baseline_name == "bmtree":
@@ -1363,7 +1383,10 @@ def main():
             configs = ["verify_qdtree.json"]
     else:
         directory = CONFIG_DIR
+        candidates = ["overall"]
         for root, dirs, files in os.walk(directory):
+            if root.split("/")[-1] not in candidates:
+                continue
             for file in files:
                 if file.endswith(".json"):
                     config_file_path = os.path.join(root, file)
@@ -1374,20 +1397,25 @@ def main():
     for config_file_path in configs:
         with open(config_file_path, "r") as json_file:
             config = json.load(json_file)
-    
-        print(f"-----------------Run config {config_file_path}-----------------")
+
+        logging.basicConfig(level=LOG_LEVEL,
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    filename=f'./log/{config_file_path.rsplit(".", 1)[0].replace("/", "_")}.log',
+                    filemode='w')
+        
+        logging.info(f"-----------------Run config {config_file_path}-----------------")
 
         for experiment in config['experiments']:
             counter += 1
-            print(f"-----------------Processing experiment #{counter}-----------------")
+            logging.info(f"-----------------Processing experiment #{counter}-----------------")
             process_experiment(experiment)
-            print(f"-----------------Finish experiment #{counter}-----------------")
+            logging.info(f"-----------------Finish experiment #{counter}-----------------")
 
             if SAVE_SPACE:
                 remove_and_create_directory(SYNTHETIC_PATH)
                 remove_and_create_directory(BENCHMARK_LIBSPATIALINDEX)
 
-        print(f"-----------------Finish config {config_file_path}-----------------")
+        logging.info(f"-----------------Finish config {config_file_path}-----------------")
         
 
 if __name__ == "__main__":

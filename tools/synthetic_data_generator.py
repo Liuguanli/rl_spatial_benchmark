@@ -42,7 +42,7 @@ def save_to_csv(data, file_path):
     data = np.round(data, 6)
     df = pd.DataFrame(data)
     df.to_csv(file_path, index=False, header=False)
-    print(f"Data saved to {file_path}")
+    # print(f"Data saved to {file_path}")
 
 def main():
     parser = argparse.ArgumentParser(description="Generate synthetic data.")

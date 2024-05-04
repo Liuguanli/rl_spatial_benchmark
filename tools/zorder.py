@@ -102,7 +102,7 @@ def main():
         raise FileNotFoundError(f"Input file {args.input_file} does not exist.")
     
     process_file(args.input_file, args.output_file, args.bits)
-    print(f"Processed {args.input_file} and saved sorted data to {args.output_file}.")
+    # print(f"Processed {args.input_file} and saved sorted data to {args.output_file}.")
 
 if __name__ == "__main__":
     main()

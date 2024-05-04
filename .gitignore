@@ -1,6 +1,6 @@
 
 
-rl_baseline/Learned-BMtree_/
+rl_baseline/Learned-BMtree/
 
 TODO.md
 
@@ -15,3 +15,7 @@ benchmark/libspatialindex/
 tree.dat
 
 tree.idx
+
+log/
+
+*.csv

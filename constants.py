@@ -2,7 +2,7 @@
 
 SEED = 42
 
-
+LOG_LEVEL = "DEBUG"  #DEBUG, WARNING, INFO, ERROR, CRITICAL
 
 CONFIG_DIR = "exp_config"
 
@@ -15,7 +15,7 @@ REAL_QUERY_PATH = "data/real/query"
 # use this flag to remove generated files if space is limited
 SAVE_SPACE = False
 RUN_EXHAUSTIVE_SEARCH = False  # TODO uncomment the printing code first in e.g., libspatialindex/test/rtree/RTreeQuery.cc line 77
-RUN_EXAMPLE = True
+RUN_EXAMPLE = False
 RUN_ALL_BASELINE_EXAMPLE = False
 
 BENCHMARK_LIBSPATIALINDEX = "benchmark/libspatialindex"

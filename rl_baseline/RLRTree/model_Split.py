@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 import hashlib
+import logging
 
 import random
 from random import randint
@@ -13,6 +14,17 @@ from collections import namedtuple
 import time
 from datetime import datetime
 import csv
+
+logger = logging.getLogger('rlrtree_split')
+logger.setLevel(logging.DEBUG) 
+
+file_handler = logging.FileHandler('rlrtree_split.log', mode='a')
+file_handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
 
 from RTree import RTree
 
@@ -52,6 +64,7 @@ parser.add_argument('-training_set_size', type=int, help='training set size', de
 
 # NEW ADDED above the original RLRTree
 parser.add_argument('-dataset_filename', help='data set distribution', required=True, default='')
+parser.add_argument('-sample_size', help='the number of sampled data points that used to train model', type=int, required=False, default=10000)
 parser.add_argument('-queryset_filename', help='data set distribution', required=True, default='')
 
 class DQN(nn.Module):
@@ -1103,9 +1116,9 @@ class SplitLearner:
                 accum_loss = 0
                 accum_loss_cnt = 0
                 # split_trange = trange(objects_for_train, desc="Training", leave=False)
-                # print("No. of obj to train: ", objects_for_train)
+                logger.info("No. of obj to train: ", objects_for_train)
                 for training_id in range(objects_for_train):
-                    # print(["Epoch", epoch, "Parts", part, "Training obj ID", training_id, "Total training obj", objects_for_train])
+                    logger.info(["Epoch", epoch, "Parts", part, "Training obj ID", training_id, "Total training obj", objects_for_train])
                     # line = fin.readline()
                     # object_boundary = [float(v) for v in line.strip().split()]
                     self.reference_tree.DefaultInsert(train_obj[training_id])
@@ -1154,7 +1167,7 @@ class SplitLearner:
 
                     if period == self.config.splits_for_update:
                         reward = self.ComputeDenseRewardForList(obj_list_for_reward)
-                        # reward_log.write('{}\n'.format(reward))
+                        # logger.info.write('{}\n'.format(reward))
                         for i in range(len(steps) - 1):
                             if steps[i][1] is None:
                                 continue
@@ -1196,18 +1209,21 @@ class SplitLearner:
         # reward_log.close()
         # loss_log.close()
         # train_log = open('./log/train.log', 'a')
-        # train_log.write('{}:\n'.format(datetime.now()))
-        # train_log.write('{}\n'.format(self.id))
-        # train_log.write('{}\n'.format(self.config))
-        # train_log.write('training time: {}\n'.format(end_time-start_time))
-        #train_log.write('zero reward: {}, zero reward2: {}\n'.format(reward_is_0, reward2_is_0))
-        # train_log.close()
+        logger.info('{}:\n'.format(datetime.now()))
+        logger.info('{}\n'.format(self.id))
+        logger.info('{}\n'.format(self.config))
+        logger.info('training time: {}\n'.format(end_time-start_time))
         self.tree.Clear()
         self.reference_tree.Clear()
         cache_tree.Clear()
 
 if __name__ == '__main__':
     args = parser.parse_args()
+
+    logger.info("--------------------------------")
+    logger.info("args:", args)
+    logger.info("--------------------------------")
+
     # if args.data_distribution == 'uniform':
     #     open_data_file = "uniform_dataset.txt"
     #     x_max = 100000
@@ -1246,6 +1262,11 @@ if __name__ == '__main__':
         for row in reader:
                 model_dataset.append([float(item) for item in row])
                 model_dataset[-1].extend(model_dataset[-1])
+
+    if len(model_dataset) > args.sample_size:
+            training_dataset = random.sample(model_dataset, args.sample_size)
+    else:
+            training_dataset = model_dataset 
 
     training_dataset = model_dataset
 

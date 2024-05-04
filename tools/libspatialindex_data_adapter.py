@@ -2,7 +2,6 @@ import pandas as pd
 import argparse
 
 def transform_data(input_file, output_file, is_scaled):
-    print("Transforming data...",  input_file, " is_scaled: ", is_scaled)
     df = pd.read_csv(input_file, header=None)
 
     scaler = 1000000 if is_scaled else 1
@@ -23,7 +22,7 @@ def transform_data(input_file, output_file, is_scaled):
     transformed_df.to_csv(output_file, sep=' ', index=False, header=False)
 
 def transform_range_query(input_file, output_file):
-    print("Transforming range query...")
+    # print("Transforming range query...")
     df = pd.read_csv(input_file, header=None)
 
     transformed_df = pd.DataFrame({
@@ -38,7 +37,7 @@ def transform_range_query(input_file, output_file):
     transformed_df.to_csv(output_file, sep=' ', index=False, header=False)
 
 def transform_knn_query(input_file, output_file):
-    print("Transforming knn query...")
+    # print("Transforming knn query...")
     df = pd.read_csv(input_file, header=None)
 
     transformed_df = pd.DataFrame({
