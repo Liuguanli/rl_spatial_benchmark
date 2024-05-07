@@ -1012,7 +1012,7 @@ if __name__ == '__main__':
         np.random.seed(0)
 
         logger.info("--------------------------------")
-        logger.info("args:", args)
+        logger.info(f"args: {args}")
         logger.info("--------------------------------")
         
         # init agent
@@ -1124,9 +1124,8 @@ if __name__ == '__main__':
                         model_dataset[-1].extend(model_dataset[-1])
 
         if len(model_dataset) > args.sample_size:
-                training_dataset = random.sample(model_dataset, args.sample_size)
-        else:
-                training_dataset = model_dataset 
+                model_dataset = random.sample(model_dataset, args.sample_size)
+        training_dataset = model_dataset 
 
         query_rectangles = []
         with open(args.queryset_filename, newline='') as csvfile:
@@ -1167,7 +1166,6 @@ if __name__ == '__main__':
                                 reference_tree.DirectRRInsert(insert_obj)
                                 reference_tree.DirectRRSplit()
                                 #print('inserted into ref tree')
-training
                             tree.PrepareRectangle(insert_obj[0], insert_obj[1] ,insert_obj[2] ,insert_obj[3]) # set the ptr to the root
                             states = tree.RetrieveSortedInsertStates(action_space_size, RL_method) # states for insertion
                             # states = tree.RetrieveSpecialInsertStates4()
@@ -1257,7 +1255,7 @@ training
             # print("model saved!")
 
         logger.info(str(args.training_set_size))
-        logger.info("Model training time: ", time.time() - start_time)
+        logger.info(f"Model training time: {time.time() - start_time}")
 
 
         # COMMENT TESTING
@@ -1507,7 +1505,7 @@ training
 
 #                 tree_access = tree.Query((x - side, x + side, y - side, y + side))
 #                 reference_tree_access = reference_tree.Query((x - side, x + side, y - side, y + side))
-#                 tree_acc_no = tree_acc_no + tree_access
+#                 tree_acc_no = tree_acc_no + tree_accessargs
 #                 ref_tree_acc_no = ref_tree_acc_no + reference_tree_access
 
 #                 if tree_access <= reference_tree_access:

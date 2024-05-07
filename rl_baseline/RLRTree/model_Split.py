@@ -1116,9 +1116,9 @@ class SplitLearner:
                 accum_loss = 0
                 accum_loss_cnt = 0
                 # split_trange = trange(objects_for_train, desc="Training", leave=False)
-                logger.info("No. of obj to train: ", objects_for_train)
+                logger.info(f"No. of obj to train: {objects_for_train}")
                 for training_id in range(objects_for_train):
-                    logger.info(["Epoch", epoch, "Parts", part, "Training obj ID", training_id, "Total training obj", objects_for_train])
+                    logger.info(f"Epoch {epoch} Parts {part} Training obj ID {training_id} Total training obj {objects_for_train}")
                     # line = fin.readline()
                     # object_boundary = [float(v) for v in line.strip().split()]
                     self.reference_tree.DefaultInsert(train_obj[training_id])
@@ -1221,7 +1221,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     logger.info("--------------------------------")
-    logger.info("args:", args)
+    logger.info(f"args: {args}")
     logger.info("--------------------------------")
 
     # if args.data_distribution == 'uniform':
@@ -1264,11 +1264,8 @@ if __name__ == '__main__':
                 model_dataset[-1].extend(model_dataset[-1])
 
     if len(model_dataset) > args.sample_size:
-            training_dataset = random.sample(model_dataset, args.sample_size)
-    else:
-            training_dataset = model_dataset 
-
-    training_dataset = model_dataset
+            model_dataset = random.sample(model_dataset, args.sample_size)
+    training_dataset = model_dataset 
 
     # if args.data_distribution in ['uniform','skew','gaussian']:
     #     with open(open_data_file) as input_file:

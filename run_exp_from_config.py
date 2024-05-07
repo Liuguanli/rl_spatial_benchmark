@@ -400,7 +400,7 @@ def run_bmtree(data_file_name, range_queries, knn_queries, ks_map, baseline_conf
 
                 ks = ks_map.get(knn_file_name)
 
-                logging.info("ks: ", ks)
+                logging.info(f"ks: {ks}")
 
                 knn_file_name_prefix = knn_file_name.rstrip('.csv')
                 knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
