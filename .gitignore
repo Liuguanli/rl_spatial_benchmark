@@ -11,12 +11,13 @@ result/
 benchmark/libspatialindex/
 benchmark/model/
 
+log/
+
 *.pyc
 
 tree.dat
 
 tree.idx
 
-log/
 
 *.csv
