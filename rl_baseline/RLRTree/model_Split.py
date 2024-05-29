@@ -18,7 +18,7 @@ import csv
 logger = logging.getLogger('rlrtree_split')
 logger.setLevel(logging.DEBUG) 
 
-file_handler = logging.FileHandler('rlrtree_split.log', mode='a')
+file_handler = logging.FileHandler('./log/rlrtree_split.log', mode='w')
 file_handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1037,7 +1037,7 @@ class SplitLearner:
                 # fin.close()
             # torch.save(self.network.state_dict(), "./model/"+self.config.model_name+'.epoch{}'.format(epoch) + '.pth')
         end_time = time.time()
-        torch.save(self.network.state_dict(), 'split.pth')
+        torch.save(self.network.state_dict(), './benchmark/model/split.pth')
         # reward_log.close()
         # loss_log.close()
         # train_log = open('./log/train.log', 'a')
@@ -1204,7 +1204,7 @@ class SplitLearner:
 
         traced_script_module = torch.jit.trace(self.network, example)
 
-        traced_script_module.save("split.pth")
+        traced_script_module.save("./benchmark/model/split.pth")
         # print(self.network.state_dict())
         # reward_log.close()
         # loss_log.close()

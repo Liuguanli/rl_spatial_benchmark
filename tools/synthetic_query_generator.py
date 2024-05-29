@@ -68,6 +68,77 @@ def generate_knn_queries(n_queries, dimensions, distribution, bounds, skewness=N
 
     return queries
 
+def generate_point_queries(n_queries, data_file_name, dimensions, distribution, skewness=None):
+    df = pd.read_csv(os.path.join(SYNTHETIC_DATA_PATH, data_file_name), header=None)
+        # Generate query centers based on the specified distribution.
+    if distribution == 'uniform':
+        # Randomly sample n_queries points from the dataframe to serve as query centers.
+        sample_indices = np.random.choice(df.index, size=n_queries, replace=False)
+        points = df.iloc[sample_indices].values
+    elif distribution == 'normal':
+        # Calculate the mean and standard deviation for each dimension in the dataframe.
+        mean = df.mean().values
+        std = df.std().values
+        # Generate query centers with a normal distribution based on the calculated mean and std.
+        points = np.random.normal(loc=mean, scale=std, size=(n_queries, dimensions))
+    elif distribution == 'skewed' and skewness is not None:
+        # Apply skewness transformation to the dataframe.
+        skewed_data = df ** skewness
+        # Randomly sample n_queries points from the skewed dataframe to serve as query centers.
+        sample_indices = np.random.choice(skewed_data.index, size=n_queries, replace=False)
+        points = skewed_data.iloc[sample_indices].values
+    else:
+        # Raise an error if the distribution type is unsupported.
+        raise ValueError("Unsupported distribution type")
+    
+    return points
+
+def generate_insertions(n_queries, dimensions, distribution, bounds, skewness=None):
+    if distribution == 'uniform':
+        queries = np.random.uniform(low=[b[0] for b in bounds], high=[b[1] for b in bounds], size=(n_queries, dimensions))
+    elif distribution == 'normal':
+        queries = np.zeros((n_queries, dimensions))
+        for d in range(dimensions):
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            queries[:, d] = np.random.normal(loc=mean, scale=std, size=n_queries)
+    elif distribution == 'skewed' and skewness is not None:
+        queries = np.zeros((n_queries, dimensions))
+        for d in range(dimensions):
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            skewed_data = np.random.normal(loc=mean, scale=std, size=n_queries) ** skewness
+            queries[:, d] = np.clip(skewed_data, bounds[d][0], bounds[d][1])
+    else:
+        raise ValueError("Unsupported distribution type")
+
+    return queries
+
+def generate_insertion_points(n_queries, data_file_name, dimensions, distribution, bounds, frequency, skewness=None):
+
+    step = n_queries // sum(frequency)
+    insertion_num = step * frequency[0]
+    point_num = step * frequency[1]
+    assert insertion_num + point_num == n_queries
+
+    queries = []
+    points = generate_point_queries(point_num, data_file_name, dimensions, distribution, skewness)
+    insertions = generate_insertions(insertion_num, dimensions, distribution, bounds, skewness)
+
+    for i in range(step):
+        insertion_slice = insertions[i * frequency[0] : i * frequency[0] + frequency[0]].tolist() 
+        point_slice = points[i * frequency[1] : i * frequency[1] + frequency[1]].tolist()
+        for record in insertion_slice:
+            record_with_id = np.insert(record, 0, 1)
+            queries.append(record_with_id)
+        for record in point_slice:
+            record_with_id = np.insert(record, 0, 2)
+            queries.append(record_with_id)
+
+    queries = np.array(queries, dtype=np.float64)
+
+    return queries
+
 
 def save_queries_to_csv(queries, file_path, query_type="range"):
     # 6 decimal places
@@ -80,14 +151,12 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
         dimensions = dimensions // 2
         column_names = [f"{dim}{i}" for i in range(1, 3) for dim in 'xyz'[:dimensions]]
         df = pd.DataFrame(queries, columns=column_names)
-    elif query_type == "knn":
-        # For knn, the column names are simply the first 'dimensions' letters of 'xyz'
+    else:
+        # For knn, point, insertion, the column names are simply the first 'dimensions' letters of 'xyz'
         column_names_base = 'xyz'
         column_names = [column_names_base[i % len(column_names_base)] + str(i // len(column_names_base) + 1) for i in range(dimensions)]
         df = pd.DataFrame(queries, columns=column_names)
-    else:
-        raise ValueError("Unsupported query type")
-
+   
     df.to_csv(file_path, index=False, header=False)
     print(f"Queries saved to {file_path}")
 
@@ -108,17 +177,25 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate queries for synthetic data.")
-    parser.add_argument("--query_type", type=str, choices=['range', 'knn'], required=True, help="Type of query to generate (range or knn).")
+    parser.add_argument("--query_type", type=str, choices=['range', 'knn', 'point', 'insert', 'insert_point'], required=True, help="Type of query to generate (range or knn).")
     parser.add_argument("--n_queries", type=int, required=True, help="Number of queries to generate.")
     parser.add_argument("--dimensions", type=int, required=True, help="Number of dimensions for the data points.")
     parser.add_argument("--distribution", type=str, required=True, choices=['uniform', 'normal', 'skewed'], help="Distribution of the query centers (uniform, normal, skewed).")
-    parser.add_argument("--bounds", type=float, nargs=2, action='append', required=True, help="Bounds for each dimension. Use twice for two dimensions.")
+    parser.add_argument("--bounds", type=float, nargs=2, action='append', required=False, help="Bounds for each dimension. Use twice for two dimensions.")
     
     # Only for range queries
     parser.add_argument("--query_range", type=float, nargs='+', help="Range for each dimension in range queries. Provide one value per dimension.")
     
     # Optional for skewed distribution
     parser.add_argument("--skewness", type=int, default=1, help="Skewness factor for skewed distribution. Default is 1.0.")
+
+    # Optional for point query
+    parser.add_argument("--data_file_name", type=str, help="For point query to sample data.")
+
+    # Only for insert_point
+    parser.add_argument("--frequency", type=int, nargs='+', help="Frequency of insertions and point queries.")
+
+
 
     args = parser.parse_args()
 
@@ -128,9 +205,13 @@ def main():
         queries = generate_range_queries(n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, bounds=args.bounds, skewness=args.skewness)
     elif args.query_type == 'knn':
         queries = generate_knn_queries(n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, bounds=args.bounds, skewness=args.skewness)
-    
-    
-    # if args.skewness:
+    elif args.query_type == 'point':
+        queries = generate_point_queries(n_queries=args.n_queries, data_file_name=args.data_file_name, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
+    elif args.query_type == 'insert':
+        queries = generate_insertions(n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, bounds=args.bounds, skewness=args.skewness)
+    elif args.query_type == 'insert_point':
+        queries = generate_insertion_points(n_queries=args.n_queries, data_file_name=args.data_file_name, dimensions=args.dimensions, distribution=args.distribution, bounds=args.bounds, frequency=args.frequency, skewness=args.skewness)
+
     if args.query_type == 'range':
         range_str = "x".join([str(_) for _ in args.query_range])
         file_name = RANGE_QUERY_FILENAME_TEMPLATE.format(
@@ -141,7 +222,7 @@ def main():
             skewness=args.skewness,
             range_str=range_str
         )
-    else:
+    elif args.query_type == 'knn':
         file_name = KNN_QUERY_FILENAME_TEMPLATE.format(
             query_type=args.query_type,
             n_queries=args.n_queries,
@@ -149,13 +230,42 @@ def main():
             distribution=args.distribution,
             skewness=args.skewness
         )
+    elif args.query_type == 'point':
+        base_name, extension = os.path.splitext(os.path.basename(args.data_file_name))
+        file_name = POINT_QUERY_FILENAME_TEMPLATE.format(
+            query_type=args.query_type,
+            n_queries=args.n_queries,
+            data=base_name,
+            dimensions=args.dimensions,
+            distribution=args.distribution,
+            skewness=args.skewness
+        )
+    elif args.query_type == 'insert':
+        file_name = INSERT_FILENAME_TEMPLATE.format(
+            query_type=args.query_type,
+            n_queries=args.n_queries,
+            dimensions=args.dimensions,
+            distribution=args.distribution,
+            skewness=args.skewness
+        )
+    elif args.query_type == 'insert_point':
+        base_name, extension = os.path.splitext(os.path.basename(args.data_file_name))
+        frequency_str = "_".join([str(_) for _ in args.frequency])
+        file_name = INSERT_POINT_FILENAME_TEMPLATE.format(
+            query_type=args.query_type,
+            n_queries=args.n_queries,
+            data=base_name,
+            dimensions=args.dimensions,
+            distribution=args.distribution,
+            skewness=args.skewness,
+            frequency=frequency_str
+        )
     # else:
     #     if args.query_type == 'range':
     #         bounds_str = "x".join([str(_) for _ in args.query_range])
     #         file_name = f"{args.query_type}_{args.n_queries}_{args.dimensions}_{args.distribution}_{bounds_str}.csv"
     #     else:
     #         file_name = f"{args.query_type}_{args.n_queries}_{args.dimensions}_{args.distribution}.csv"
-
 
     dir_path = SYNTHETIC_QUERY_PATH
     if not os.path.exists(dir_path):

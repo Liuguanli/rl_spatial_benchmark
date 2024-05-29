@@ -27,7 +27,7 @@ random.seed(42)
 logger = logging.getLogger('rlrtree_choosesubtree')
 logger.setLevel(logging.DEBUG) 
 
-file_handler = logging.FileHandler('rlrtree_choosesubtree.log', mode='a')
+file_handler = logging.FileHandler('./log/rlrtree_choosesubtree.log', mode='w')
 file_handler.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1249,7 +1249,7 @@ if __name__ == '__main__':
 
             traced_script_module = torch.jit.trace(brain_final.Q_eval, example)
 
-            traced_script_module.save("choose_subtree.pth")
+            traced_script_module.save("./benchmark/model/choose_subtree.pth")
 
         #     torch.save(brain_final.Q_eval.state_dict(), 'choose_subtree.pth')
             # print("model saved!")

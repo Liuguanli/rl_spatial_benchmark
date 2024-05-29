@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--dump_dir",
     type=str,
-    default="./benchmark/libspatialindex",
+    default="./benchmark/model",
     required=False,
     help="Dump valid trees to this directory for later inspection.")
 

@@ -37,12 +37,12 @@ popd
 echo "Training started with data file $data_file and query file $query_file"
 
 eval "$train_choose_subtree_command"
-cp choose_subtree.pth benchmark/libspatialindex
+# cp choose_subtree.pth benchmark/model
 
 echo "Training CHOOSE SUBTREE Finished"
 
 eval "$train_train_split_command"
-cp split.pth benchmark/libspatialindex
+# cp split.pth benchmark/model
 
 echo "Training SPLIT Finished"
 

@@ -53,7 +53,7 @@
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "model_path": "benchmark/libspatialindex",
+            "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
             "sample_size": 10000,
             "epoch": 10
@@ -66,7 +66,7 @@
             "page_size": 100,
             "sampling_ratio": 0.0001,
             "action_sampling_size": 200,
-            "model_path": "benchmark/libspatialindex"
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -124,7 +124,7 @@
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "model_path": "benchmark/libspatialindex",
+            "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
             "sample_size": 10000,
             "epoch": 10
@@ -137,7 +137,7 @@
             "page_size": 100,
             "sampling_ratio": 0.0001,
             "action_sampling_size": 200,
-            "model_path": "benchmark/libspatialindex"
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -195,7 +195,7 @@
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "model_path": "benchmark/libspatialindex",
+            "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
             "sample_size": 10000,
             "epoch": 10
@@ -208,7 +208,7 @@
             "page_size": 100,
             "sampling_ratio": 0.0001,
             "action_sampling_size": 200,
-            "model_path": "benchmark/libspatialindex"
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -260,7 +260,7 @@
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "model_path": "benchmark/libspatialindex",
+            "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
             "sample_size": 10000,
             "epoch": 10
@@ -273,7 +273,7 @@
             "page_size": 100,
             "sampling_ratio": 0.0001,
             "action_sampling_size": 200,
-            "model_path": "benchmark/libspatialindex"
+            "model_path": "benchmark/model"
           }
         }
       ]

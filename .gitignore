@@ -9,6 +9,7 @@ data/
 result/
 
 benchmark/libspatialindex/
+benchmark/model/
 
 *.pyc
 

@@ -4,6 +4,8 @@ import pandas as pd
 import argparse
 import os
 
+# values = [x,y] ->  z-value
+# rank space values = [x,y] -> res = [rank of x, rank of y] 
 def interleave_bits(values, bits_per_dimension):
     z = 0
     num_dimensions = len(values)
