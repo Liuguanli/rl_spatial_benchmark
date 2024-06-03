@@ -15,10 +15,7 @@
         "range_query_only.json", 
         "knn_query_only.json",
         "point_query_only.json", 
-        "write_only.json",
-        "balance_only.json",
-        "write_heavy_only.json",
-        "read_heavy_only.json"
+        "balance_only.json"
        ],
       "baseline": [
         {

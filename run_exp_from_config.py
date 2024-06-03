@@ -74,9 +74,25 @@ def cleanup_intermediate_files():
     safe_remove("tree.idx")
 
     safe_remove(Z_ORDER_OUTPUT)
+    safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
     safe_remove(BMTREE_INPUT)
+    safe_remove(CHOOSE_SUBTREE_MODEL_NAME)
+    safe_remove(SPLIT_MODEL_NAME)
+    safe_remove(QDTREE_MODEL_NAME)
+
     logger.info(f"finish cleanup_intermediate_files")
 
+
+def copy_and_rename(source_filename, new_filename):
+
+    global logger
+    logger.info(f"copy_and_rename: {source_filename} {new_filename}")
+    # directory = os.path.dirname(source_filename)
+
+    # destination_filename = os.path.join(directory, new_filename)
+
+    shutil.copyfile(source_filename, new_filename)
+    logger.info(f"finish copy_and_rename")
 
 
 def run_exhaustive_search(data_file, query_file, query_type="range", k=None):
@@ -239,13 +255,27 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
         fill_factor = baseline_config.get("fill_factor", 1.0)
         bit_num = baseline_config.get("bit_num", 20)
 
-        transform_command = f"python tools/zorder.py {ablosute_data_file_name} {Z_ORDER_OUTPUT} {bit_num}"
-        elapsed_time_ns_order = execute_command(transform_command)
+        z_order_output_default = Z_ORDER_SORTED_DEFAULT.format(
+            data_file_prefix=data_file_prefix,
+            bit_num=bit_num
+        )
 
         data_file = Z_ORDER_SORTED_OUTPUT
 
-        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {Z_ORDER_OUTPUT} --output {data_file}"
-        execute_command(format_data_command)
+        if not os.path.exists(z_order_output_default):
+            logger.info(f"{z_order_output_default} NOT exists")
+
+            transform_command = f"python tools/zorder.py {ablosute_data_file_name} {Z_ORDER_OUTPUT} {bit_num}"
+            elapsed_time_ns_order = execute_command(transform_command)
+
+            format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {Z_ORDER_OUTPUT} --output {data_file}"
+            execute_command(format_data_command)
+
+            copy_and_rename(data_file, z_order_output_default)
+        else:
+            copy_and_rename(z_order_output_default, data_file)
+
+            elapsed_time_ns_order = 0
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
@@ -323,7 +353,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(Z_ORDER_SORTED_OUTPUT)
+        # safe_remove(Z_ORDER_SORTED_OUTPUT)
 
 def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -340,13 +370,26 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
         fill_factor = baseline_config.get("fill_factor", 1.0)
         bit_num = baseline_config.get("bit_num", 20)
 
-        transform_command = f"python tools/rank_space_z.py {ablosute_data_file_name} {RANK_SPACE_Z_ORDER_OUTPUT} {bit_num}"
-        elapsed_time_ns_order = execute_command(transform_command)
-
         data_file = RANK_SPACE_Z_ORDER_SORTED_OUTPUT
 
-        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file}"
-        execute_command(format_data_command)
+        rank_space_z_order_output_default = RANK_SPACE_Z_ORDER_SORTED_DEFAULT.format(
+            data_file_prefix=data_file_prefix,
+            bit_num=bit_num
+        )
+
+        if not os.path.exists(rank_space_z_order_output_default):
+            logger.info(f"{rank_space_z_order_output_default} NOT exists")
+
+            transform_command = f"python tools/rank_space_z.py {ablosute_data_file_name} {RANK_SPACE_Z_ORDER_OUTPUT} {bit_num}"
+            elapsed_time_ns_order = execute_command(transform_command)
+
+            format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file}"
+            execute_command(format_data_command)
+            copy_and_rename(data_file, rank_space_z_order_output_default)
+        else:
+            copy_and_rename(rank_space_z_order_output_default, data_file)
+
+            elapsed_time_ns_order = 0
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
@@ -424,7 +467,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
+        # safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
 
 def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -452,15 +495,32 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 ablosute_query_file_name = f"data/real/query/{range_file_name}"
 
             logger.info("Prepare BMTree")
+
+            bmtree_output_default = BMTREE_OUTPUT_DEFAULT.format(
+                data_file_prefix=data_file_prefix,
+                query=file_name_prefix,
+                bit_num=bit_num,
+                tree_depth=tree_depth,
+                sample_size=sample_size,
+            )
+
+            if not os.path.exists(bmtree_output_default):
+                logger.info(f"{bmtree_output_default} NOT exists")
             
-            data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
-            execute_command(data_transfer_command)
+                data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
+                execute_command(data_transfer_command)
 
-            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num}"
-            elapsed_time_ns_learn = execute_command(learn_bmtree_command)
+                learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num}"
+                elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
-            data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
-            execute_command(data_adapter_command)
+                data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
+                execute_command(data_adapter_command)
+
+                copy_and_rename(BMTREE_OUTPUT, bmtree_output_default)
+            else:
+                copy_and_rename(bmtree_output_default, BMTREE_OUTPUT)
+
+                elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
             command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
@@ -555,7 +615,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(BMTREE_OUTPUT)
+        # safe_remove(BMTREE_OUTPUT)
 
 def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -651,7 +711,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(RTREE_DATA)
+        # safe_remove(RTREE_DATA)
 
 def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
     
@@ -749,7 +809,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(RTREE_DATA)
+        # safe_remove(RTREE_DATA)
 
 def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -786,12 +846,36 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                 ablosute_query_file_name = f"data/real/query/{range_file_name}"
 
             logger.info("Prepare RLRTree")
-            
-            # data_transfer_command = f"cp {ablosute_data_file_name} {ablosute_query_file_name}"
-            # execute_command(data_transfer_command)
 
-            learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch} {sample_size}"
-            elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
+            split_model_name_default = SPLIT_MODEL_NAME_DEFAULT.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+            )
+
+            choose_subtree_model_name_default = CHOOSE_SUBTREE_MODEL_NAME_DEFAULT.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+            )
+
+            if not os.path.exists(split_model_name_default) or not os.path.exists(choose_subtree_model_name_default):
+                logger.info(f"{split_model_name_default} NOT exists")
+                logger.info(f"{choose_subtree_model_name_default} NOT exists")
+                
+                learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch} {sample_size}"
+                elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
+
+                copy_and_rename(SPLIT_MODEL_NAME, split_model_name_default)
+                copy_and_rename(CHOOSE_SUBTREE_MODEL_NAME, choose_subtree_model_name_default)
+            else:
+                copy_and_rename(split_model_name_default, SPLIT_MODEL_NAME)
+                copy_and_rename(choose_subtree_model_name_default, CHOOSE_SUBTREE_MODEL_NAME)
+
+                elapsed_time_ns_learn = 0
+
 
             command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
@@ -876,7 +960,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(RLRTREE_DATA)
+        # safe_remove(RLRTREE_DATA)
 
 def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -973,7 +1057,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(KDTREE_DATA)
+        # safe_remove(KDTREE_DATA)
 
 
 def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
@@ -1067,7 +1151,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                 insert_point_output_path = KDTREE_GREEDY_INSERT_POINT_OUTPUT_PATH.format(
                     data_file_prefix=data_file_prefix,
                     range_query_prefix=file_name_prefix,
-                    insert_point_prefix=insert_file_name_prefix,
+                    insert_point_prefix=insert_point_file_name_prefix,
                 )
                 execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery")
 
@@ -1077,7 +1161,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(KDTREE_GREEDY_DATA)
+        # safe_remove(KDTREE_GREEDY_DATA)
         # save_remove(KDTREE_GREEDY_QUERY)
 
 
@@ -1114,8 +1198,25 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
-            elapsed_time_ns_learn = execute_command(learn_qdtree_command)
+            qdtree_model_name_default = QDTREE_MODEL_NAME_DEFAULT.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                episode=episode,
+                sampling_ratio=sampling_ratio,
+                action_sampling_size=action_sampling_size,
+            )
+
+            if not os.path.exists(qdtree_model_name_default):
+                logger.info(f"{qdtree_model_name_default} NOT exists") 
+
+                learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
+                elapsed_time_ns_learn = execute_command(learn_qdtree_command)
+
+                copy_and_rename(QDTREE_MODEL_NAME, qdtree_model_name_default)
+            else:
+                copy_and_rename(qdtree_model_name_default, QDTREE_MODEL_NAME)
+
+                elapsed_time_ns_learn = 0
 
             logger.info(f"Start building qdtree: {data_file}")
             
@@ -1199,7 +1300,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                 insert_point_output_path = QDTREE_INSERT_POINT_OUTPUT_PATH.format(
                     data_file_prefix=data_file_prefix,
                     range_query_prefix=file_name_prefix,
-                    insert_point_prefix=insert_file_name_prefix,
+                    insert_point_prefix=insert_point_file_name_prefix,
                     episode=episode,
                     sampling_ratio=sampling_ratio,
                     action_sampling_size=action_sampling_size,
@@ -1212,7 +1313,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        safe_remove(QDTREE_DATA)
+        # safe_remove(QDTREE_DATA)
         # save_remove(QDTREE_QUERY)
 
 
@@ -1376,6 +1477,11 @@ def process_experiment(experiment):
                                 execute_command(query_command)
                             else:
                                 raise ValueError(f"File {data_file_name} does not exist.")
+        
+        if len(range_queries) == 0:
+            logger.info("No queries in range_queries (synthetic)")
+
+            range_queries.append(RANGE_QUERY_FILENAME_DEFAULT)
 
     else:
         data_file_name = RELATIVE_REAL_DATA_FILENAME.format(
@@ -1517,7 +1623,11 @@ def process_experiment(experiment):
                                 execute_command(query_command)
                             else:
                                 raise ValueError(f"File {data_file_name} does not exist.")
-             
+        
+        if len(range_queries) == 0:
+            logger.info("No queries in range_queries (real)")
+
+            range_queries.append(REAL_RANGE_QUERY_FILENAME_DEFAULT.format(data=base_name))    
 
     query_path = REAL_QUERY_PATH if is_real_data else SYNTHETIC_QUERY_PATH
 

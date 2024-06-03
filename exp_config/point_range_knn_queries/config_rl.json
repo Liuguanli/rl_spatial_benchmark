@@ -2,7 +2,7 @@
   "experiments": [
     {
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "OSM",
         "skewness": 1,
@@ -52,9 +52,9 @@
     },
     {
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
-        "distribution": "uniform",
+        "distribution": "normal",
         "skewness": 1,
         "bounds": [
           [0, 1],

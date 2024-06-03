@@ -52,7 +52,7 @@
       "data": {
         "size": 10000000,
         "dimensions": 2,
-        "distribution": "uniform",
+        "distribution": "normal",
         "skewness": 1,
         "bounds": [
           [0, 1],

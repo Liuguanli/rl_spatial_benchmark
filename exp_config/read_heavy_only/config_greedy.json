@@ -12,11 +12,11 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "read_heavy_only.json"
        ],
       "baseline": [
         {
-          "name": "zorder",
+          "name": "rankspace",
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -24,15 +24,15 @@
           }
         },
         {
-          "name": "rtree",
+          "name": "rstar",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "rtree_variant": "rstar"
           }
         },
         {
-          "name": "kdtree",
+          "name": "kdgreedy",
           "config": {
             "page_size": 100
           }
@@ -51,11 +51,11 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "read_heavy_only.json"
        ],
       "baseline": [
         {
-          "name": "zorder",
+          "name": "rankspace",
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -63,15 +63,15 @@
           }
         },
         {
-          "name": "rtree",
+          "name": "rstar",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "rtree_variant": "rstar"
           }
         },
         {
-          "name": "kdtree",
+          "name": "kdgreedy",
           "config": {
             "page_size": 100
           }

@@ -12,7 +12,7 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "balance_only.json"
        ],
       "baseline": [
         {
@@ -51,7 +51,7 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "balance_only.json"
        ],
       "baseline": [
         {

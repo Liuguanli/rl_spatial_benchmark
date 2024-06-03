@@ -39,6 +39,7 @@ Z_INSERT_OUTPUT_PATH = "result/libspatialindex/zorder/insert/{data_file_prefix}_
 Z_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/zorder/insert_point/{data_file_prefix}_{insert_point_prefix}_bits_{bit_num}.txt"
 Z_ORDER_SORTED_OUTPUT = "benchmark/model/z_sorted_data"
 Z_ORDER_OUTPUT = "benchmark/model/z_order_data.csv"
+Z_ORDER_SORTED_DEFAULT = "benchmark/model/z_order_data_{data_file_prefix}_bits_{bit_num}"
 
 RANK_SPACE_Z_BUILD_OUTPUT_PATH = "result/libspatialindex/rankspace_zorder/build/{data_file_prefix}_bits_{bit_num}.txt"
 RANK_SPACE_Z_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/rankspace_zorder/range/{data_file_prefix}_{range_query_prefix}_bits_{bit_num}.txt"
@@ -48,6 +49,7 @@ RANK_SPACE_Z_INSERT_OUTPUT_PATH = "result/libspatialindex/rankspace_zorder/inser
 RANK_SPACE_Z_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/rankspace_zorder/insert_point/{data_file_prefix}_{insert_point_prefix}_bits_{bit_num}.txt"
 RANK_SPACE_Z_ORDER_SORTED_OUTPUT = "benchmark/model/rankspace_z_sorted_data"
 RANK_SPACE_Z_ORDER_OUTPUT = "benchmark/model/rankspace_z_order_data.csv"
+RANK_SPACE_Z_ORDER_SORTED_DEFAULT = "benchmark/model/rankspace_z_order_data_{data_file_prefix}_bits_{bit_num}"
 
 BMTREE_BUILD_OUTPUT_PATH = "result/libspatialindex/bmtree/build/{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
 BMTREE_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/bmtree/range/{data_file_prefix}_{range_query_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
@@ -56,6 +58,7 @@ BMTREE_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/bmtree/point/{data_file
 BMTREE_INSERT_OUTPUT_PATH = "result/libspatialindex/bmtree/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
 BMTREE_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/bmtree/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
 BMTREE_INPUT = "rl_baseline/Learned-BMTree/sorted_data_with_sfc.csv"
+BMTREE_OUTPUT_DEFAULT = "benchmark/model/bmtree_sorted_data_{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}"
 BMTREE_OUTPUT = "benchmark/model/bmtree_sorted_data"
 
 RTREE_DATA = "benchmark/libspatialindex/rtree_data"
@@ -83,9 +86,10 @@ RLRTREE_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/rlrtree/knn/{data_file_p
 RLRTREE_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/rlrtree/point/{data_file_prefix}_{range_query_prefix}_{point_query_prefix}_{variant}_epoch_{epoch}.txt"
 RLRTREE_INSERT_OUTPUT_PATH = "result/libspatialindex/rlrtree/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_{variant}_epoch_{epoch}.txt"
 RLRTREE_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/rlrtree/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_{variant}_epoch_{epoch}.txt"
-CHOOSE_SUBTREE_MODEL_NAME = "choose_subtree_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}.pth"
-SPLIT_MODEL_NAME = "split_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}.pth"
-
+CHOOSE_SUBTREE_MODEL_NAME = "benchmark/model/choose_subtree.pth"
+CHOOSE_SUBTREE_MODEL_NAME_DEFAULT = "choose_subtree_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}.pth"
+SPLIT_MODEL_NAME = "benchmark/model/split.pth"
+SPLIT_MODEL_NAME_DEFAULT = "benchmark/model/split_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}.pth"
 
 KDTREE_DATA = "benchmark/libspatialindex/kdtree_data"
 KDTREE_BUILD_OUTPUT_PATH = "result/libspatialindex/kdtree/build/{data_file_prefix}.txt"
@@ -111,15 +115,18 @@ QDTREE_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/qdtree/knn/{data_file_pre
 QDTREE_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/qdtree/point/{data_file_prefix}_{range_query_prefix}_{point_query_prefix}_episode_{episode}_sampling_ratio_{sampling_ratio}_action_space_{action_sampling_size}.txt"
 QDTREE_INSERT_OUTPUT_PATH = "result/libspatialindex/qdtree/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_episode_{episode}_sampling_ratio_{sampling_ratio}_action_space_{action_sampling_size}.txt"
 QDTREE_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/qdtree/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_episode_{episode}_sampling_ratio_{sampling_ratio}_action_space_{action_sampling_size}.txt"
-QDTREE_MODEL_NAME = "qdtree_{data_file_prefix}_{range_query_prefix}_epoch_{epoch}_sampling_ratio_{sampling_ratio}_action_space_{action_sampling_size}.pth"
+QDTREE_MODEL_NAME = "benchmark/model/qdtree.pth"
+QDTREE_MODEL_NAME_DEFAULT = "benchmark/model/qdtree_{data_file_prefix}_{range_query_prefix}_episode_{episode}_sampling_ratio_{sampling_ratio}_action_space_{action_sampling_size}.pth"
 
 
+RANGE_QUERY_FILENAME_DEFAULT = "range_1000_2_uniform_1_0.001x0.001.csv"
 RANGE_QUERY_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}_{range_str}.csv"
 KNN_QUERY_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
 POINT_QUERY_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{data}_{dimensions}_{distribution}_{skewness}.csv"
 INSERT_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
 INSERT_POINT_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{data}_{dimensions}_{distribution}_{skewness}_{frequency}.csv"
 
+REAL_RANGE_QUERY_FILENAME_DEFAULT = "{data}_range_1000_2_uniform_1_0.001x0.001.csv"
 REAL_RANGE_QUERY_FILENAME_TEMPLATE = "{data}_{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}_{range_str}.csv"
 REAL_KNN_QUERY_FILENAME_TEMPLATE = "{data}_{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
 REAL_POINT_QUERY_FILENAME_TEMPLATE = "{data}_{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
