@@ -21,7 +21,8 @@ def interleave_bits(values, bits_per_dimension):
 def process_file(input_file, output_file, bits_per_dimension):
     # Load data from the input file
     df = pd.read_csv(input_file, header=None)
-    df = (df * 1000000).astype(int)
+    # scaled_df = (df * 10000000).astype(int)
+    # df = (df * 1000000).astype(int)
 
     num_columns = df.shape[1]
     rank_columns = []
@@ -44,7 +45,7 @@ def process_file(input_file, output_file, bits_per_dimension):
         return interleave_bits(values, bits_per_dimension)
     
     z_order = rank_df.apply(map_and_interleave, axis=1)
-    df['Z-order'] = z_order / 1000000  # Assuming you want to normalize or scale back the data
+    df['Z-order'] = z_order
 
     # Sort dataframe based on Z-order and save to output file
     sorted_df = df.sort_values(by='Z-order')

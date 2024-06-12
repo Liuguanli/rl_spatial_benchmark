@@ -1,10 +1,8 @@
 import pandas as pd
 import argparse
 
-def transform_data(input_file, output_file, is_scaled):
+def transform_data(input_file, output_file):
     df = pd.read_csv(input_file, header=None)
-
-    scaler = 1000000 if is_scaled else 1
 
     # df[0] = pd.to_numeric(df[0], errors='coerce')
     # df[1] = pd.to_numeric(df[1], errors='coerce')
@@ -13,10 +11,10 @@ def transform_data(input_file, output_file, is_scaled):
     transformed_df = pd.DataFrame({
         'Col1': 1,
         'Col2': range(len(df)),
-        'Col3': df[0] / scaler, 
-        'Col4': df[1] / scaler, 
-        'Col5': df[0] / scaler, 
-        'Col6': df[1] / scaler
+        'Col3': df[0], 
+        'Col4': df[1], 
+        'Col5': df[0], 
+        'Col6': df[1]
     })
 
     transformed_df.to_csv(output_file, sep=' ', index=False, header=False)
@@ -83,7 +81,7 @@ def transform_insert_point(input_file, output_file):
     df = pd.read_csv(input_file, header=None)
 
     transformed_df = pd.DataFrame({
-        'Col1': df[0],
+        'Col1': df[0].astype(int),
         'Col2': 9999999,
         'Col3': df[1], 
         'Col4': df[2], 
@@ -105,7 +103,7 @@ def main():
     args = parser.parse_args()
 
     if args.type == 'data':
-        transform_data(args.input, args.output, args.is_scaled)
+        transform_data(args.input, args.output) #, args.is_scaled)
     elif args.type == 'range_query':
         transform_range_query(args.input, args.output)
     elif args.type == 'knn_query':

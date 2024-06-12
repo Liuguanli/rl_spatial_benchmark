@@ -255,7 +255,6 @@ PyDispatcher==2.0.5
 pydocstyle @ file:///tmp/build/80754af9/pydocstyle_1621600989141/work
 pyerfa @ file:///tmp/build/80754af9/pyerfa_1621556109336/work
 pyflakes @ file:///tmp/build/80754af9/pyflakes_1617200973297/work
-pygm @ file:///home/liuguanli/Dropbox/research/PGM/PyGM
 Pygments==2.17.2
 PyHamcrest @ file:///tmp/build/80754af9/pyhamcrest_1615748656804/work
 PyJWT @ file:///opt/conda/conda-bld/pyjwt_1657544592787/work

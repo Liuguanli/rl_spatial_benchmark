@@ -12,10 +12,7 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "knn_query_only.json",
-        "point_query_only.json", 
-        "balance_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -106,10 +103,7 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "knn_query_only.json",
-        "point_query_only.json", 
-        "balance_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -200,10 +194,7 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "knn_query_only.json",
-        "point_query_only.json", 
-        "balance_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -294,10 +285,7 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "knn_query_only.json",
-        "point_query_only.json", 
-        "balance_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -388,10 +376,7 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "knn_query_only.json",
-        "point_query_only.json", 
-        "balance_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -482,10 +467,7 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "knn_query_only.json",
-        "point_query_only.json", 
-        "balance_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {

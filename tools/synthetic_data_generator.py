@@ -46,9 +46,9 @@ def save_to_csv(data, file_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate synthetic data.")
-    parser.add_argument("--size", type=int, help="Number of data points to generate.", required=True)
-    parser.add_argument("--dimensions", type=int, help="Number of dimensions.", required=True)
-    parser.add_argument("--distribution", type=str, help="Type of distribution (uniform, normal, skewed).", required=True)
+    parser.add_argument("--size", type=int, default=10000, help="Number of data points to generate.", required=True)
+    parser.add_argument("--dimensions", type=int, default=2, help="Number of dimensions.", required=True)
+    parser.add_argument("--distribution", type=str, default="uniform", help="Type of distribution (uniform, normal, skewed).", required=True)
     parser.add_argument("--skewness", type=int, default=1, help="Skewness of skew data.", required=False)
     parser.add_argument("--range", type=float, nargs=2, action='append', help="Range for each dimension. Repeat this argument for each dimension.", required=True)
     # parser.add_argument("--output", type=str, help="Output CSV file path.", required=True)
@@ -74,6 +74,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# python tools/synthetic_data_generator.py --size 10000 --dimensions 2 --distribution uniform --skewness 1 --range 0 1 --range 0 1
+# python tools/synthetic_data_generator.py --size 10000 --dimensions 2 --distribution skewed --skewness 2 --range 0 1 --range 0 1
+# python tools/synthetic_data_generator.py --size 10000 --dimensions 2 --distribution normal --skewness 1 --range 0 1 --range 0 1
 
 
 

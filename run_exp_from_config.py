@@ -510,7 +510,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
                 execute_command(data_transfer_command)
 
-                learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num}"
+                learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name}"
                 elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
                 data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
@@ -882,6 +882,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
 
             build_output_path = RLRTREE_BUILD_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
             )
@@ -1042,7 +1043,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
             )
             execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery")
 
-        for file_name in insertions:
+        for file_name in insert_points:
             file_name_prefix = file_name.rstrip('.csv')
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
             insert_point_output_path = KDTREE_INSERT_POINT_OUTPUT_PATH.format(
@@ -1692,10 +1693,13 @@ def main():
     configs = []
     if RUN_EXAMPLE:
         if RUN_ALL_BASELINE_EXAMPLE:
-            configs = ["example_config_all_baselines.json"]
-        else:
-            # configs = ["example_config.json"]
-            configs = ["verify_qdtree.json"]
+            # configs = ["example_config_all_baselines.json",
+            #            "example_config_all_baselines_insert.json",
+            #            "example_config_all_baselines_read_heavy.json",
+            #            "example_config_all_baselines_write_heavy.json"]
+            configs = ["example_config_all_baselines_point_rank_space.json"]
+        # else:
+        #     configs = ["verify_qdtree.json"]
     else:
         directory = CONFIG_DIR
         # candidates = ["overall"]
@@ -1708,7 +1712,6 @@ def main():
                     config_file_path = os.path.join(root, file)
                     configs.append(config_file_path)
                     # print(config_file_path)
-    
     counter = 0
 
     for config_file_path in configs:

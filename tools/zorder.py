@@ -59,6 +59,7 @@ import numpy as np
 import pandas as pd
 import argparse
 import os
+import struct
 
 def interleave_bits(values, bits_per_dimension):
     z = 0
@@ -71,19 +72,30 @@ def interleave_bits(values, bits_per_dimension):
             z |= (value & (1 << bit_pos)) << shift_amount
     return z
 
+def float_to_int_bits(value, shift_length):
+    binary_value = struct.pack('>f', value)
+    int_value = int.from_bytes(binary_value, 'big')
+    int_20_bits = int_value >> (32 - shift_length)
+    return int(int_20_bits)
+
+def convert_data_to_int_bits(data_frame, bit_length):
+    for col in data_frame.columns:
+        data_frame[col] = data_frame[col].apply(float_to_int_bits, args=(bit_length,))
+    return data_frame
+
 
 def process_file(input_file, output_file, bits_per_dimension):
     # Load data from the input file
     df = pd.read_csv(input_file, header=None)
-    df = (df * 1000000).astype(int)
+    df_copy = df.copy()
+    adjusted_df = convert_data_to_int_bits(df_copy, bits_per_dimension)
 
     # Calculate Z-order values directly from the data
     def map_and_interleave(row):
         values = row.tolist()
         return interleave_bits(values, bits_per_dimension)
     
-    z_order = df.apply(map_and_interleave, axis=1)
-    df = df / 1000000
+    z_order = adjusted_df.apply(map_and_interleave, axis=1)
     df['Z-order'] = z_order
 
     # Sort dataframe based on Z-order and save to output file

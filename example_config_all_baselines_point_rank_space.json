@@ -1,0 +1,220 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "us",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json",
+        "point_query_only.json", 
+        "balance_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        },
+        {
+          "name": "rankspace",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "australia",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json",
+        "point_query_only.json", 
+        "balance_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        },
+        {
+          "name": "rankspace",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "india",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json",
+        "point_query_only.json", 
+        "balance_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        },
+        {
+          "name": "rankspace",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "uniform",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json",
+        "point_query_only.json", 
+        "balance_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        },
+        {
+          "name": "rankspace",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "normal",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json",
+        "point_query_only.json", 
+        "balance_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        },
+        {
+          "name": "rankspace",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        }
+      ]
+    },
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "skewed",
+        "dimensions": 2,
+        "skewness": 2,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json",
+        "point_query_only.json", 
+        "balance_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        },
+        {
+          "name": "rankspace",
+          "config": {
+            "fill_factor": 0.9,
+            "page_size": 100,
+            "bit_num": 20
+          }
+        }
+      ]
+    }
+  ]
+}

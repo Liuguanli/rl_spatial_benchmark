@@ -16,6 +16,8 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
     # Initialize an empty list to store the generated queries.
     queries = []
     bounds = [(df[col].min(), df[col].max()) for col in df.columns]
+    # mean = df.mean().values
+    # std = df.std().values
     
     # Generate query centers based on the specified distribution.
     if distribution == 'uniform':
@@ -24,16 +26,27 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
         centers = df.iloc[sample_indices].values
     elif distribution == 'normal':
         # Calculate the mean and standard deviation for each dimension in the dataframe.
-        mean = df.mean().values
-        std = df.std().values
-        # Generate query centers with a normal distribution based on the calculated mean and std.
-        centers = np.random.normal(loc=mean, scale=std, size=(n_queries, dimensions))
+        centers = np.zeros((n_queries, dimensions))
+        for d in range(dimensions):
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            lower_bound = np.full((n_queries,), bounds[d][0] + query_range[d]/2)
+            upper_bound = np.full((n_queries,), bounds[d][1] - query_range[d]/2)
+            centers[:, d] = np.clip(np.random.normal(loc=mean, scale=std, size=n_queries), lower_bound, upper_bound)
     elif distribution == 'skewed' and skewness is not None:
         # Apply skewness transformation to the dataframe.
-        skewed_data = df ** skewness
-        # Randomly sample n_queries points from the skewed dataframe to serve as query centers.
-        sample_indices = np.random.choice(skewed_data.index, size=n_queries, replace=False)
-        centers = skewed_data.iloc[sample_indices].values
+        # skewed_data = df ** skewness
+        centers = np.zeros((n_queries, dimensions))
+        for d in range(dimensions):
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            skewed_data = np.random.normal(loc=mean, scale=std, size=n_queries) ** skewness
+            lower_bound = np.full((n_queries,), bounds[d][0] + query_range[d]/2)
+            upper_bound = np.full((n_queries,), bounds[d][1] - query_range[d]/2)
+            centers[:, d] = np.clip(skewed_data, lower_bound, upper_bound)
+        # # Randomly sample n_queries points from the skewed dataframe to serve as query centers.
+        # sample_indices = np.random.choice(skewed_data.index, size=n_queries, replace=False)
+        # centers = skewed_data.iloc[sample_indices].values
     else:
         # Raise an error if the distribution type is unsupported.
         raise ValueError("Unsupported distribution type")
@@ -44,8 +57,10 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
         max_bounds = []
         for c, r, b in zip(center, query_range, bounds):
             # Calculate the minimum and maximum bounds for each dimension.
-            min_bound = max(c - r / 2, b[0])
-            max_bound = min(c + r / 2, b[1])
+            min_bound = max(c - r/2, b[0])
+            min_bound = min(min_bound, b[1] - r)
+            max_bound = min(c + r/2, b[1])
+            max_bound = max(max_bound, min_bound + r)
             min_bounds.append(min_bound)
             max_bounds.append(max_bound)
         # Combine the minimum and maximum bounds to form the query bounds.
@@ -53,45 +68,31 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
         # Append the query bounds to the list of queries.
         queries.append(query_bounds)
 
-    # Return the list of generated queries.
+    queries = np.array(queries, dtype=np.float64)
     return queries
 
 
-
 def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None):
-    """
-    Generates k-NN (k-Nearest Neighbor) queries from a given DataFrame.
-
-    Parameters:
-    - df: DataFrame containing the dataset.
-    - n_queries: The number of queries to generate.
-    - query_range: The range of the queries.
-    - bounds: The bounds of the dataset for each dimension.
-    - distribution: The distribution type of the queries ('uniform', 'normal', or 'skewed').
-    - skewness: The skewness parameter for the 'skewed' distribution.
-
-    Returns:
-    - A numpy array containing the generated k-NN queries.
-    """
     df = pd.read_csv(data_file, header=None)
+    mean = df.mean().values
+    std = df.std().values
 
     bounds = [(df[col].min(), df[col].max()) for col in df.columns]
 
     # Generate query centers based on the specified distribution.
+    queries = np.zeros((n_queries, dimensions))
     if distribution == 'uniform':
         # Randomly sample n_queries points from the dataframe to serve as query centers.
         sample_indices = np.random.choice(df.index, size=n_queries, replace=False)
         queries = df.iloc[sample_indices].values
     elif distribution == 'normal':
-        # Use mean and standard deviation of the dataframe to generate normal distributed queries.
-        mean = df.mean().values
-        std = df.std().values
-        queries = np.random.normal(loc=mean, scale=std, size=(n_queries, dimensions))
+        # Use mean and standard deviation of each dimension to generate normally distributed queries.
+        for d in range(dimensions):
+            queries[:, d] = np.clip(np.random.normal(loc=mean[d], scale=std[d], size=n_queries), bounds[d][0], bounds[d][1])
     elif distribution == 'skewed' and skewness is not None:
-        # Apply skewness transformation and sample n_queries points for skewed distribution.
-        skewed_data = df ** skewness
-        sample_indices = np.random.choice(skewed_data.index, size=n_queries, replace=False)
-        queries = skewed_data.iloc[sample_indices].values
+        for d in range(dimensions):
+            skewed_data = np.random.normal(loc=mean[d], scale=std[d], size=n_queries) ** skewness
+            queries[:, d] = np.clip(skewed_data, bounds[d][0], bounds[d][1])
     else:
         # Raise an error if the distribution type is unsupported.
         raise ValueError("Unsupported distribution type")
@@ -101,6 +102,29 @@ def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform
         queries[:, dim] = np.clip(queries[:, dim], bounds[dim][0], bounds[dim][1])
 
     return queries
+
+
+def generate_point_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None):
+    df = pd.read_csv(data_file, header=None)    
+    if distribution == 'uniform':
+        # Randomly sample n_queries points from the dataframe to serve as query centers.
+        sample_indices = np.random.choice(df.index, size=n_queries, replace=False)
+        points = df.iloc[sample_indices].values
+    elif distribution == 'normal':
+        # Normalize data and sample
+        normalized_df = (df - df.mean()) / df.std()
+        sample_indices = np.random.choice(normalized_df.index, size=n_queries, replace=False)
+        points = df.iloc[sample_indices].values  # Return original data points
+    elif distribution == 'skewed' and skewness is not None:
+        # Skew data and sample
+        skewed_df = df ** skewness
+        sample_indices = np.random.choice(skewed_df.index, size=n_queries, replace=False)
+        points = df.iloc[sample_indices].values
+    else:
+        # Raise an error if the distribution type is unsupported.
+        raise ValueError("Unsupported distribution type")
+    
+    return points
 
 
 def generate_insertions(data_file, n_queries, dimensions, distribution='uniform', skewness=None):
@@ -124,21 +148,33 @@ def generate_insertions(data_file, n_queries, dimensions, distribution='uniform'
 
     # Generate unique points ensuring they do not overlap with existing data
     insertion_points = []
+    if 'india' in data_file:
+        df_source = pd.read_csv("data/real/dataset/india_100000000.csv", header=None)
+    elif 'australia' in data_file:
+        df_source = pd.read_csv("data/real/dataset/australia_100000000.csv", header=None)
+    elif 'us' in data_file:
+        df_source = pd.read_csv("data/real/dataset/us_100000000.csv", header=None)
+    else:
+        raise ValueError("Unsupported distribution type")
     while len(insertion_points) < n_queries:
+        
+        random_index = np.random.randint(0, len(df_source))
+        # Retrieve the point at the random index
+        point = df_source.iloc[random_index]
 
-        if distribution == 'uniform':
-            # Randomly sample n_queries points from the dataframe to serve as query centers.
-            np.random.uniform([b[0] for b in bounds], [b[1] for b in bounds])
-        elif distribution == 'normal':
-            # Use mean and standard deviation of the dataframe to generate normal distributed queries.
-            point = np.random.normal(mean, std)
-            point = np.clip(point, [b[0] for b in bounds], [b[1] for b in bounds])
-        elif distribution == 'skewed' and skewness is not None:
-            point = np.random.normal([b[0] for b in bounds], [b[1] for b in bounds]) ** skewness
-            point = np.clip(point, [b[0] for b in bounds], [b[1] for b in bounds])
-        else:
-            # Raise an error if the distribution type is unsupported.
-            raise ValueError("Unsupported distribution type")
+        # if distribution == 'uniform':
+        #     # Randomly sample n_queries points from the dataframe to serve as query centers.
+        #     point = np.random.uniform([b[0] for b in bounds], [b[1] for b in bounds])
+        # elif distribution == 'normal':
+        #     # Use mean and standard deviation of the dataframe to generate normal distributed queries.
+        #     point = np.random.normal(mean, std)
+        #     point = np.clip(point, [b[0] for b in bounds], [b[1] for b in bounds])
+        # elif distribution == 'skewed' and skewness is not None:
+        #     point = np.random.normal([b[0] for b in bounds], [b[1] for b in bounds]) ** skewness
+        #     point = np.clip(point, [b[0] for b in bounds], [b[1] for b in bounds])
+        # else:
+        #     # Raise an error if the distribution type is unsupported.
+        #     raise ValueError("Unsupported distribution type")
         point_tuple = tuple(point)
         
         # Check if the generated point is unique
@@ -156,12 +192,30 @@ def generate_insertion_points(data_file, n_queries, dimensions, frequency, distr
     assert insertion_num + point_num == n_queries
 
     queries = []
-    points = generate_knn_queries(data_file, point_num, dimensions, distribution, skewness)
     insertions = generate_insertions(data_file, insertion_num, dimensions, distribution, skewness)
+
+    df = pd.read_csv(data_file, header=None)
 
     for i in range(step):
         insertion_slice = insertions[i * frequency[0] : i * frequency[0] + frequency[0]].tolist() 
-        point_slice = points[i * frequency[1] : i * frequency[1] + frequency[1]].tolist()
+        df = pd.concat([df, pd.DataFrame(insertion_slice)])
+        new_points = []
+        if distribution == 'uniform':
+            # Randomly sample n_queries points from the dataframe to serve as query centers.
+            sample_indices = np.random.choice(df.index, size=frequency[1], replace=False)
+            new_points = df.iloc[sample_indices].values
+        elif distribution == 'normal':
+            # Normalize data and sample
+            normalized_df = (df - df.mean()) / df.std()
+            sample_indices = np.random.choice(normalized_df.index, size=frequency[1], replace=False)
+            new_points = df.iloc[sample_indices].values  # Return original data points
+        elif distribution == 'skewed' and skewness is not None:
+            # Skew data and sample
+            skewed_df = df ** skewness
+            sample_indices = np.random.choice(skewed_df.index, size=frequency[1], replace=False)
+            new_points = skewed_df.iloc[sample_indices].values
+
+        point_slice = new_points.tolist()
         for record in insertion_slice:
             record_with_id = np.insert(record, 0, 1)
             queries.append(record_with_id)
@@ -174,11 +228,9 @@ def generate_insertion_points(data_file, n_queries, dimensions, frequency, distr
     return queries
 
 
-
-
 def save_queries_to_csv(queries, file_path, query_type="range"):
-    # 6 decimal places
-    queries = np.round(queries, 6)
+    # # 6 decimal places
+    # queries = np.round(queries, 6)
     
     # Determine number of dimensions
     dimensions = queries.shape[1]
@@ -194,7 +246,7 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
         df = pd.DataFrame(queries, columns=column_names)
 
     df.to_csv(file_path, index=False, header=False)
-    print(f"Queries saved to {file_path}")
+    # print(f"Queries saved to {file_path}")
 
 
 def main():
@@ -224,7 +276,7 @@ def main():
     elif args.query_type == 'knn':
         queries = generate_knn_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
     elif args.query_type == 'point':
-        queries = generate_knn_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
+        queries = generate_point_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
     elif args.query_type == 'insert':
         queries = generate_insertions(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
     elif args.query_type == 'insert_point':
@@ -290,3 +342,19 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+## range
+# python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution uniform --skewness 1 --query_range 1.0 1.0
+# python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution normal --skewness 1 --query_range 1.0 1.0
+# python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution skewed --skewness 2 --query_range 1.0 1.0
+
+## knn
+# python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type knn --n_queries 100 --dimensions 2 --distribution uniform --skewness 1
+# python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type knn --n_queries 100 --dimensions 2 --distribution normal --skewness 1
+# python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type knn --n_queries 100 --dimensions 2 --distribution skewed --skewness 2
+
+
+# insert
+# python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1
+# python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1
+# python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1

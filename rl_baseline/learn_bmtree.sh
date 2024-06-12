@@ -3,8 +3,8 @@
 sub_dir="./rl_baseline"
 
 # Check if two arguments are passed
-if [ "$#" -ne 5 ]; then
-    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num>"
+if [ "$#" -ne 6 ]; then
+    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num> <absolute_file_name>"
     exit 1
 fi
 
@@ -14,6 +14,7 @@ query_file=$2
 tree_depth=$3
 sample_size=$4
 bit_num=$5
+absolute_data_file=$6
 
 python_file="exp_opt_fast.py"
 
@@ -78,10 +79,9 @@ fi
 cd $target_directory
 
 
-python $source_filename --data $data_file --action_depth $tree_depth
+python $source_filename --data $absolute_data_file --action_depth $tree_depth
 
 # remove data and queries.
-
 
 # data_file=$1
 # query_file=$2
