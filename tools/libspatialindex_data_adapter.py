@@ -1,5 +1,6 @@
 import pandas as pd
 import argparse
+import os
 
 def transform_data(input_file, output_file):
     df = pd.read_csv(input_file, header=None)
@@ -21,6 +22,7 @@ def transform_data(input_file, output_file):
 
 def transform_range_query(input_file, output_file):
     # print("Transforming range query...")
+
     df = pd.read_csv(input_file, header=None)
 
     transformed_df = pd.DataFrame({

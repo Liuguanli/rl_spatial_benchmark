@@ -18,7 +18,7 @@ REAL_WORKLOAD_PATH = "data/real/workloads"
 # use this flag to remove generated files if space is limited
 SAVE_SPACE = False
 RUN_EXHAUSTIVE_SEARCH = False  # TODO uncomment the printing code first in e.g., libspatialindex/test/rtree/RTreeQuery.cc line 77
-RUN_EXAMPLE = True
+RUN_EXAMPLE = False
 RUN_ALL_BASELINE_EXAMPLE = True
 
 PAGE_SIZE = 4096
@@ -119,14 +119,14 @@ QDTREE_MODEL_NAME = "benchmark/model/qdtree.pth"
 QDTREE_MODEL_NAME_DEFAULT = "benchmark/model/qdtree_{data_file_prefix}_{range_query_prefix}_episode_{episode}_sampling_ratio_{sampling_ratio}_action_space_{action_sampling_size}.pth"
 
 
-RANGE_QUERY_FILENAME_DEFAULT = "range_1000_2_normal_1_0.001x0.001.csv"
+RANGE_QUERY_FILENAME_DEFAULT = "range_1000_2_uniform_1_0.001x0.001.csv"
 RANGE_QUERY_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}_{range_str}.csv"
 KNN_QUERY_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
 POINT_QUERY_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{data}_{dimensions}_{distribution}_{skewness}.csv"
 INSERT_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
 INSERT_POINT_FILENAME_TEMPLATE = "{query_type}_{n_queries}_{data}_{dimensions}_{distribution}_{skewness}_{frequency}.csv"
 
-REAL_RANGE_QUERY_FILENAME_DEFAULT = "{data}_range_1000_2_normal_1_0.001x0.001.csv"
+REAL_RANGE_QUERY_FILENAME_DEFAULT = "{data}_range_1000_2_uniform_1_0.001x0.001.csv"
 REAL_RANGE_QUERY_FILENAME_TEMPLATE = "{data}_{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}_{range_str}.csv"
 REAL_KNN_QUERY_FILENAME_TEMPLATE = "{data}_{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"
 REAL_POINT_QUERY_FILENAME_TEMPLATE = "{data}_{query_type}_{n_queries}_{dimensions}_{distribution}_{skewness}.csv"

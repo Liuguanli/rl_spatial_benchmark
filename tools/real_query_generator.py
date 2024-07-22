@@ -18,6 +18,8 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
     bounds = [(df[col].min(), df[col].max()) for col in df.columns]
     # mean = df.mean().values
     # std = df.std().values
+
+    query_range = [query_range[d] * (bounds[d][1] - bounds[d][0]) for d in range(dimensions)]
     
     # Generate query centers based on the specified distribution.
     if distribution == 'uniform':
@@ -156,31 +158,15 @@ def generate_insertions(data_file, n_queries, dimensions, distribution='uniform'
         df_source = pd.read_csv("data/real/dataset/us_100000000.csv", header=None)
     else:
         raise ValueError("Unsupported distribution type")
-    while len(insertion_points) < n_queries:
-        
-        random_index = np.random.randint(0, len(df_source))
+    
+    df_diff = pd.DataFrame([point for point in df_source.values.tolist() if tuple(point) not in existing_points])
+
+    for i in range(n_queries):
+        random_index = np.random.randint(0, len(df_diff))
         # Retrieve the point at the random index
         point = df_source.iloc[random_index]
 
-        # if distribution == 'uniform':
-        #     # Randomly sample n_queries points from the dataframe to serve as query centers.
-        #     point = np.random.uniform([b[0] for b in bounds], [b[1] for b in bounds])
-        # elif distribution == 'normal':
-        #     # Use mean and standard deviation of the dataframe to generate normal distributed queries.
-        #     point = np.random.normal(mean, std)
-        #     point = np.clip(point, [b[0] for b in bounds], [b[1] for b in bounds])
-        # elif distribution == 'skewed' and skewness is not None:
-        #     point = np.random.normal([b[0] for b in bounds], [b[1] for b in bounds]) ** skewness
-        #     point = np.clip(point, [b[0] for b in bounds], [b[1] for b in bounds])
-        # else:
-        #     # Raise an error if the distribution type is unsupported.
-        #     raise ValueError("Unsupported distribution type")
-        point_tuple = tuple(point)
-        
-        # Check if the generated point is unique
-        if point_tuple not in existing_points:
-            insertion_points.append(point)
-            existing_points.add(point_tuple)  # Update the set to include the new point
+        insertion_points.append(point)
 
     return np.array(insertion_points)
 
@@ -191,41 +177,40 @@ def generate_insertion_points(data_file, n_queries, dimensions, frequency, distr
     point_num = step * frequency[1]
     assert insertion_num + point_num == n_queries
 
-    queries = []
     insertions = generate_insertions(data_file, insertion_num, dimensions, distribution, skewness)
-
+    insertions_df = pd.DataFrame(insertions)
     df = pd.read_csv(data_file, header=None)
 
+    if distribution == 'uniform':
+        shuffled_df = df.sample(frac=1).reset_index(drop=True)
+    elif distribution == 'normal':
+        # Normalize data and sample
+        normalized_df = (df - df.mean()) / df.std()
+        shuffled_df = normalized_df.sample(frac=1).reset_index(drop=True)
+    elif distribution == 'skewed' and skewness is not None:
+        # Skew data and sample
+        skewed_df = df ** skewness
+        shuffled_df = skewed_df.sample(frac=1).reset_index(drop=True)
+
+    insertions_df = insertions_df.sample(n=min(insertion_num, len(insertions_df))).reset_index()
+    query_df = shuffled_df.sample(n=min(point_num, len(shuffled_df))).reset_index()
+    insertions_list = insertions_df.values.tolist()
+    query_list = query_df.values.tolist()
+
+    # df_combined = pd.DataFrame()
+    combined_list = []
     for i in range(step):
-        insertion_slice = insertions[i * frequency[0] : i * frequency[0] + frequency[0]].tolist() 
-        df = pd.concat([df, pd.DataFrame(insertion_slice)])
-        new_points = []
-        if distribution == 'uniform':
-            # Randomly sample n_queries points from the dataframe to serve as query centers.
-            sample_indices = np.random.choice(df.index, size=frequency[1], replace=False)
-            new_points = df.iloc[sample_indices].values
-        elif distribution == 'normal':
-            # Normalize data and sample
-            normalized_df = (df - df.mean()) / df.std()
-            sample_indices = np.random.choice(normalized_df.index, size=frequency[1], replace=False)
-            new_points = df.iloc[sample_indices].values  # Return original data points
-        elif distribution == 'skewed' and skewness is not None:
-            # Skew data and sample
-            skewed_df = df ** skewness
-            sample_indices = np.random.choice(skewed_df.index, size=frequency[1], replace=False)
-            new_points = skewed_df.iloc[sample_indices].values
+        # insertion_slice = insertions_df[i * frequency[0] : i * frequency[0] + frequency[0]]
+        # point_slice = query_df[i * frequency[1] : i * frequency[1] + frequency[1]]
+        insertion_slice = insertions_list[i * frequency[0] : i * frequency[0] + frequency[0]]
+        point_slice = query_list[i * frequency[1] : i * frequency[1] + frequency[1]]
+        # df_combined = pd.concat([df_combined, insertion_slice, point_slice], ignore_index=True)
+        combined_list.extend(insertion_slice)
+        combined_list.extend(point_slice)
 
-        point_slice = new_points.tolist()
-        for record in insertion_slice:
-            record_with_id = np.insert(record, 0, 1)
-            queries.append(record_with_id)
-        for record in point_slice:
-            record_with_id = np.insert(record, 0, 2)
-            queries.append(record_with_id)
-
-    queries = np.array(queries, dtype=np.float64)
-
-    return queries
+    # print("df_combined.shape:", df_combined.shape)
+    # return df_combined.values.tolist()
+    return np.array(combined_list)
 
 
 def save_queries_to_csv(queries, file_path, query_type="range"):

@@ -1,14 +1,15 @@
 import json
-import subprocess
-import os
-import time
-import shutil
-
 import logging
+import os
+import shutil
+import subprocess
+import time
 
 logger = None
+is_range_query = True
 
 from constants import *
+
 
 def execute_command(command):
 
@@ -64,14 +65,14 @@ def cleanup_intermediate_files():
     logger.info(f"cleanup_intermediate_files")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        safe_remove("a")
-        safe_remove("b")
-        safe_remove(".t")
-        safe_remove("res2")
+        safe_remove("./benchmark/a")
+        safe_remove("./benchmark/b")
+        safe_remove("./benchmark/.t")
+        safe_remove("./benchmark/res2")
 
-    safe_remove("res")
-    safe_remove("tree.dat")
-    safe_remove("tree.idx")
+    safe_remove("./benchmark/res")
+    safe_remove('./benchmark/tree.dat')
+    safe_remove('./benchmark/tree.idx')
 
     safe_remove(Z_ORDER_OUTPUT)
     safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
@@ -108,14 +109,14 @@ def run_exhaustive_search(data_file, query_file, query_type="range", k=None):
 
     logger.info(f"Running exhaustive search: {query_type}")
     if query_type == "range":
-        subprocess.run("test-rtree-Exhaustive .t intersection > res2", shell=True, check=True)
+        subprocess.run("test-rtree-Exhaustive ./benchmark/.t intersection > ./benchmark/res2", shell=True, check=True)
     else:
         if k:
-            subprocess.run(f"test-rtree-Exhaustive .t {k}NN > res2", shell=True, check=True)
+            subprocess.run(f"test-rtree-Exhaustive ./benchmark/.t {k}NN > ./benchmark/res2", shell=True, check=True)
 
     logger.info("Comparing results")
-    subprocess.run("sort -n res > a", shell=True)
-    subprocess.run("sort -n res2 > b", shell=True)
+    subprocess.run("sort -n ./benchmark/res > ./benchmark/a", shell=True)
+    subprocess.run("sort -n ./benchmark/res2 > ./benchmark/b", shell=True)
 
     diff_result = subprocess.run("diff a b", shell=True)
     if diff_result.returncode == 0:
@@ -134,9 +135,9 @@ def execute_range_query(data_file, query_file, range_query_output_path, test_fil
     logger.info(f"execute_range_query: data_file:{data_file} query_file:{query_file} range_query_output_path:{range_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} tree intersection {BUFFER} > res"
+        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER} > ./benchmark/res"
     else:
-        command = f"{test_file} {query_file} tree intersection {BUFFER}"
+        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
 
     logger.info(f"execute_range_query: {command}")
 
@@ -146,7 +147,8 @@ def execute_range_query(data_file, query_file, range_query_output_path, test_fil
     os.makedirs(os.path.dirname(range_query_output_path), exist_ok=True)
 
     with open(range_query_output_path, "w") as f:
-        f.write(result.stderr)
+        if result:
+            f.write(result.stderr)
         f.write(f"Elapsed Time: {elapsed_time_ns_range}\n")
 
     if RUN_EXHAUSTIVE_SEARCH:
@@ -161,16 +163,17 @@ def execute_knn_query(k, query_file, data_file, knn_query_output_path, test_file
     logger.info(f"execute_knn_query: data_file:{data_file} query_file:{query_file} knn_query_output_path:{knn_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} tree {k}NN {BUFFER}> res"
+        command = f"{test_file} {query_file} ./benchmark/tree {k}NN {BUFFER}> res"
     else:
-        command = f"{test_file} {query_file} tree {k}NN {BUFFER}"
+        command = f"{test_file} {query_file} ./benchmark/tree {k}NN {BUFFER}"
     
     result, elapsed_time_ns_knn = execute_command_with_err(command)
 
     os.makedirs(os.path.dirname(knn_query_output_path), exist_ok=True)
 
     with open(knn_query_output_path, "w") as f:
-        f.write(result.stderr)
+        if result:
+            f.write(result.stderr)
         f.write(f"Elapsed Time: {elapsed_time_ns_knn}\n")
 
     if RUN_EXHAUSTIVE_SEARCH:
@@ -185,16 +188,17 @@ def execute_point_query(query_file, data_file, point_query_output_path, test_fil
     logger.info(f"execute_point_query: data_file:{data_file} query_file:{query_file} point_query_output_path:{point_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} tree intersection {BUFFER} > res"
+        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER} > res"
     else:
-        command = f"{test_file} {query_file} tree intersection {BUFFER}"
+        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
     os.makedirs(os.path.dirname(point_query_output_path), exist_ok=True)
 
     with open(point_query_output_path, "w") as f:
-        f.write(result.stderr)
+        if result:
+            f.write(result.stderr)
         f.write(f"Elapsed Time: {elapsed_time_ns_point}\n")
 
     if RUN_EXHAUSTIVE_SEARCH:
@@ -208,14 +212,15 @@ def execute_insert(query_file, insert_output_path, test_file="test-rtree-RTreeQu
     global logger
     logger.info(f"execute_insert: query_file:{query_file} insert_output_path:{insert_output_path} test_file:{test_file}")
 
-    command = f"{test_file} {query_file} tree intersection {BUFFER}"
+    command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
     os.makedirs(os.path.dirname(insert_output_path), exist_ok=True)
 
     with open(insert_output_path, "w") as f:
-        f.write(result.stderr)
+        if result:
+            f.write(result.stderr)
         f.write(f"Elapsed Time: {elapsed_time_ns_point}\n")
 
     logger.info("Finish insert")
@@ -226,14 +231,15 @@ def execute_insert_point(query_file, insert_point_output_path, test_file="test-r
     global logger
     logger.info(f"execute_insert_point: query_file:{query_file} insert_point_output_path:{insert_point_output_path} test_file:{test_file}")
 
-    command = f"{test_file} {query_file} tree intersection {BUFFER}"
+    command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
     os.makedirs(os.path.dirname(insert_point_output_path), exist_ok=True)
 
     with open(insert_point_output_path, "w") as f:
-        f.write(result.stderr)
+        if result:
+            f.write(result.stderr)
         f.write(f"Elapsed Time: {elapsed_time_ns_point}\n")
 
     logger.info("Finish insert_point")
@@ -279,20 +285,28 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
-        build_output_path = Z_BUILD_OUTPUT_PATH.format(
-            data_file_prefix=data_file_prefix,
-            bit_num=bit_num
-        )
+        # save build information when executing point or knn queries. range query is not considered becuase
+        # we put default query every time. We do this because some models are saved to avoid training again,
+        # so the build time is not accurate. But for point and knn queries, they are executed when index is built 
+        # for the first time.
+        if point_queries or knn_queries:
+            build_output_path = Z_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                bit_num=bit_num
+            )
 
-        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-        with open(build_output_path, "w") as f:
-            f.write(result.stderr)
-            f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
+            with open(build_output_path, "w") as f:
+                if result:
+                    f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -353,7 +367,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(Z_ORDER_SORTED_OUTPUT)
+        safe_remove(Z_ORDER_SORTED_OUTPUT)
 
 def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -393,20 +407,24 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
-        build_output_path = RANK_SPACE_Z_BUILD_OUTPUT_PATH.format(
-            data_file_prefix=data_file_prefix,
-            bit_num=bit_num,
-        )
+        if point_queries or knn_queries:
+            build_output_path = RANK_SPACE_Z_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                bit_num=bit_num,
+            )
 
-        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-        with open(build_output_path, "w") as f:
-            f.write(result.stderr)
-            f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
+            with open(build_output_path, "w") as f:
+                if result:
+                    f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -467,7 +485,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
+        safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
 
 def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -523,23 +541,27 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
-            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
-            build_output_path = BMTREE_BUILD_OUTPUT_PATH.format(
-                data_file_prefix=data_file_prefix,
-                query=file_name_prefix,
-                bit_num=bit_num,
-                tree_depth=tree_depth,
-                sample_size=sample_size,
-            )
+            if point_queries or knn_queries:
+                build_output_path = BMTREE_BUILD_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    query=file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size,
+                )
 
-            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+                os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-            with open(build_output_path, "w") as f:
-                f.write(result.stderr)
-                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
-                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                with open(build_output_path, "w") as f:
+                    if result:
+                        f.write(result.stderr)
+                    f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                    f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
             data_file = BMTREE_OUTPUT
 
@@ -615,7 +637,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(BMTREE_OUTPUT)
+        safe_remove(BMTREE_OUTPUT)
 
 def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -638,20 +660,24 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
 
         logger.info(f"Start building rtree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
-        build_output_path = RTREE_BUILD_OUTPUT_PATH.format(
-            data_file_prefix=data_file_prefix,
-            variant=rtree_variant
-        )
-                
-        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+        if point_queries or knn_queries:
+            build_output_path = RTREE_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                variant=rtree_variant
+            )
+                    
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-        with open(build_output_path, "w") as f:
-            f.write(result.stderr)
-            f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+            with open(build_output_path, "w") as f:
+                if result:
+                    f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -711,7 +737,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(RTREE_DATA)
+        safe_remove(RTREE_DATA)
 
 def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
     
@@ -736,20 +762,24 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Start building rstartree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
-        build_output_path = R_STAR_TREE_BUILD_OUTPUT_PATH.format(
-            data_file_prefix=data_file_prefix,
-            variant=rtree_variant
-        )
+        if point_queries or knn_queries:
+            build_output_path = R_STAR_TREE_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                variant=rtree_variant
+            )
 
-        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-        with open(build_output_path, "w") as f:
-            f.write(result.stderr)
-            f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+            with open(build_output_path, "w") as f:
+                if result:
+                    f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -809,7 +839,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(RTREE_DATA)
+        safe_remove(RTREE_DATA)
 
 def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -877,22 +907,26 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                 elapsed_time_ns_learn = 0
 
 
-            command = f"test-rtree-RTreeLoad {data_file} tree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-RTreeLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
-            build_output_path = RLRTREE_BUILD_OUTPUT_PATH.format(
-                data_file_prefix=data_file_prefix,
-                range_query_prefix=file_name_prefix,
-                variant=rtree_variant,
-                epoch=epoch,
-            )
+            if point_queries or knn_queries:
+                build_output_path = RLRTREE_BUILD_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    variant=rtree_variant,
+                    epoch=epoch,
+                )
 
-            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+                os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-            with open(build_output_path, "w") as f:
-                f.write(result.stderr)
-                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
-                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                with open(build_output_path, "w") as f:
+                    if result:
+                        f.write(result.stderr)
+                    f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                    f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
             range_query_output_path = RLRTREE_RANGE_QUERY_OUTPUT_PATH.format(
@@ -961,7 +995,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(RLRTREE_DATA)
+        safe_remove(RLRTREE_DATA)
 
 def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -987,21 +1021,25 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
-        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path tree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path ./benchmark/tree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
 
         logger.info(f"Start building kdtree: {command}")
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
-        build_output_path = KDTREE_BUILD_OUTPUT_PATH.format(
-            data_file_prefix=data_file_prefix
-        )
+        if point_queries or knn_queries:
+            build_output_path = KDTREE_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix
+            )
 
-        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-        with open(build_output_path, "w") as f:
-            f.write(result.stderr)
-            f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+            with open(build_output_path, "w") as f:
+                if result:
+                    f.write(result.stderr)
+                f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -1058,8 +1096,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(KDTREE_DATA)
-
+        safe_remove(KDTREE_DATA)
 
 def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
     
@@ -1090,22 +1127,26 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} tree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} ./benchmark/tree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
 
             logger.info(f"Start building kdtree: {command}")
 
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
-            build_output_path = KDTREE_GREEDY_BUILD_OUTPUT_PATH.format(
-                data_file_prefix=data_file_prefix,
-                range_query_prefix=file_name_prefix
-            )
+            if point_queries or knn_queries:
+                build_output_path = KDTREE_GREEDY_BUILD_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix
+                )
 
-            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+                os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-            with open(build_output_path, "w") as f:
-                f.write(result.stderr)
-                f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+                with open(build_output_path, "w") as f:
+                    if result:
+                        f.write(result.stderr)
+                    f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
             range_query_output_path = KDTREE_GREEDY_RANGE_QUERY_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
@@ -1162,9 +1203,8 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(KDTREE_GREEDY_DATA)
+        safe_remove(KDTREE_GREEDY_DATA)
         # save_remove(KDTREE_GREEDY_QUERY)
-
 
 def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
     
@@ -1221,26 +1261,30 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
 
             logger.info(f"Start building qdtree: {data_file}")
             
-            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} tree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} ./benchmark/tree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
 
             logger.info(f"Start building qdtree: {command}")
 
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
-            build_output_path = QDTREE_BUILD_OUTPUT_PATH.format(
-                data_file_prefix=data_file_prefix,
-                range_query_prefix=file_name_prefix,
-                episode=episode,
-                sampling_ratio=sampling_ratio,
-                action_sampling_size=action_sampling_size,
-            )
+            if point_queries or knn_queries:
+                build_output_path = QDTREE_BUILD_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    episode=episode,
+                    sampling_ratio=sampling_ratio,
+                    action_sampling_size=action_sampling_size,
+                )
 
-            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+                os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-            with open(build_output_path, "w") as f:
-                f.write(result.stderr)
-                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
-                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                with open(build_output_path, "w") as f:
+                    if result:
+                        f.write(result.stderr)
+                    f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                    f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
@@ -1314,13 +1358,17 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
     finally:
         # clean up intermediate files
         cleanup_intermediate_files()
-        # safe_remove(QDTREE_DATA)
+        safe_remove(QDTREE_DATA)
         # save_remove(QDTREE_QUERY)
-
 
 def process_experiment(experiment):
 
     global logger
+
+    # if not experiment['available']:
+    if not experiment.get('available', True):
+        logger.info(f"experiment not available")
+        return
 
     range_queries = []
     knn_queries = []
@@ -1339,6 +1387,8 @@ def process_experiment(experiment):
     logger.info(f"data distribution: {data_distribution}")
 
     is_real_data = True
+
+    workload_suffix = "_small" if RUN_EXAMPLE else ""
 
     if data_distribution in ["uniform", "normal", "skewed"]:
 
@@ -1361,7 +1411,7 @@ def process_experiment(experiment):
         # Workloads Section:
         for workload in experiment['workloads']:
 
-            with open(os.path.join(SYNTHETIC_WORKLOAD_PATH, workload), "r") as json_file:
+            with open(os.path.join(SYNTHETIC_WORKLOAD_PATH + workload_suffix, workload), "r") as json_file:
                 workload = json.load(json_file)
 
                 # Operation Section
@@ -1481,7 +1531,10 @@ def process_experiment(experiment):
         
         if len(range_queries) == 0:
             logger.info("No queries in range_queries (synthetic)")
-
+            if os.path.exists(os.path.join(SYNTHETIC_QUERY_PATH, RANGE_QUERY_FILENAME_DEFAULT)):
+                query_command = f"python tools/synthetic_query_generator.py --query_type range --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1 --bounds 0 1 --bounds 0 1 --query_range 0.001 0.001"
+                execute_command(query_command)
+            is_range_query = False
             range_queries.append(RANGE_QUERY_FILENAME_DEFAULT)
 
     else:
@@ -1500,7 +1553,7 @@ def process_experiment(experiment):
         # Workloads Section:
         for workload in experiment['workloads']:
 
-            with open(os.path.join(REAL_WORKLOAD_PATH, workload), "r") as json_file:
+            with open(os.path.join(REAL_WORKLOAD_PATH + workload_suffix, workload), "r") as json_file:
                 workload = json.load(json_file)
                 # Queries Section
                 for query in workload['operations']:
@@ -1627,7 +1680,10 @@ def process_experiment(experiment):
         
         if len(range_queries) == 0:
             logger.info("No queries in range_queries (real)")
-
+            if not os.path.exists(os.path.join(REAL_QUERY_PATH, REAL_RANGE_QUERY_FILENAME_DEFAULT.format(data=base_name))):
+                query_command = f"python tools/real_query_generator.py --data {absolute_data_file_name} --query_type range --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1 --query_range 0.001 0.001"
+                execute_command(query_command)
+            is_range_query = False
             range_queries.append(REAL_RANGE_QUERY_FILENAME_DEFAULT.format(data=base_name))    
 
     query_path = REAL_QUERY_PATH if is_real_data else SYNTHETIC_QUERY_PATH
@@ -1651,6 +1707,12 @@ def process_experiment(experiment):
     # Baselines Section
     for baseline in experiment['baseline']:
         baseline_name = baseline['name']
+
+        if not baseline.get('available', True):
+            logger.info(f"{baseline_name} is not available")
+            continue
+
+
         # config of a specific baseline
         baseline_config = baseline["config"]
 
@@ -1693,17 +1755,25 @@ def main():
     configs = []
     if RUN_EXAMPLE:
         if RUN_ALL_BASELINE_EXAMPLE:
-            # configs = ["example_config_all_baselines.json",
-            #            "example_config_all_baselines_insert.json",
-            #            "example_config_all_baselines_read_heavy.json",
-            #            "example_config_all_baselines_write_heavy.json"]
-            configs = ["example_config_all_baselines_point_rank_space.json"]
+            configs = ["example_config_all_baselines.json",
+                       "example_config_all_baselines_insert.json",
+                       "example_config_all_baselines_read_heavy.json",
+                       "example_config_all_baselines_write_heavy.json"]
+            configs = ["example_config_all_baselines_point_rank_space_100m.json"]
         # else:
         #     configs = ["verify_qdtree.json"]
     else:
         directory = CONFIG_DIR
-        # candidates = ["overall"]
-        candidates = ["point_range_knn_queries", "write_only", "write_heavy_only"]
+        # First run point_range_knn_queries to make sure queries are generated first for RL based.
+        special_candidate = "point_range_knn_queries"
+        for root, dirs, files in os.walk(directory):
+            if root.split("/")[-1] == special_candidate:
+                for file in files:
+                    if file.endswith(".json"):
+                        config_file_path = os.path.join(root, file)
+                        configs.append(config_file_path)
+
+        candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
         for root, dirs, files in os.walk(directory):
             if root.split("/")[-1] not in candidates:
                 continue
@@ -1711,7 +1781,6 @@ def main():
                 if file.endswith(".json"):
                     config_file_path = os.path.join(root, file)
                     configs.append(config_file_path)
-                    # print(config_file_path)
     counter = 0
 
     for config_file_path in configs:

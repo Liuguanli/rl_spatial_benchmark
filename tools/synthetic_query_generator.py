@@ -14,6 +14,8 @@ from constants import KNN_QUERY_FILENAME_TEMPLATE, RANGE_QUERY_FILENAME_TEMPLATE
 
 def generate_range_queries(n_queries, dimensions, distribution, query_range, bounds, skewness=None):
     queries = []
+    query_range = [query_range[d] * (bounds[d][1] - bounds[d][0]) for d in range(dimensions)]
+
     if distribution == 'uniform':
         adjusted_bounds = [(b[0] + r/2, b[1] - r/2) for b, r in zip(bounds, query_range)]
         centers = np.random.uniform(low=[b[0] for b in adjusted_bounds], high=[b[1] for b in adjusted_bounds], size=(n_queries, dimensions))
