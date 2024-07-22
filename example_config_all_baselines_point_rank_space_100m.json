@@ -1,0 +1,29 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 100000000,
+        "distribution": "us",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "point_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        }
+      ]
+    }
+  ]
+}

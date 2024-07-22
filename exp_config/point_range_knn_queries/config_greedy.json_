@@ -3,7 +3,7 @@
     {
       "available": false,
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "us",
         "skewness": 1,
@@ -13,7 +13,9 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "point_query_only.json", 
+        "range_query_only.json", 
+        "knn_query_only.json"
        ],
       "baseline": [
         {
@@ -41,9 +43,9 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "india",
         "skewness": 1,
@@ -53,7 +55,9 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "point_query_only.json", 
+        "range_query_only.json", 
+        "knn_query_only.json"
        ],
       "baseline": [
         {
@@ -81,9 +85,9 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "australia",
         "skewness": 1,
@@ -93,7 +97,9 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "point_query_only.json", 
+        "range_query_only.json", 
+        "knn_query_only.json"
        ],
       "baseline": [
         {
@@ -121,9 +127,9 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "normal",
         "skewness": 1,
@@ -133,7 +139,9 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "point_query_only.json", 
+        "range_query_only.json", 
+        "knn_query_only.json"
        ],
       "baseline": [
         {
@@ -161,9 +169,9 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "uniform",
         "skewness": 1,
@@ -173,7 +181,9 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "point_query_only.json", 
+        "range_query_only.json", 
+        "knn_query_only.json"
        ],
       "baseline": [
         {
@@ -201,9 +211,9 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
-        "size": 10000000,
+        "size": 100000000,
         "dimensions": 2,
         "distribution": "skewed",
         "skewness": 4,
@@ -213,7 +223,9 @@
         ]
       },
       "workloads": [
-        "write_heavy_only.json"
+        "point_query_only.json", 
+        "range_query_only.json", 
+        "knn_query_only.json"
        ],
       "baseline": [
         {

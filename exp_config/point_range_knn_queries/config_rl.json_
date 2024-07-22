@@ -19,28 +19,34 @@
        ],
       "baseline": [
         {
-          "name": "zorder",
-          "available": false,
+          "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 2,
+            "sampling": 10000,
             "page_size": 100,
-            "bit_num": 32
+            "bit_num": 20
           }
         },
         {
-          "name": "rtree",
-          "available": false,
+          "name": "rlrtree",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
-          "available": true,
+          "name": "qdtree",
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -64,27 +70,34 @@
        ],
       "baseline": [
         {
-          "name": "zorder",
-          "available": false,
+          "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 2,
+            "sampling": 10000,
             "page_size": 100,
-            "bit_num": 32
+            "bit_num": 20
           }
         },
         {
-          "name": "rtree",
-          "available": false,
+          "name": "rlrtree",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
+          "name": "qdtree",
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -108,27 +121,34 @@
        ],
       "baseline": [
         {
-          "name": "zorder",
-          "available": false,
+          "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 2,
+            "sampling": 10000,
             "page_size": 100,
-            "bit_num": 32
+            "bit_num": 20
           }
         },
         {
-          "name": "rtree",
-          "available": false,
+          "name": "rlrtree",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
+          "name": "qdtree",
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -152,27 +172,34 @@
        ],
       "baseline": [
         {
-          "name": "zorder",
-          "available": false,
+          "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 2,
+            "sampling": 10000,
             "page_size": 100,
-            "bit_num": 32
+            "bit_num": 20
           }
         },
         {
-          "name": "rtree",
-          "available": false,
+          "name": "rlrtree",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
+          "name": "qdtree",
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -196,27 +223,34 @@
        ],
       "baseline": [
         {
-          "name": "zorder",
-          "available": false,
+          "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 2,
+            "sampling": 10000,
             "page_size": 100,
-            "bit_num": 32
+            "bit_num": 20
           }
         },
         {
-          "name": "rtree",
-          "available": false,
+          "name": "rlrtree",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
+          "name": "qdtree",
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]
@@ -240,27 +274,34 @@
        ],
       "baseline": [
         {
-          "name": "zorder",
-          "available": false,
+          "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 2,
+            "sampling": 10000,
             "page_size": 100,
-            "bit_num": 32
+            "bit_num": 20
           }
         },
         {
-          "name": "rtree",
-          "available": false,
+          "name": "rlrtree",
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
+          "name": "qdtree",
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]
