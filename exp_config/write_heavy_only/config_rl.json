@@ -1,7 +1,7 @@
 {
   "experiments": [
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -13,9 +13,7 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "range_query_only.json", 
-        "knn_query_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -52,7 +50,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -64,9 +62,7 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "range_query_only.json", 
-        "knn_query_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -103,7 +99,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -115,9 +111,7 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "range_query_only.json", 
-        "knn_query_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -154,7 +148,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -166,9 +160,7 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "range_query_only.json", 
-        "knn_query_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -205,7 +197,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -217,9 +209,7 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "range_query_only.json", 
-        "knn_query_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {
@@ -256,7 +246,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -268,9 +258,7 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "range_query_only.json", 
-        "knn_query_only.json"
+        "write_heavy_only.json"
        ],
       "baseline": [
         {

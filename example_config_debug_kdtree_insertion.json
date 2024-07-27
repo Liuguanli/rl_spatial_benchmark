@@ -1,0 +1,28 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "us",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "write_only_debug.json",
+        "balance_only_debug.json"
+       ],
+      "baseline": [
+        {
+          "name": "kdtree",
+          "config": {
+            "page_size": 100
+          }
+        }
+      ]
+    }    
+  ]
+}
