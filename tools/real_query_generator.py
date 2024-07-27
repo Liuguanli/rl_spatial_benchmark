@@ -142,10 +142,11 @@ def generate_insertions(data_file, n_queries, dimensions, distribution='uniform'
     Returns:
     - A numpy array containing the generated unique insertion points.
     """
+
     df = pd.read_csv(data_file, header=None)
-    mean = df.mean().values
-    std = df.std().values
-    bounds = [(df[col].min(), df[col].max()) for col in df.columns]
+    # mean = df.mean().values
+    # std = df.std().values
+    # bounds = [(df[col].min(), df[col].max()) for col in df.columns]
     existing_points = set(map(tuple, df.values.tolist()))  # Convert existing points to a set of tuples for fast lookup
 
     # Generate unique points ensuring they do not overlap with existing data
@@ -161,14 +162,9 @@ def generate_insertions(data_file, n_queries, dimensions, distribution='uniform'
     
     df_diff = pd.DataFrame([point for point in df_source.values.tolist() if tuple(point) not in existing_points])
 
-    for i in range(n_queries):
-        random_index = np.random.randint(0, len(df_diff))
-        # Retrieve the point at the random index
-        point = df_source.iloc[random_index]
+    query_df = df_diff.sample(n=min(n_queries, len(df_diff))).reset_index(drop=True)
 
-        insertion_points.append(point)
-
-    return np.array(insertion_points)
+    return query_df.values
 
 def generate_insertion_points(data_file, n_queries, dimensions, frequency, distribution='uniform', skewness=None):
     
@@ -192,8 +188,8 @@ def generate_insertion_points(data_file, n_queries, dimensions, frequency, distr
         skewed_df = df ** skewness
         shuffled_df = skewed_df.sample(frac=1).reset_index(drop=True)
 
-    insertions_df = insertions_df.sample(n=min(insertion_num, len(insertions_df))).reset_index()
-    query_df = shuffled_df.sample(n=min(point_num, len(shuffled_df))).reset_index()
+    # insertions_df = insertions_df.sample(n=min(insertion_num, len(insertions_df))).reset_index()
+    query_df = shuffled_df.sample(n=min(point_num, len(shuffled_df))).reset_index(drop=True)
     insertions_list = insertions_df.values.tolist()
     query_list = query_df.values.tolist()
 
@@ -204,6 +200,8 @@ def generate_insertion_points(data_file, n_queries, dimensions, frequency, distr
         # point_slice = query_df[i * frequency[1] : i * frequency[1] + frequency[1]]
         insertion_slice = insertions_list[i * frequency[0] : i * frequency[0] + frequency[0]]
         point_slice = query_list[i * frequency[1] : i * frequency[1] + frequency[1]]
+        insertion_slice = [[1] + item for item in insertion_slice]
+        point_slice = [[2] + item for item in point_slice]
         # df_combined = pd.concat([df_combined, insertion_slice, point_slice], ignore_index=True)
         combined_list.extend(insertion_slice)
         combined_list.extend(point_slice)
@@ -340,6 +338,9 @@ if __name__ == "__main__":
 
 
 # insert
-# python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1
+# python tools/real_query_generator.py --data data/real/dataset/india_10000000.csv --query_type insert --n_queries 10000000 --dimensions 2 --distribution uniform --skewness 1
 # python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1
 # python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1
+
+# insert point
+# python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type insert_point --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1 --frequency 18 2
