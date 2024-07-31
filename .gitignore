@@ -15,8 +15,11 @@ log/
 
 *.pyc
 
-tree.dat
+*.dat
 
-tree.idx
+*.idx
 
 *.csv
+
+benchmark/*.dat
+benchmark/*.idx
