@@ -19,7 +19,7 @@ REAL_WORKLOAD_PATH = "data/real/workloads"
 SAVE_SPACE = False
 RUN_EXHAUSTIVE_SEARCH = False  # TODO uncomment the printing code first in e.g., libspatialindex/test/rtree/RTreeQuery.cc line 77
 RUN_EXAMPLE = False
-RUN_ALL_BASELINE_EXAMPLE = True
+RUN_ALL_BASELINE_EXAMPLE = False
 
 PAGE_SIZE = 4096
 BUFFER = 0

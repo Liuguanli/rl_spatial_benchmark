@@ -74,6 +74,33 @@ def cleanup_intermediate_files():
     safe_remove('./benchmark/tree.dat')
     safe_remove('./benchmark/tree.idx')
 
+    safe_remove('./benchmark/zorder.dat')
+    safe_remove('./benchmark/zorder.idx')
+
+    safe_remove('./benchmark/rtree.dat')
+    safe_remove('./benchmark/rtree.idx')
+
+    safe_remove('./benchmark/kdtree.dat')
+    safe_remove('./benchmark/kdtree.idx')
+
+    safe_remove('./benchmark/rankspace.dat')
+    safe_remove('./benchmark/rankspace.idx')
+
+    safe_remove('./benchmark/rstar.dat')
+    safe_remove('./benchmark/rstar.idx')
+
+    safe_remove('./benchmark/kdgreedy.dat')
+    safe_remove('./benchmark/kdgreedy.idx')
+
+    safe_remove('./benchmark/bmtree.dat')
+    safe_remove('./benchmark/bmtree.idx')
+
+    safe_remove('./benchmark/rlrtree.dat')
+    safe_remove('./benchmark/rlrtree.idx')
+
+    safe_remove('./benchmark/qdtree.dat')
+    safe_remove('./benchmark/qdtree.idx')
+
     safe_remove(Z_ORDER_OUTPUT)
     safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
     safe_remove(BMTREE_INPUT)
@@ -128,16 +155,16 @@ def run_exhaustive_search(data_file, query_file, query_type="range", k=None):
     logger.info(f"Results: {wc_result.stdout}")
 
 
-def execute_range_query(data_file, query_file, range_query_output_path, test_file="test-rtree-RTreeQuery"):
+def execute_range_query(data_file, query_file, range_query_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
 
     global logger
 
     logger.info(f"execute_range_query: data_file:{data_file} query_file:{query_file} range_query_output_path:{range_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER} > ./benchmark/res"
+        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER} > ./benchmark/res"
     else:
-        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
+        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
 
     logger.info(f"execute_range_query: {command}")
 
@@ -157,15 +184,15 @@ def execute_range_query(data_file, query_file, range_query_output_path, test_fil
     logger.info("Finish range query")
 
 
-def execute_knn_query(k, query_file, data_file, knn_query_output_path, test_file="test-rtree-RTreeQuery"):
+def execute_knn_query(k, query_file, data_file, knn_query_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
 
     global logger
     logger.info(f"execute_knn_query: data_file:{data_file} query_file:{query_file} knn_query_output_path:{knn_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} ./benchmark/tree {k}NN {BUFFER}> res"
+        command = f"{test_file} {query_file} ./benchmark/{index_name} {k}NN {BUFFER}> res"
     else:
-        command = f"{test_file} {query_file} ./benchmark/tree {k}NN {BUFFER}"
+        command = f"{test_file} {query_file} ./benchmark/{index_name} {k}NN {BUFFER}"
     
     result, elapsed_time_ns_knn = execute_command_with_err(command)
 
@@ -182,15 +209,15 @@ def execute_knn_query(k, query_file, data_file, knn_query_output_path, test_file
     logger.info("Finish knn query")
 
 
-def execute_point_query(query_file, data_file, point_query_output_path, test_file="test-rtree-RTreeQuery"):
+def execute_point_query(query_file, data_file, point_query_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
 
     global logger
     logger.info(f"execute_point_query: data_file:{data_file} query_file:{query_file} point_query_output_path:{point_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER} > res"
+        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER} > res"
     else:
-        command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
+        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
@@ -207,12 +234,12 @@ def execute_point_query(query_file, data_file, point_query_output_path, test_fil
     logger.info("Finish point query")
     
 
-def execute_insert(query_file, insert_output_path, test_file="test-rtree-RTreeQuery"):
+def execute_insert(query_file, insert_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
 
     global logger
     logger.info(f"execute_insert: query_file:{query_file} insert_output_path:{insert_output_path} test_file:{test_file}")
 
-    command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
+    command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
@@ -226,12 +253,12 @@ def execute_insert(query_file, insert_output_path, test_file="test-rtree-RTreeQu
     logger.info("Finish insert")
     
 
-def execute_insert_point(query_file, insert_point_output_path, test_file="test-rtree-RTreeQuery"):
+def execute_insert_point(query_file, insert_point_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
 
     global logger
     logger.info(f"execute_insert_point: query_file:{query_file} insert_point_output_path:{insert_point_output_path} test_file:{test_file}")
 
-    command = f"{test_file} {query_file} ./benchmark/tree intersection {BUFFER}"
+    command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
@@ -285,7 +312,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/zorder {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -305,8 +332,8 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/zorder.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/zorder.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -316,7 +343,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 bit_num=bit_num,
             )
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
-            execute_range_query(data_file, query_file, range_query_output_path, "test-rtree-RTreeQuery")
+            execute_range_query(data_file, query_file, range_query_output_path, "test-rtree-RTreeQuery", index_name="zorder")
 
         for file_name in knn_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -329,7 +356,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                     bit_num=bit_num,
                     k=k
                 )
-                execute_knn_query(k, query_file, data_file, knn_query_output_path)
+                execute_knn_query(k, query_file, data_file, knn_query_output_path, index_name="zorder")
 
         for file_name in point_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -339,7 +366,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 point_query_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_point_query(query_file, data_file, point_query_output_path)
+            execute_point_query(query_file, data_file, point_query_output_path, index_name="zorder")
 
         for file_name in insertions:
             file_name_prefix = file_name.rstrip('.csv')
@@ -349,7 +376,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 insert_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_insert(query_file, insert_output_path)
+            execute_insert(query_file, insert_output_path, index_name="zorder")
 
         for file_name in insert_points:
             file_name_prefix = file_name.rstrip('.csv')
@@ -359,7 +386,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 insert_point_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_insert_point(query_file, insert_point_output_path)
+            execute_insert_point(query_file, insert_point_output_path, index_name="zorder")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -407,7 +434,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/rankspace {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -423,8 +450,8 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rankspace.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rankspace.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -434,7 +461,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                 range_query_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_range_query(data_file, query_file, range_query_output_path)
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="rankspace")
 
         for file_name in knn_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -447,7 +474,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                     bit_num=bit_num,
                     k=k
                 )
-                execute_knn_query(k, query_file, data_file, knn_query_output_path)
+                execute_knn_query(k, query_file, data_file, knn_query_output_path, index_name="rankspace")
 
         for file_name in point_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -457,7 +484,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                 point_query_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_point_query(query_file, data_file, point_query_output_path)
+            execute_point_query(query_file, data_file, point_query_output_path, index_name="rankspace")
 
         for file_name in insertions:
             file_name_prefix = file_name.rstrip('.csv')
@@ -467,7 +494,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                 insert_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_insert(query_file, insert_output_path)
+            execute_insert(query_file, insert_output_path, index_name="rankspace")
 
         for file_name in insert_points:
             file_name_prefix = file_name.rstrip('.csv')
@@ -477,7 +504,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                 insert_point_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-            execute_insert_point(query_file, insert_point_output_path)
+            execute_insert_point(query_file, insert_point_output_path, index_name="rankspace")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -541,7 +568,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
-            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/tree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/bmtree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -560,8 +587,8 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                         f.write(result.stderr)
                     f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                     f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/bmtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/bmtree.idx')}\n")
 
             data_file = BMTREE_OUTPUT
 
@@ -573,7 +600,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 tree_depth=tree_depth,
                 sample_size=sample_size,
             )
-            execute_range_query(data_file, query_file, range_query_output_path)
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="bmtree")
 
             for knn_file_name in knn_queries:
                 knn_file_name_prefix = knn_file_name.rstrip('.csv')
@@ -590,7 +617,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                         knn_query_prefix=knn_file_name_prefix,
                         k=k
                     )
-                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path)
+                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="bmtree")
 
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
@@ -603,7 +630,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                     tree_depth=tree_depth,
                     sample_size=sample_size
                 )
-                execute_point_query(query_file, data_file, point_query_output_path)
+                execute_point_query(query_file, data_file, point_query_output_path, index_name="bmtree")
 
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
@@ -616,7 +643,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                     tree_depth=tree_depth,
                     sample_size=sample_size
                 )
-                execute_insert(query_file, insert_output_path)
+                execute_insert(query_file, insert_output_path, index_name="bmtree")
 
             for file_name in insert_points:
                 insert_point_file_name_prefix = file_name.rstrip('.csv')
@@ -629,7 +656,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                     tree_depth=tree_depth,
                     sample_size=sample_size
                 )
-                execute_insert_point(query_file, insert_point_output_path)
+                execute_insert_point(query_file, insert_point_output_path, index_name="bmtree")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -660,7 +687,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
 
         logger.info(f"Start building rtree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rtree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -676,8 +703,8 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rtree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rtree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -687,7 +714,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_range_query(data_file, query_file, range_query_output_path)
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="rtree")
 
         for file_name in knn_queries:
             ks = ks_map.get(file_name)
@@ -700,7 +727,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                     k=k,
                     variant=rtree_variant
                 )
-                execute_knn_query(k, query_file, data_file, knn_query_output_path)
+                execute_knn_query(k, query_file, data_file, knn_query_output_path, index_name="rtree")
 
         for file_name in point_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -710,7 +737,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 point_query_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_point_query(query_file, data_file, point_query_output_path)
+            execute_point_query(query_file, data_file, point_query_output_path, index_name="rtree")
 
         for file_name in insertions:
             file_name_prefix = file_name.rstrip('.csv')
@@ -720,7 +747,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 insert_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_insert(query_file, insert_output_path)
+            execute_insert(query_file, insert_output_path, index_name="rtree")
 
         for file_name in insert_points:
             file_name_prefix = file_name.rstrip('.csv')
@@ -730,7 +757,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 insert_point_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_insert_point(query_file, insert_point_output_path)
+            execute_insert_point(query_file, insert_point_output_path, index_name="rtree")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -762,7 +789,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Start building rstartree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rstar {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -778,8 +805,8 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rstar.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rstar.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -789,7 +816,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_range_query(data_file, query_file, range_query_output_path)
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="rstar")
 
         for file_name in knn_queries:
             ks = ks_map.get(file_name)
@@ -802,7 +829,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                     k=k,
                     variant=rtree_variant
                 )
-                execute_knn_query(k, query_file, data_file, knn_query_output_path)
+                execute_knn_query(k, query_file, data_file, knn_query_output_path, index_name="rstar")
 
         for file_name in point_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -812,7 +839,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 point_query_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_point_query(query_file, data_file, point_query_output_path)
+            execute_point_query(query_file, data_file, point_query_output_path, index_name="rstar")
 
         for file_name in insertions:
             file_name_prefix = file_name.rstrip('.csv')
@@ -822,7 +849,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 insert_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_insert(query_file, insert_output_path)
+            execute_insert(query_file, insert_output_path, index_name="rstar")
 
         for file_name in insert_points:
             file_name_prefix = file_name.rstrip('.csv')
@@ -832,7 +859,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 insert_point_prefix=file_name_prefix,
                 variant=rtree_variant
             )
-            execute_insert_point(query_file, insert_point_output_path)
+            execute_insert_point(query_file, insert_point_output_path, index_name="rstar")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -906,8 +933,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
 
                 elapsed_time_ns_learn = 0
 
-
-            command = f"test-rtree-RTreeLoad {data_file} ./benchmark/tree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -925,8 +951,8 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                         f.write(result.stderr)
                     f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                     f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rlrtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rlrtree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
             range_query_output_path = RLRTREE_RANGE_QUERY_OUTPUT_PATH.format(
@@ -935,7 +961,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                 variant=rtree_variant,
                 epoch=epoch,
             )
-            execute_range_query(data_file, query_file, range_query_output_path)
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="rlrtree")
 
             for file_name in knn_queries:
                 ks = ks_map.get(file_name)
@@ -950,7 +976,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                         k=k,
                         variant=rtree_variant
                     )
-                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path)
+                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="rlrtree")
 
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
@@ -962,7 +988,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     epoch=epoch,
                     variant=rtree_variant
                 )
-                execute_point_query(query_file, data_file, point_query_output_path)
+                execute_point_query(query_file, data_file, point_query_output_path, index_name="rlrtree")
 
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
@@ -974,7 +1000,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     epoch=epoch,
                     variant=rtree_variant
                 )
-                execute_insert(query_file, insert_output_path)
+                execute_insert(query_file, insert_output_path, index_name="rlrtree")
 
             for file_name in insert_points:
                 insert_point_file_name_prefix = file_name.rstrip('.csv')
@@ -986,7 +1012,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     epoch=epoch,
                     variant=rtree_variant
                 )
-                execute_insert_point(query_file, insert_point_output_path)
+                execute_insert_point(query_file, insert_point_output_path, index_name="rlrtree")
 
 
     except subprocess.CalledProcessError as e:
@@ -1021,7 +1047,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
-        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path ./benchmark/tree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path ./benchmark/kdtree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
 
         logger.info(f"Start building kdtree: {command}")
 
@@ -1038,8 +1064,8 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/kdtree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/kdtree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -1048,7 +1074,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix
             )
-            execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery")
+            execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
 
         for file_name in knn_queries:
@@ -1061,7 +1087,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                     knn_query_prefix=file_name_prefix,
                     k=k
                 )
-                execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery")
+                execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
         for file_name in point_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -1070,7 +1096,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 data_file_prefix=data_file_prefix,
                 point_query_prefix=file_name_prefix,
             )
-            execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery")
+            execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
         for file_name in insertions:
             file_name_prefix = file_name.rstrip('.csv')
@@ -1079,7 +1105,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 data_file_prefix=data_file_prefix,
                 insert_prefix=file_name_prefix,
             )
-            execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery")
+            execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
         for file_name in insert_points:
             file_name_prefix = file_name.rstrip('.csv')
@@ -1088,7 +1114,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 data_file_prefix=data_file_prefix,
                 insert_point_prefix=file_name_prefix,
             )
-            execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery")
+            execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -1127,7 +1153,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} ./benchmark/tree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} ./benchmark/kdgreedy {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
 
             logger.info(f"Start building kdtree: {command}")
 
@@ -1145,14 +1171,14 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                     if result:
                         f.write(result.stderr)
                     f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/kdgreedy.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/kdgreedy.idx')}\n")
 
             range_query_output_path = KDTREE_GREEDY_RANGE_QUERY_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix
             )
-            execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery")
+            execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
 
             for file_name in knn_queries:
                 ks = ks_map.get(file_name)
@@ -1165,7 +1191,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                         knn_query_prefix=knn_file_name_prefix,
                         k=k
                     )
-                    execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery")
+                    execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
 
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
@@ -1175,7 +1201,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                     range_query_prefix=file_name_prefix,
                     point_query_prefix=point_file_name_prefix,
                 )
-                execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery")
+                execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
 
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
@@ -1185,7 +1211,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                     range_query_prefix=file_name_prefix,
                     insert_prefix=insert_file_name_prefix,
                 )
-                execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery")
+                execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
 
             for file_name in insert_points:
                 insert_point_file_name_prefix = file_name.rstrip('.csv')
@@ -1195,7 +1221,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                     range_query_prefix=file_name_prefix,
                     insert_point_prefix=insert_point_file_name_prefix,
                 )
-                execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery")
+                execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
 
     except subprocess.CalledProcessError as e:
         logger.info(f"fail: {e}")
@@ -1261,7 +1287,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
 
             logger.info(f"Start building qdtree: {data_file}")
             
-            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} ./benchmark/tree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} ./benchmark/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
 
             logger.info(f"Start building qdtree: {command}")
 
@@ -1283,8 +1309,8 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                         f.write(result.stderr)
                     f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                     f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/tree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/tree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/qdtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/qdtree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
@@ -1295,7 +1321,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                 sampling_ratio=sampling_ratio,
                 action_sampling_size=action_sampling_size,
             )
-            execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery")
+            execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
 
             for file_name in knn_queries:
                 ks = ks_map.get(file_name)
@@ -1311,7 +1337,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                         action_sampling_size=action_sampling_size,
                         k=k
                     )
-                    execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery")
+                    execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
 
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
@@ -1324,7 +1350,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                     sampling_ratio=sampling_ratio,
                     action_sampling_size=action_sampling_size,
                 )
-                execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery")
+                execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
 
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
@@ -1337,7 +1363,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                     sampling_ratio=sampling_ratio,
                     action_sampling_size=action_sampling_size,
                 )
-                execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery")
+                execute_insert(query_file, insert_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
 
             for file_name in insert_points:
                 insert_point_file_name_prefix = file_name.rstrip('.csv')
@@ -1350,7 +1376,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                     sampling_ratio=sampling_ratio,
                     action_sampling_size=action_sampling_size,
                 )
-                execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery")
+                execute_insert_point(query_file, insert_point_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
 
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
@@ -1760,20 +1786,21 @@ def main():
                        "example_config_all_baselines_read_heavy.json",
                        "example_config_all_baselines_write_heavy.json"]
             configs = ["example_config_all_baselines_point_rank_space_100m.json"]
-        # else:
-        #     configs = ["verify_qdtree.json"]
+        else: # for debug specific index
+            configs = ["example_config_debug_kdtree_insertion.json"]
     else:
         directory = CONFIG_DIR
         # First run point_range_knn_queries to make sure queries are generated first for RL based.
-        special_candidate = "point_range_knn_queries"
-        for root, dirs, files in os.walk(directory):
-            if root.split("/")[-1] == special_candidate:
-                for file in files:
-                    if file.endswith(".json"):
-                        config_file_path = os.path.join(root, file)
-                        configs.append(config_file_path)
+        # special_candidate = "point_range_knn_queries"
+        # for root, dirs, files in os.walk(directory):
+        #     if root.split("/")[-1] == special_candidate:
+        #         for file in files:
+        #             if file.endswith(".json"):
+        #                 config_file_path = os.path.join(root, file)
+        #                 configs.append(config_file_path)
 
         candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
+        candidates = ["write_heavy_only"]
         for root, dirs, files in os.walk(directory):
             if root.split("/")[-1] not in candidates:
                 continue
@@ -1822,3 +1849,6 @@ def setup_logger(config_file_path):
 
 if __name__ == "__main__":
     main()
+# python tools/libspatialindex_data_adapter.py --type data --input data/real/dataset/us_10000.csv --output benchmark/libspatialindex/kdtree_data
+# test-kdtree-KDTreeBulkLoad kdtree benchmark/libspatialindex/kdtree_data path ./benchmark/tree 100 1.0 4096 0
+# test-kdtree-KDTreeQuery benchmark/libspatialindex/us_10000_insert_10000_2_uniform_1 ./benchmark/tree intersection 0

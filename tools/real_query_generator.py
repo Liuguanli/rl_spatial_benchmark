@@ -327,7 +327,10 @@ if __name__ == "__main__":
     main()
 
 ## range
-# python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution uniform --skewness 1 --query_range 1.0 1.0
+# python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution uniform --skewness 1 --query_range 0.1 0.1
+# python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution uniform --skewness 1 --query_range 0.1 0.1
+# python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution uniform --skewness 1 --query_range 0.1 0.1
+
 # python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution normal --skewness 1 --query_range 1.0 1.0
 # python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type range --n_queries 100 --dimensions 2 --distribution skewed --skewness 2 --query_range 1.0 1.0
 

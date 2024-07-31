@@ -3,7 +3,7 @@
     {
       "available": true,
       "data": {
-        "size": 10000,
+        "size": 10000000,
         "dimensions": 2,
         "distribution": "us",
         "skewness": 1,
@@ -36,7 +36,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }

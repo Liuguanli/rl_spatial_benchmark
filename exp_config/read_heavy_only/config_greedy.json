@@ -36,7 +36,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -46,7 +46,7 @@
     {
       "available": true,
       "data": {
-        "size": 10000,
+        "size": 10000000,
         "dimensions": 2,
         "distribution": "india",
         "skewness": 1,
@@ -79,7 +79,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -89,7 +89,7 @@
     {
       "available": true,
       "data": {
-        "size": 10000,
+        "size": 10000000,
         "dimensions": 2,
         "distribution": "australia",
         "skewness": 1,
@@ -122,7 +122,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -132,7 +132,7 @@
     {
       "available": true,
       "data": {
-        "size": 10000,
+        "size": 10000000,
         "dimensions": 2,
         "distribution": "normal",
         "skewness": 1,
@@ -165,7 +165,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -175,7 +175,7 @@
     {
       "available": true,
       "data": {
-        "size": 10000,
+        "size": 10000000,
         "dimensions": 2,
         "distribution": "uniform",
         "skewness": 1,
@@ -208,7 +208,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -218,7 +218,7 @@
     {
       "available": true,
       "data": {
-        "size": 10000,
+        "size": 10000000,
         "dimensions": 2,
         "distribution": "skewed",
         "skewness": 4,
@@ -251,7 +251,7 @@
         },
         {
           "name": "kdgreedy",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100
           }

@@ -38,6 +38,7 @@
         },
         {
           "name": "kdgreedy",
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -82,6 +83,7 @@
         },
         {
           "name": "kdgreedy",
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -126,6 +128,7 @@
         },
         {
           "name": "kdgreedy",
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -215,6 +218,7 @@
         },
         {
           "name": "kdgreedy",
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -259,6 +263,7 @@
         },
         {
           "name": "kdgreedy",
+          "available": true,
           "config": {
             "page_size": 100
           }
