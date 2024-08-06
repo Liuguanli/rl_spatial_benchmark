@@ -4,6 +4,22 @@
 
 #### Datasets
 
+![Real data](./figs/data/real_dataset_10000_density.png)
+
+![Synthetic data](./figs/data/synthetic_dataset_10000_density.png)
+
+
+![Real data point](./figs/data/real_dataset_10000_hist_point.png)
+
+![Real data range](./figs/data/real_dataset_10000_hist_range.png)
+
+
+![Synthetic data point](./figs/data/synthetic_dataset_10000_hist_point.png)
+
+![Synthetic data range](./figs/data/synthetic_dataset_10000_hist_range.png)
+
+
+
 #### Query generation
 
 #### Configs
@@ -72,7 +88,7 @@
 
 ![Balcanced query time](./figs/exp/balanced_query_time.png)
 ![Balcancedinsert time](./figs/exp/balanced_insert_time.png)
-![Balcancedquery P50](./figs/exp/balanced_query_time_P50.png)
+![Balcancedquery P50](./figs/exp/balanced_query_P50.png)
 ![Balcanced query P99](./figs/exp/balanced_query_time_P99.png)
 ![Balcanced insert P50](./figs/exp/balanced_insert_time_P50.png)
 ![Balcanced insert P99](./figs/exp/balanced_insert_time_P99.png)
