@@ -549,23 +549,22 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 sample_size=sample_size,
             )
 
-            if not os.path.exists(bmtree_output_default):
-                logger.info(f"{bmtree_output_default} NOT exists")
-            
-                data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
-                execute_command(data_transfer_command)
+            # if not os.path.exists(bmtree_output_default):
+            # logger.info(f"{bmtree_output_default} NOT exists")
+        
+            data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
+            execute_command(data_transfer_command)
 
-                learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name}"
-                elapsed_time_ns_learn = execute_command(learn_bmtree_command)
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name}"
+            elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
-                data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
-                execute_command(data_adapter_command)
+            data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
+            execute_command(data_adapter_command)
 
-                copy_and_rename(BMTREE_OUTPUT, bmtree_output_default)
-            else:
-                copy_and_rename(bmtree_output_default, BMTREE_OUTPUT)
-
-                elapsed_time_ns_learn = 0
+            copy_and_rename(BMTREE_OUTPUT, bmtree_output_default)
+            # else:
+            #     copy_and_rename(bmtree_output_default, BMTREE_OUTPUT)
+                # elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
             command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/bmtree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
@@ -909,6 +908,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
+                sample_size=sample_size
             )
 
             choose_subtree_model_name_default = CHOOSE_SUBTREE_MODEL_NAME_DEFAULT.format(
@@ -916,6 +916,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
+                sample_size=sample_size
             )
 
             if not os.path.exists(split_model_name_default) or not os.path.exists(choose_subtree_model_name_default):
@@ -942,6 +943,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     range_query_prefix=file_name_prefix,
                     variant=rtree_variant,
                     epoch=epoch,
+                    sample_size=sample_size
                 )
 
                 os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
@@ -960,8 +962,22 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
+                sample_size=sample_size
             )
             execute_range_query(data_file, query_file, range_query_output_path, index_name="rlrtree")
+
+            for file_name in point_queries:
+                point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
+                point_query_output_path = RLRTREE_POINT_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    point_query_prefix=point_file_name_prefix,
+                    epoch=epoch,
+                    variant=rtree_variant,
+                    sample_size=sample_size
+                )
+                execute_point_query(query_file, data_file, point_query_output_path, index_name="rlrtree")
 
             for file_name in knn_queries:
                 ks = ks_map.get(file_name)
@@ -974,21 +990,10 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                         knn_query_prefix=knn_file_name_prefix,
                         epoch=epoch,
                         k=k,
-                        variant=rtree_variant
+                        variant=rtree_variant,
+                        sample_size=sample_size
                     )
                     execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="rlrtree")
-
-            for file_name in point_queries:
-                point_file_name_prefix = file_name.rstrip('.csv')
-                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
-                point_query_output_path = RLRTREE_POINT_QUERY_OUTPUT_PATH.format(
-                    data_file_prefix=data_file_prefix,
-                    range_query_prefix=file_name_prefix,
-                    point_query_prefix=point_file_name_prefix,
-                    epoch=epoch,
-                    variant=rtree_variant
-                )
-                execute_point_query(query_file, data_file, point_query_output_path, index_name="rlrtree")
 
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
@@ -998,7 +1003,8 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     range_query_prefix=file_name_prefix,
                     insert_prefix=insert_file_name_prefix,
                     epoch=epoch,
-                    variant=rtree_variant
+                    variant=rtree_variant,
+                    sample_size=sample_size
                 )
                 execute_insert(query_file, insert_output_path, index_name="rlrtree")
 
@@ -1010,7 +1016,8 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     range_query_prefix=file_name_prefix,
                     insert_point_prefix=insert_point_file_name_prefix,
                     epoch=epoch,
-                    variant=rtree_variant
+                    variant=rtree_variant,
+                    sample_size=sample_size
                 )
                 execute_insert_point(query_file, insert_point_output_path, index_name="rlrtree")
 
@@ -1787,27 +1794,27 @@ def main():
                        "example_config_all_baselines_write_heavy.json"]
             configs = ["example_config_all_baselines_point_rank_space_100m.json"]
         else: # for debug specific index
-            configs = ["example_config_debug_kdtree_insertion.json"]
+            configs = ["example_config_debug_bmtree.json"]
     else:
         directory = CONFIG_DIR
         # First run point_range_knn_queries to make sure queries are generated first for RL based.
-        # special_candidate = "point_range_knn_queries"
-        # for root, dirs, files in os.walk(directory):
-        #     if root.split("/")[-1] == special_candidate:
-        #         for file in files:
-        #             if file.endswith(".json"):
-        #                 config_file_path = os.path.join(root, file)
-        #                 configs.append(config_file_path)
-
-        candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
-        candidates = ["write_heavy_only"]
+        special_candidate = "point_range_knn_queries"
         for root, dirs, files in os.walk(directory):
-            if root.split("/")[-1] not in candidates:
-                continue
-            for file in files:
-                if file.endswith(".json"):
-                    config_file_path = os.path.join(root, file)
-                    configs.append(config_file_path)
+            if root.split("/")[-1] == special_candidate:
+                for file in files:
+                    if file.endswith(".json"):
+                        config_file_path = os.path.join(root, file)
+                        configs.append(config_file_path)
+
+        # candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
+        # # candidates = ["write_only", "balance_only", "write_heavy_only"]
+        # for root, dirs, files in os.walk(directory):
+        #     if root.split("/")[-1] not in candidates:
+        #         continue
+        #     for file in files:
+        #         if file.endswith(".json"):
+        #             config_file_path = os.path.join(root, file)
+        #             configs.append(config_file_path)
     counter = 0
 
     for config_file_path in configs:

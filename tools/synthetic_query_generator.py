@@ -297,9 +297,9 @@ if __name__ == "__main__":
 
 
 ## range
-# python tools/synthetic_query_generator.py --query_type range --n_queries 100 --dimensions 2 --distribution normal --bounds 0 1 --bounds 0 1 --query_range 0.1 0.1
-# python tools/synthetic_query_generator.py --query_type range --n_queries 100 --dimensions 2 --distribution skewed --skewness 2 --bounds 0 1 --bounds 0 1 --query_range 0.1 0.1
-# python tools/synthetic_query_generator.py --query_type range --n_queries 100 --dimensions 2 --distribution uniform --bounds 0 1 --bounds 0 1 --query_range 0.1 0.1
+# python tools/synthetic_query_generator.py --query_type range --n_queries 20 --dimensions 2 --distribution normal --bounds 0 1 --bounds 0 1 --query_range 0.1 0.1
+# python tools/synthetic_query_generator.py --query_type range --n_queries 20 --dimensions 2 --distribution skewed --skewness 4 --bounds 0 1 --bounds 0 1 --query_range 0.1 0.1
+# python tools/synthetic_query_generator.py --query_type range --n_queries 20 --dimensions 2 --distribution uniform --bounds 0 1 --bounds 0 1 --query_range 0.1 0.1
 
 ## knn
 # python tools/synthetic_query_generator.py --query_type knn --n_queries 100 --dimensions 2 --distribution normal --bounds 0 1 --bounds 0 1
@@ -314,3 +314,4 @@ if __name__ == "__main__":
 # python tools/synthetic_query_generator.py --query_type insert --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1 --bounds 0 1 --bounds 0 1
 # python tools/synthetic_query_generator.py --query_type insert --n_queries 1000 --dimensions 2 --distribution normal --skewness 1 --bounds 0 1 --bounds 0 1
 # python tools/synthetic_query_generator.py --query_type insert --n_queries 1000 --dimensions 2 --distribution normal --skewness 1 --bounds 0 1 --bounds 0 1
+# python tools/synthetic_query_generator.py --query_type insert --n_queries 1000 --dimensions 2 --distribution skewed --skewness 4 --bounds 0 1 --bounds 0 1

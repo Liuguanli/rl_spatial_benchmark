@@ -1160,6 +1160,8 @@ class SplitLearner:
                                         # action = randint(0, self.config.action_space-1)
                                 self.tree.SplitWithCandidateAction(action)
                                 steps.append((states, action))
+                                # print("Train 6 states:", states)
+                                # print("Train 6 action:", action)
                     if triggered and len(steps) > 0 and steps[-1][1] is not None:
                         steps.append(([0]*4*self.config.action_space, None))
                     period += 1

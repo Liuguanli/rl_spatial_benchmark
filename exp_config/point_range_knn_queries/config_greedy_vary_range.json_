@@ -1,0 +1,47 @@
+{
+  "experiments": [
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only_vary3.json"
+       ],
+      "baseline": [
+        {
+          "name": "rankspace",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rstar",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "kdgreedy",
+          "available": true,
+          "config": {
+            "page_size": 100
+          }
+        }
+      ]
+    }
+  ]
+}

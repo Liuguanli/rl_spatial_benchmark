@@ -1,0 +1,33 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 100000000,
+        "distribution": "australia",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "point_query_only.json",
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        }
+      ]
+    }   
+  ]
+}

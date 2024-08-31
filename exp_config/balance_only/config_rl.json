@@ -18,16 +18,18 @@
       "baseline": [
         {
           "name": "bmtree",
+          "available": true,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 2,
+            "tree_depth": 10,
             "sampling": 10000,
             "page_size": 100,
-            "bit_num": 20
+            "bit_num": 32
           }
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -39,6 +41,7 @@
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -67,16 +70,18 @@
       "baseline": [
         {
           "name": "bmtree",
+          "available": true,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 2,
+            "tree_depth": 10,
             "sampling": 10000,
             "page_size": 100,
-            "bit_num": 20
+            "bit_num": 32
           }
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -88,6 +93,7 @@
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -99,7 +105,7 @@
       ]
     },
     {
-      "available": false,
+      "available": true,
       "data": {
         "size": 10000000,
         "dimensions": 2,
@@ -116,16 +122,18 @@
       "baseline": [
         {
           "name": "bmtree",
+          "available": true,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 2,
+            "tree_depth": 10,
             "sampling": 10000,
             "page_size": 100,
-            "bit_num": 20
+            "bit_num": 32
           }
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -137,6 +145,7 @@
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -148,7 +157,7 @@
       ]
     },
     {
-      "available": false,
+      "available": true,
       "data": {
         "size": 10000000,
         "dimensions": 2,
@@ -165,16 +174,18 @@
       "baseline": [
         {
           "name": "bmtree",
+          "available": false,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 2,
+            "tree_depth": 10,
             "sampling": 10000,
             "page_size": 100,
-            "bit_num": 20
+            "bit_num": 32
           }
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -186,6 +197,7 @@
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -197,7 +209,7 @@
       ]
     },
     {
-      "available": false,
+      "available": true,
       "data": {
         "size": 10000000,
         "dimensions": 2,
@@ -214,16 +226,18 @@
       "baseline": [
         {
           "name": "bmtree",
+          "available": false,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 2,
+            "tree_depth": 10,
             "sampling": 10000,
             "page_size": 100,
-            "bit_num": 20
+            "bit_num": 32
           }
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -235,6 +249,7 @@
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -246,7 +261,7 @@
       ]
     },
     {
-      "available": false,
+      "available": true,
       "data": {
         "size": 10000000,
         "dimensions": 2,
@@ -263,16 +278,18 @@
       "baseline": [
         {
           "name": "bmtree",
+          "available": false,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 2,
+            "tree_depth": 10,
             "sampling": 10000,
             "page_size": 100,
-            "bit_num": 20
+            "bit_num": 32
           }
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -284,6 +301,7 @@
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,

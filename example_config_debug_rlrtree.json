@@ -1,0 +1,285 @@
+{
+  "experiments": [
+    {
+      "data": {
+        "size": 10000,
+        "distribution": "australia",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "rtree",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "rstar",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000,
+            "epoch": 10
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 10000,
+        "distribution": "india",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "rtree",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "rstar",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000,
+            "epoch": 10
+          }
+        }
+      ]
+    },    
+    {
+      "available": true,
+      "data": {
+        "size": 10000,
+        "distribution": "us",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "rtree",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "rstar",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000,
+            "epoch": 10
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 10000,
+        "distribution": "uniform",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "rtree",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "rstar",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000,
+            "epoch": 10
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 10000,
+        "distribution": "normal",
+        "dimensions": 2,
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "rtree",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "rstar",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000,
+            "epoch": 10
+          }
+        }
+      ]
+    },    
+    {
+      "available": true,
+      "data": {
+        "size": 10000,
+        "distribution": "skewed",
+        "dimensions": 2,
+        "skewness": 4,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "rtree",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "rstar",
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000,
+            "epoch": 10
+          }
+        }
+      ]
+    }        
+  ]
+}
