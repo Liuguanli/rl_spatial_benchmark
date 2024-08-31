@@ -4,19 +4,19 @@
 
 #### Datasets
 
-![Real data](./figs/data/real_dataset_10000_density.png)
+![Real data](./figs/data_img/real_dataset_10000_density.png)
 
-![Synthetic data](./figs/data/synthetic_dataset_10000_density.png)
-
-
-![Real data point](./figs/data/real_dataset_10000_hist_point.png)
-
-![Real data range](./figs/data/real_dataset_10000_hist_range.png)
+![Synthetic data](./figs/data_img/synthetic_dataset_10000_density.png)
 
 
-![Synthetic data point](./figs/data/synthetic_dataset_10000_hist_point.png)
+![Real data point](./figs/data_img/real_dataset_10000_hist_point.png)
 
-![Synthetic data range](./figs/data/synthetic_dataset_10000_hist_range.png)
+![Real data range](./figs/data_img/real_dataset_10000_hist_range.png)
+
+
+![Synthetic data point](./figs/data_img/synthetic_dataset_10000_hist_point.png)
+
+![Synthetic data range](./figs/data_img/synthetic_dataset_10000_hist_range.png)
 
 
 
