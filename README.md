@@ -6,9 +6,9 @@
 
 Download datasets and workloads from [Dropbox Link](https://www.dropbox.com/scl/fo/nthnm8in7pdvmfeq6o28x/AGRfXnULbIK1xwMwjuwsE_E?rlkey=f4wze475ygnq4z6xem6g57zos&st=gmdv0mgs&dl=0)
 
-Add a **data** folder under root folder.
+Add a **data** folder under **./**.
 
-Move real and synthetic folders under data.
+Move **real** and **synthetic** folders from **resources** to **data**.
 
 #### Dataset distributions
 
