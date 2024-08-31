@@ -23,3 +23,5 @@ log/
 
 benchmark/*.dat
 benchmark/*.idx
+
+resources/

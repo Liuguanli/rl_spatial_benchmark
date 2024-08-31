@@ -1,8 +1,15 @@
 ## Benchmarking RL-enhacned Spatial Indices
 
-### Setup
 
 #### Datasets
+
+Download datasets and workloads from ![here](https://www.dropbox.com/scl/fo/nthnm8in7pdvmfeq6o28x/AGRfXnULbIK1xwMwjuwsE_E?rlkey=f4wze475ygnq4z6xem6g57zos&st=gmdv0mgs&dl=0)
+
+Add a **data** folder under root folder.
+
+Move real and synthetic folders under data.
+
+#### Dataset distributions
 
 ![Real data](./figs/data_img/real_dataset_10000_density.png)
 
@@ -19,13 +26,15 @@
 ![Synthetic data range](./figs/data_img/synthetic_dataset_10000_hist_range.png)
 
 
-
-#### Query generation
-
 #### Configs
+
+check folder: **\exp_config**
 
 ### Run experiments
 
+```bash
+bash run_all.sh
+```
 
 ### Index building
 
