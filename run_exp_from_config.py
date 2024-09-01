@@ -1806,15 +1806,15 @@ def main():
                         config_file_path = os.path.join(root, file)
                         configs.append(config_file_path)
 
-        # candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
-        # # candidates = ["write_only", "balance_only", "write_heavy_only"]
-        # for root, dirs, files in os.walk(directory):
-        #     if root.split("/")[-1] not in candidates:
-        #         continue
-        #     for file in files:
-        #         if file.endswith(".json"):
-        #             config_file_path = os.path.join(root, file)
-        #             configs.append(config_file_path)
+        # # candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
+        candidates = ["write_only", "read_heavy_only", "write_heavy_only"]
+        for root, dirs, files in os.walk(directory):
+            if root.split("/")[-1] not in candidates:
+                continue
+            for file in files:
+                if file.endswith(".json"):
+                    config_file_path = os.path.join(root, file)
+                    configs.append(config_file_path)
     counter = 0
 
     for config_file_path in configs:

@@ -1,0 +1,324 @@
+{
+  "experiments": [
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 50000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 50000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0005,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 100000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 100000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 500000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 500000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.005,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 1000000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1000000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.01,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only_vary_ratio.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "zorder",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "kdtree",
+          "available": true,
+          "config": {
+            "page_size": 100
+          }
+        },
+        {
+          "name": "rankspace",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rstar",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "kdgreedy",
+          "available": true,
+          "config": {
+            "page_size": 100
+          }
+        }
+      ]
+    }
+  ]
+}

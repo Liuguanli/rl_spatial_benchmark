@@ -18,7 +18,7 @@
       "baseline": [
         {
           "name": "rankspace",
-          "available": false,
+          "available": true,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -27,7 +27,7 @@
         },
         {
           "name": "rstar",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
