@@ -774,7 +774,12 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         if point_queries or knn_queries:
             build_output_path = R_STAR_TREE_BUILD_OUTPUT_PATH.format(
-                data_file_prefix=data_file_prefixR_STAR_TREE_DATA
+                data_file_prefix=data_file_prefix,
+                variant=rtree_variant
+            )
+
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
             with open(build_output_path, "w") as f:
                 if result:
                     f.write(result.stderr)
