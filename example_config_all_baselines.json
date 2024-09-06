@@ -3,6 +3,7 @@
     {
       "data": {
         "size": 10000,
+        "available": true,
         "distribution": "us",
         "dimensions": 2,
         "skewness": 1,
@@ -19,7 +20,18 @@
        ],
       "baseline": [
         {
+          "name": "qdtree",
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.01,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
           "name": "zorder",
+          "available": false,
           "config": {
             "fill_factor": 0.9,
             "page_size": 100,
@@ -28,6 +40,7 @@
         },
         {
           "name": "rankspace",
+          "available": false,
           "config": {
             "fill_factor": 0.9,
             "page_size": 100,
@@ -36,6 +49,7 @@
         },
         {
           "name": "bmtree",
+          "available": false,
           "config": {
             "fill_factor": 0.9,
             "tree_depth": 1,
@@ -46,6 +60,7 @@
         },
         {
           "name": "rtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -54,6 +69,7 @@
         },
         {
           "name": "rstar",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -62,6 +78,7 @@
         },
         {
           "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -72,18 +89,21 @@
         },
         {
           "name": "kdtree",
+          "available": false,
           "config": {
             "page_size": 100
           }
         },
         {
           "name": "kdgreedy",
+          "available": false,
           "config": {
             "page_size": 100
           }
         },
         {
           "name": "qdtree",
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -97,6 +117,7 @@
     {
       "data": {
         "size": 10000,
+        "available": false,
         "distribution": "australia",
         "dimensions": 2,
         "skewness": 1,
@@ -175,22 +196,13 @@
           "config": {
             "page_size": 100
           }
-        },
-        {
-          "name": "qdtree",
-          "config": {
-            "episode": 10,
-            "page_size": 100,
-            "sampling_ratio": 0.01,
-            "action_sampling_size": 200,
-            "model_path": "benchmark/model"
-          }
         }
       ]
     },
     {
       "data": {
         "size": 10000,
+        "available": false,
         "distribution": "india",
         "dimensions": 2,
         "skewness": 1,
@@ -285,6 +297,7 @@
     {
       "data": {
         "size": 10000,
+        "available": false,
         "distribution": "uniform",
         "dimensions": 2,
         "skewness": 1,
@@ -379,6 +392,7 @@
     {
       "data": {
         "size": 10000,
+        "available": false,
         "distribution": "normal",
         "dimensions": 2,
         "skewness": 1,
@@ -473,6 +487,7 @@
     {
       "data": {
         "size": 10000,
+        "available": false,
         "distribution": "skewed",
         "dimensions": 2,
         "skewness": 2,

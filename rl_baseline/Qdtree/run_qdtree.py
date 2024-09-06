@@ -11,8 +11,8 @@ import torch.optim as optim
 from gym.spaces import Box, Discrete
 from qdtree_env import QdtreeEnv
 from ray import tune
-from ray.rllib.agents.ppo import PPOTrainer
 from ray.rllib.models import ModelCatalog
+from ray.rllib.agents.ppo import PPOTrainer
 from ray.tune import grid_search, run_experiments
 from ray.tune.registry import register_env
 from torch.distributions import Categorical
@@ -117,6 +117,7 @@ def train_model(args):
         "train_batch_size": 10000,
         "framework": "torch",
         "lr": 5e-3,
+
     }
 
     trainer = PPOTrainer(config=config)

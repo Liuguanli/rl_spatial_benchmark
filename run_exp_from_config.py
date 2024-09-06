@@ -59,47 +59,23 @@ def safe_remove(file_name):
     logger.info(f"finish safe_remove")
     
 
-def cleanup_intermediate_files():
+def cleanup_intermediate_files(index_name):
 
     global logger
     logger.info(f"cleanup_intermediate_files")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        safe_remove("./benchmark/a")
-        safe_remove("./benchmark/b")
-        safe_remove("./benchmark/.t")
-        safe_remove("./benchmark/res2")
+        safe_remove(f"{INDEX_PATH}/a")
+        safe_remove(f"{INDEX_PATH}/b")
+        safe_remove(f"{INDEX_PATH}/.t")
+        safe_remove(f"{INDEX_PATH}/res2")
 
-    safe_remove("./benchmark/res")
-    safe_remove('./benchmark/tree.dat')
-    safe_remove('./benchmark/tree.idx')
+    safe_remove(f"{INDEX_PATH}/res")
+    safe_remove(f"{INDEX_PATH}/tree.dat")
+    safe_remove(f"{INDEX_PATH}/tree.idx")
 
-    safe_remove('./benchmark/zorder.dat')
-    safe_remove('./benchmark/zorder.idx')
-
-    safe_remove('./benchmark/rtree.dat')
-    safe_remove('./benchmark/rtree.idx')
-
-    safe_remove('./benchmark/kdtree.dat')
-    safe_remove('./benchmark/kdtree.idx')
-
-    safe_remove('./benchmark/rankspace.dat')
-    safe_remove('./benchmark/rankspace.idx')
-
-    safe_remove('./benchmark/rstar.dat')
-    safe_remove('./benchmark/rstar.idx')
-
-    safe_remove('./benchmark/kdgreedy.dat')
-    safe_remove('./benchmark/kdgreedy.idx')
-
-    safe_remove('./benchmark/bmtree.dat')
-    safe_remove('./benchmark/bmtree.idx')
-
-    safe_remove('./benchmark/rlrtree.dat')
-    safe_remove('./benchmark/rlrtree.idx')
-
-    safe_remove('./benchmark/qdtree.dat')
-    safe_remove('./benchmark/qdtree.idx')
+    safe_remove(f"{INDEX_PATH}/{index_name}.dat")
+    safe_remove(f"{INDEX_PATH}/{index_name}.idx")
 
     safe_remove(Z_ORDER_OUTPUT)
     safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
@@ -136,14 +112,14 @@ def run_exhaustive_search(data_file, query_file, query_type="range", k=None):
 
     logger.info(f"Running exhaustive search: {query_type}")
     if query_type == "range":
-        subprocess.run("test-rtree-Exhaustive ./benchmark/.t intersection > ./benchmark/res2", shell=True, check=True)
+        subprocess.run(f"test-rtree-Exhaustive {INDEX_PATH}/.t intersection > {INDEX_PATH}/res2", shell=True, check=True)
     else:
         if k:
-            subprocess.run(f"test-rtree-Exhaustive ./benchmark/.t {k}NN > ./benchmark/res2", shell=True, check=True)
+            subprocess.run(f"test-rtree-Exhaustive {INDEX_PATH}/.t {k}NN > {INDEX_PATH}/res2", shell=True, check=True)
 
     logger.info("Comparing results")
-    subprocess.run("sort -n ./benchmark/res > ./benchmark/a", shell=True)
-    subprocess.run("sort -n ./benchmark/res2 > ./benchmark/b", shell=True)
+    subprocess.run(f"sort -n {INDEX_PATH}/res > {INDEX_PATH}/a", shell=True)
+    subprocess.run(f"sort -n {INDEX_PATH}/res2 > {INDEX_PATH}/b", shell=True)
 
     diff_result = subprocess.run("diff a b", shell=True)
     if diff_result.returncode == 0:
@@ -162,9 +138,9 @@ def execute_range_query(data_file, query_file, range_query_output_path, test_fil
     logger.info(f"execute_range_query: data_file:{data_file} query_file:{query_file} range_query_output_path:{range_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER} > ./benchmark/res"
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} intersection {BUFFER} > {INDEX_PATH}/res"
     else:
-        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} intersection {BUFFER}"
 
     logger.info(f"execute_range_query: {command}")
 
@@ -190,9 +166,9 @@ def execute_knn_query(k, query_file, data_file, knn_query_output_path, test_file
     logger.info(f"execute_knn_query: data_file:{data_file} query_file:{query_file} knn_query_output_path:{knn_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} ./benchmark/{index_name} {k}NN {BUFFER}> res"
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} {k}NN {BUFFER}> res"
     else:
-        command = f"{test_file} {query_file} ./benchmark/{index_name} {k}NN {BUFFER}"
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} {k}NN {BUFFER}"
     
     result, elapsed_time_ns_knn = execute_command_with_err(command)
 
@@ -215,9 +191,9 @@ def execute_point_query(query_file, data_file, point_query_output_path, test_fil
     logger.info(f"execute_point_query: data_file:{data_file} query_file:{query_file} point_query_output_path:{point_query_output_path} test_file:{test_file}")
 
     if RUN_EXHAUSTIVE_SEARCH:
-        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER} > res"
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} intersection {BUFFER} > res"
     else:
-        command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
@@ -239,7 +215,7 @@ def execute_insert(query_file, insert_output_path, test_file="test-rtree-RTreeQu
     global logger
     logger.info(f"execute_insert: query_file:{query_file} insert_output_path:{insert_output_path} test_file:{test_file}")
 
-    command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
+    command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
@@ -258,7 +234,7 @@ def execute_insert_point(query_file, insert_point_output_path, test_file="test-r
     global logger
     logger.info(f"execute_insert_point: query_file:{query_file} insert_point_output_path:{insert_point_output_path} test_file:{test_file}")
 
-    command = f"{test_file} {query_file} ./benchmark/{index_name} intersection {BUFFER}"
+    command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} intersection {BUFFER}"
     
     result, elapsed_time_ns_point = execute_command_with_err(command)
 
@@ -312,7 +288,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/zorder {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} {INDEX_PATH}/zorder {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -332,8 +308,8 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/zorder.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/zorder.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/zorder.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/zorder.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -393,8 +369,10 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="zorder")
         safe_remove(Z_ORDER_SORTED_OUTPUT)
+        safe_remove(z_order_output_default)
+        
 
 def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -434,7 +412,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/rankspace {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} {INDEX_PATH}/rankspace {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -450,8 +428,8 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rankspace.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rankspace.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rankspace.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rankspace.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -511,8 +489,9 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="rankspace")
         safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
+        safe_remove(rank_space_z_order_output_default)
 
 def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -567,7 +546,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 # elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
-            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/bmtree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} {INDEX_PATH}/bmtree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -586,8 +565,8 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                         f.write(result.stderr)
                     f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                     f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/bmtree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/bmtree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/bmtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/bmtree.idx')}\n")
 
             data_file = BMTREE_OUTPUT
 
@@ -662,8 +641,9 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="bmtree")
         safe_remove(BMTREE_OUTPUT)
+        safe_remove(bmtree_output_default)
 
 def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -686,7 +666,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
 
         logger.info(f"Start building rtree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rtree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rtree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -702,8 +682,8 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rtree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rtree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rtree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rtree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -762,7 +742,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
         logger.error(f"fail: {e}")
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="rtree")
         safe_remove(RTREE_DATA)
 
 def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
@@ -788,7 +768,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Start building rstartree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rstar {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rstar {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -804,8 +784,8 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rstar.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rstar.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rstar.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rstar.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -864,7 +844,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
         logger.error(f"fail: {e}")
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="rstar")
         safe_remove(RTREE_DATA)
 
 def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
@@ -934,7 +914,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
 
                 elapsed_time_ns_learn = 0
 
-            command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -953,8 +933,8 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                         f.write(result.stderr)
                     f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                     f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/rlrtree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/rlrtree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rlrtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rlrtree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
             range_query_output_path = RLRTREE_RANGE_QUERY_OUTPUT_PATH.format(
@@ -1027,7 +1007,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="rlrtree")
         safe_remove(RLRTREE_DATA)
 
 def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
@@ -1054,7 +1034,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
-        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path ./benchmark/kdtree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path {INDEX_PATH}/kdtree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
 
         logger.info(f"Start building kdtree: {command}")
 
@@ -1071,8 +1051,8 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 if result:
                     f.write(result.stderr)
                 f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/kdtree.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/kdtree.idx')}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/kdtree.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/kdtree.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -1128,7 +1108,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="kdtree")
         safe_remove(KDTREE_DATA)
 
 def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
@@ -1160,7 +1140,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} ./benchmark/kdgreedy {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} {INDEX_PATH}/kdgreedy {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
 
             logger.info(f"Start building kdtree: {command}")
 
@@ -1178,8 +1158,8 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                     if result:
                         f.write(result.stderr)
                     f.write(f"Elapsed Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/kdgreedy.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/kdgreedy.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/kdgreedy.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/kdgreedy.idx')}\n")
 
             range_query_output_path = KDTREE_GREEDY_RANGE_QUERY_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
@@ -1235,7 +1215,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="kdgreedy")
         safe_remove(KDTREE_GREEDY_DATA)
         # save_remove(KDTREE_GREEDY_QUERY)
 
@@ -1294,7 +1274,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
 
             logger.info(f"Start building qdtree: {data_file}")
             
-            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} ./benchmark/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} {INDEX_PATH}/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
 
             logger.info(f"Start building qdtree: {command}")
 
@@ -1316,8 +1296,8 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                         f.write(result.stderr)
                     f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
                     f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
-                    f.write(f"Tree.dat Size: {os.path.getsize('./benchmark/qdtree.dat')}\n")
-                    f.write(f"Tree.idx Size: {os.path.getsize('./benchmark/qdtree.idx')}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/qdtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/qdtree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
@@ -1390,7 +1370,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files()
+        cleanup_intermediate_files(index_name="qdtree")
         safe_remove(QDTREE_DATA)
         # save_remove(QDTREE_QUERY)
 
@@ -1792,7 +1772,8 @@ def main():
                        "example_config_all_baselines_insert.json",
                        "example_config_all_baselines_read_heavy.json",
                        "example_config_all_baselines_write_heavy.json"]
-            configs = ["example_config_all_baselines_point_rank_space_100m.json"]
+            
+            configs = ["example_config_all_baselines.json"]
         else: # for debug specific index
             configs = ["example_config_debug_bmtree.json"]
     else:

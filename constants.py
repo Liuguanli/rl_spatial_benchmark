@@ -15,11 +15,15 @@ REAL_QUERY_PATH = "data/real/query"
 SYNTHETIC_WORKLOAD_PATH = "data/synthetic/workloads"
 REAL_WORKLOAD_PATH = "data/real/workloads"
 
+IS_HDD = False
+
+INDEX_PATH = "./benchmark" if IS_HDD else "/media/liuguanli/DATA"
+
 # use this flag to remove generated files if space is limited
 SAVE_SPACE = False
 RUN_EXHAUSTIVE_SEARCH = False  # TODO uncomment the printing code first in e.g., libspatialindex/test/rtree/RTreeQuery.cc line 77
-RUN_EXAMPLE = False
-RUN_ALL_BASELINE_EXAMPLE = False
+RUN_EXAMPLE = True
+RUN_ALL_BASELINE_EXAMPLE = True
 
 PAGE_SIZE = 4096
 BUFFER = 0
