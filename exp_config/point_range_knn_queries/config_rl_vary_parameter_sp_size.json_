@@ -1,7 +1,7 @@
 {
   "experiments": [
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -132,7 +132,7 @@
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
-            "sampling": 500000,
+            "sampling": 20000,
             "page_size": 100,
             "bit_num": 32
           }
@@ -145,7 +145,7 @@
             "fill_factor": 0.4,
             "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
-            "sample_size": 500000,
+            "sample_size": 20000,
             "epoch": 10
           }
         },
@@ -155,7 +155,7 @@
           "config": {
             "episode": 10,
             "page_size": 100,
-            "sampling_ratio": 0.005,
+            "sampling_ratio": 0.0002,
             "action_sampling_size": 200,
             "model_path": "benchmark/model"
           }
@@ -186,7 +186,7 @@
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
-            "sampling": 1000000,
+            "sampling": 40000,
             "page_size": 100,
             "bit_num": 32
           }
@@ -199,7 +199,7 @@
             "fill_factor": 0.4,
             "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
-            "sample_size": 1000000,
+            "sample_size": 40000,
             "epoch": 10
           }
         },
@@ -209,7 +209,7 @@
           "config": {
             "episode": 10,
             "page_size": 100,
-            "sampling_ratio": 0.01,
+            "sampling_ratio": 0.0004,
             "action_sampling_size": 200,
             "model_path": "benchmark/model"
           }
@@ -229,7 +229,7 @@
         ]
       },
       "workloads": [
-        "range_query_only_vary_ratio.json",
+        "range_query_only.json",
         "point_query_only.json",
         "knn_query_only_25.json"
        ],
@@ -240,7 +240,7 @@
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
-            "sampling": 10000,
+            "sampling": 80000,
             "page_size": 100,
             "bit_num": 32
           }
@@ -253,7 +253,7 @@
             "fill_factor": 0.4,
             "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
-            "sample_size": 10000,
+            "sample_size": 80000,
             "epoch": 10
           }
         },
@@ -263,59 +263,225 @@
           "config": {
             "episode": 10,
             "page_size": 100,
-            "sampling_ratio": 0.0001,
+            "sampling_ratio": 0.0008,
             "action_sampling_size": 200,
             "model_path": "benchmark/model"
           }
-        },
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
         {
-          "name": "zorder",
+          "name": "bmtree",
           "available": true,
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 160000,
             "page_size": 100,
             "bit_num": 32
           }
         },
         {
-          "name": "rtree",
-          "available": true,
+          "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "quadratic"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 160000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdtree",
+          "name": "qdtree",
           "available": true,
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0016,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
-        },
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
         {
-          "name": "rankspace",
+          "name": "bmtree",
           "available": true,
           "config": {
             "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 320000,
             "page_size": 100,
             "bit_num": 32
           }
         },
         {
-          "name": "rstar",
-          "available": true,
+          "name": "rlrtree",
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
-            "rtree_variant": "rstar"
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 320000,
+            "epoch": 10
           }
         },
         {
-          "name": "kdgreedy",
+          "name": "qdtree",
           "available": true,
           "config": {
-            "page_size": 100
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0032,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling": 640000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 640000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0064,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 10,
+            "sampling":1280000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 1280000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": true,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "sampling_ratio": 0.0128,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
           }
         }
       ]

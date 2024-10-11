@@ -13,7 +13,10 @@
         ]
       },
       "workloads": [
-        "range_query_only_vary.json"
+        "point_query_only.json", 
+        "knn_query_only.json",
+        "range_query_only_vary.json",
+        "range_query_only_vary_ratio.json"
        ],
       "baseline": [
         {
@@ -44,7 +47,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -56,7 +59,8 @@
         ]
       },
       "workloads": [
-        "range_query_only_vary.json"
+        "range_query_only_vary.json",
+        "range_query_only_vary_ratio.json"
        ],
       "baseline": [
         {

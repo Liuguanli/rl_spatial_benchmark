@@ -21,7 +21,7 @@
       "baseline": [
         {
           "name": "zorder",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 0.9,
             "page_size": 100,
@@ -30,7 +30,7 @@
         },
         {
           "name": "rankspace",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 0.9,
             "page_size": 100,
@@ -39,7 +39,7 @@
         },
         {
           "name": "bmtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 0.9,
             "tree_depth": 1,
@@ -59,7 +59,7 @@
         },
         {
           "name": "rstar",
-          "available": true,
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -68,7 +68,7 @@
         },
         {
           "name": "rlrtree",
-          "available": true,
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -79,21 +79,21 @@
         },
         {
           "name": "kdtree",
-          "available": true,
+          "available": false,
           "config": {
             "page_size": 100
           }
         },
         {
           "name": "kdgreedy",
-          "available": true,
+          "available": false,
           "config": {
             "page_size": 100
           }
         },
         {
           "name": "qdtree",
-          "available": true,
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,

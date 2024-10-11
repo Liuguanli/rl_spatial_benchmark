@@ -8,6 +8,7 @@ import time
 logger = None
 is_range_query = True
 
+import constants
 from constants import *
 
 
@@ -288,7 +289,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} {INDEX_PATH}/zorder {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} {INDEX_PATH}/zorder {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -412,7 +413,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} {INDEX_PATH}/rankspace {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} {INDEX_PATH}/rankspace {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -520,13 +521,13 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
             logger.info("Prepare BMTree")
 
-            bmtree_output_default = BMTREE_OUTPUT_DEFAULT.format(
-                data_file_prefix=data_file_prefix,
-                query=file_name_prefix,
-                bit_num=bit_num,
-                tree_depth=tree_depth,
-                sample_size=sample_size,
-            )
+            # bmtree_output_default = BMTREE_OUTPUT_DEFAULT.format(
+            #     data_file_prefix=data_file_prefix,
+            #     query=file_name_prefix,
+            #     bit_num=bit_num,
+            #     tree_depth=tree_depth,
+            #     sample_size=sample_size,
+            # )
 
             # if not os.path.exists(bmtree_output_default):
             # logger.info(f"{bmtree_output_default} NOT exists")
@@ -540,13 +541,13 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
             data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
             execute_command(data_adapter_command)
 
-            copy_and_rename(BMTREE_OUTPUT, bmtree_output_default)
+            # copy_and_rename(BMTREE_OUTPUT, bmtree_output_default)
             # else:
             #     copy_and_rename(bmtree_output_default, BMTREE_OUTPUT)
                 # elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
-            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} {INDEX_PATH}/bmtree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} {INDEX_PATH}/bmtree {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -643,7 +644,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         # clean up intermediate files
         cleanup_intermediate_files(index_name="bmtree")
         safe_remove(BMTREE_OUTPUT)
-        safe_remove(bmtree_output_default)
+        # safe_remove(bmtree_output_default)
 
 def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -666,7 +667,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
 
         logger.info(f"Start building rtree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rtree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rtree {page_size} {fill_factor} {rtree_variant} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -768,7 +769,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Start building rstartree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rstar {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rstar {page_size} {fill_factor} {rtree_variant} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -914,7 +915,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
 
                 elapsed_time_ns_learn = 0
 
-            command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {BLOCK_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -1034,7 +1035,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
-        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path {INDEX_PATH}/kdtree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path {INDEX_PATH}/kdtree {page_size} 1.0 {BLOCK_SIZE} {BUFFER}"  
 
         logger.info(f"Start building kdtree: {command}")
 
@@ -1140,7 +1141,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} {INDEX_PATH}/kdgreedy {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} {INDEX_PATH}/kdgreedy {page_size} 1.0 {BLOCK_SIZE} {BUFFER}"  
 
             logger.info(f"Start building kdtree: {command}")
 
@@ -1274,7 +1275,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
 
             logger.info(f"Start building qdtree: {data_file}")
             
-            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} {INDEX_PATH}/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} {INDEX_PATH}/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {BLOCK_SIZE} {BUFFER}"  
 
             logger.info(f"Start building qdtree: {command}")
 
@@ -1697,7 +1698,7 @@ def process_experiment(experiment):
                 query_command = f"python tools/real_query_generator.py --data {absolute_data_file_name} --query_type range --n_queries 1000 --dimensions 2 --distribution uniform --skewness 1 --query_range 0.001 0.001"
                 execute_command(query_command)
             is_range_query = False
-            range_queries.append(REAL_RANGE_QUERY_FILENAME_DEFAULT.format(data=base_name))    
+            range_queries.append(REAL_RANGE_QUERY_FILENAME_DEFAULT.format(data=base_name))
 
     query_path = REAL_QUERY_PATH if is_real_data else SYNTHETIC_QUERY_PATH
 
@@ -1775,7 +1776,7 @@ def main():
             
             configs = ["example_config_all_baselines.json"]
         else: # for debug specific index
-            configs = ["example_config_debug_bmtree.json"]
+            configs = ["example_config_fill_factor.json"]
     else:
         directory = CONFIG_DIR
         # First run point_range_knn_queries to make sure queries are generated first for RL based.
@@ -1787,15 +1788,15 @@ def main():
                         config_file_path = os.path.join(root, file)
                         configs.append(config_file_path)
 
-        # # candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
-        candidates = ["write_only", "read_heavy_only", "write_heavy_only"]
-        for root, dirs, files in os.walk(directory):
-            if root.split("/")[-1] not in candidates:
-                continue
-            for file in files:
-                if file.endswith(".json"):
-                    config_file_path = os.path.join(root, file)
-                    configs.append(config_file_path)
+        # candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
+        # candidates = ["write_only", "read_heavy_only", "write_heavy_only"]
+        # for root, dirs, files in os.walk(directory):
+        #     if root.split("/")[-1] not in candidates:
+        #         continue
+        #     for file in files:
+        #         if file.endswith(".json"):
+        #             config_file_path = os.path.join(root, file)
+        #             configs.append(config_file_path)
     counter = 0
 
     for config_file_path in configs:

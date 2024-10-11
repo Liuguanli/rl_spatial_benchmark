@@ -13,12 +13,15 @@
         ]
       },
       "workloads": [
-        "range_query_only_vary3.json"
+        "point_query_only.json", 
+        "knn_query_only.json",
+        "range_query_only_vary.json",
+        "range_query_only_vary_ratio.json"
        ],
       "baseline": [
         {
           "name": "rankspace",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -27,7 +30,7 @@
         },
         {
           "name": "rstar",
-          "available": true,
+          "available": false,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
