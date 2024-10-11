@@ -25,3 +25,4 @@ benchmark/*.dat
 benchmark/*.idx
 
 resources/
+temp/
