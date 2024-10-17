@@ -14,7 +14,7 @@
       },
       "workloads": [
         "balance_only.json"
-       ],
+      ],
       "baseline": [
         {
           "name": "rankspace",

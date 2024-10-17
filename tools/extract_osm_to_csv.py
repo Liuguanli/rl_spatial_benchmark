@@ -52,9 +52,14 @@ def main(osm_pbf_file, output_file, sample_output_file):
 
 if __name__ == '__main__':
 
-    sample_data('data/real/dataset/india.csv', 'data/real/dataset/india', 100000000)
-    sample_data('data/real/dataset/australia.csv', 'data/real/dataset/australia', 100000000)
-    sample_data('data/real/dataset/us.csv', 'data/real/dataset/us', 100000000)
-    sample_data('data/real/dataset/india.csv', 'data/real/dataset/india', 10000000)
-    sample_data('data/real/dataset/australia.csv', 'data/real/dataset/australia', 10000000)
-    sample_data('data/real/dataset/us.csv', 'data/real/dataset/us', 10000000)
+    # sample_data('data/real/dataset/india.csv', 'data/real/dataset/india', 100000000)
+    # sample_data('data/real/dataset/australia.csv', 'data/real/dataset/australia', 100000000)
+    # sample_data('data/real/dataset/us.csv', 'data/real/dataset/us', 100000000)
+    # sample_data('data/real/dataset/india.csv', 'data/real/dataset/india', 10000000)
+    # sample_data('data/real/dataset/australia.csv', 'data/real/dataset/australia', 10000000)
+    # sample_data('data/real/dataset/us.csv', 'data/real/dataset/us', 10000000)
+
+    sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', 50000000)
+    sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', 50000000)
+    sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', 5000000)
+    sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', 5000000)

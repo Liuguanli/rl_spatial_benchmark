@@ -1,0 +1,228 @@
+{
+  "experiments": [
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "point_query_only.json",
+        "knn_query_only_25.json"
+       ],
+      "baseline": [
+        {
+          "name": "bmtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 6,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "bmtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 8,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "bmtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 12,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "bmtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 14,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 6
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 8
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 12
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 10000,
+            "epoch": 14
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 6,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 8,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 12,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 14,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 200,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 8,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 50,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 8,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 100,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 8,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 400,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 8,
+            "page_size": 100,
+            "sampling_ratio": 0.001,
+            "action_sampling_size": 800,
+            "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 160000,
+            "epoch": 10
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 320000,
+            "epoch": 10
+          }
+        }
+      ]
+    }
+  ]
+}

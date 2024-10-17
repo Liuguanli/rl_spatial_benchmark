@@ -314,7 +314,7 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/zorder {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/zorder {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -436,7 +436,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Starting SFC Rtree bulk load using sorted data: {data_file}")
         
-        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/rankspace {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-SFCRTreeBulkLoad {data_file} ./benchmark/rankspace {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -569,7 +569,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 # elapsed_time_ns_learn = 0
 
             # build bmtree sfcrtree
-            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/bmtree {page_size} {fill_factor} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-SFCRTreeBulkLoad {BMTREE_OUTPUT} ./benchmark/bmtree {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -688,7 +688,7 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
 
         logger.info(f"Start building rtree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rtree {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rtree {page_size} {fill_factor} {rtree_variant} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -790,7 +790,7 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         logger.info(f"Start building rstartree ({rtree_variant}): {data_file}")
         
-        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rstar {page_size} {fill_factor} {rtree_variant} {PAGE_SIZE} {BUFFER}"
+        command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rstar {page_size} {fill_factor} {rtree_variant} {BLOCK_SIZE} {BUFFER}"
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -942,7 +942,7 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
 
             #     elapsed_time_ns_learn = 0
 
-            command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {PAGE_SIZE} {BUFFER}"
+            command = f"test-rtree-RTreeLoad {data_file} ./benchmark/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {BLOCK_SIZE} {BUFFER}"
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
@@ -1062,7 +1062,7 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         
         # The second parameter path is not used and 1.0 is also not used. They are for greedy kdtree. 
         # Here, they are placeholders.
-        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path ./benchmark/kdtree {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+        command = f"test-kdtree-KDTreeBulkLoad kdtree {data_file} path ./benchmark/kdtree {page_size} 1.0 {BLOCK_SIZE} {BUFFER}"  
 
         logger.info(f"Start building kdtree: {command}")
 
@@ -1168,7 +1168,7 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
 
-            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} ./benchmark/kdgreedy {page_size} 1.0 {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-KDTreeBulkLoad greedy_kdtree {data_file} {query_file} ./benchmark/kdgreedy {page_size} 1.0 {BLOCK_SIZE} {BUFFER}"  
 
             logger.info(f"Start building kdtree: {command}")
 
@@ -1302,7 +1302,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
 
             logger.info(f"Start building qdtree: {data_file}")
             
-            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} ./benchmark/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {PAGE_SIZE} {BUFFER}"  
+            command = f"test-kdtree-QDTreeBulkLoad qdtree {data_file} {query_file} ./benchmark/qdtree {page_size} 1.0 {model_path} {action_sampling_size} {BLOCK_SIZE} {BUFFER}"  
 
             logger.info(f"Start building qdtree: {command}")
 
