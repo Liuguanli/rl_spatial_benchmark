@@ -1,0 +1,22 @@
+# Build Files
+build
+compile_commands.json
+Index
+
+# Extensions
+*.csv
+*.png
+*.err
+*.json
+*run.sh
+.python-version
+
+# Other
+Experiments
+Queries
+Snapshots
+.clangd
+*._*
+*DS_Store*
+dataFile.txt
+log.txt
