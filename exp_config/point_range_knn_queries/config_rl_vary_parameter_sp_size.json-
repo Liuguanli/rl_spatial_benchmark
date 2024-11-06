@@ -109,7 +109,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -163,7 +163,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -236,7 +236,7 @@
       "baseline": [
         {
           "name": "bmtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
@@ -290,7 +290,7 @@
       "baseline": [
         {
           "name": "bmtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
@@ -301,7 +301,7 @@
         },
         {
           "name": "rlrtree",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -325,7 +325,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -355,7 +355,7 @@
         },
         {
           "name": "rlrtree",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -379,7 +379,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -433,7 +433,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -488,3 +488,4 @@
     }
   ]
 }
+config_rl_vary_parameter_sp_size

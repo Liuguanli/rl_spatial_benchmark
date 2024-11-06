@@ -1,0 +1,190 @@
+{
+    "experiments": [
+      {
+        "available": true,
+        "data": {
+          "size": 100000000,
+          "dimensions": 2,
+          "distribution": "australia",
+          "skewness": 1,
+          "bounds": [
+            [0, 1],
+            [0, 1]
+          ]
+        },
+        "workloads": [
+          "range_query_only.json",
+          "point_query_only.json",
+          "knn_query_only_25.json"
+        ],
+        "baseline": [
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0001,
+              "action_sampling_size": 800,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0001,
+              "action_sampling_size": 400,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0001,
+              "action_sampling_size": 200,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0002,
+              "action_sampling_size": 800,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0002,
+              "action_sampling_size": 400,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0002,
+              "action_sampling_size": 200,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0004,
+              "action_sampling_size": 800,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0004,
+              "action_sampling_size": 400,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0004,
+              "action_sampling_size": 200,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0008,
+              "action_sampling_size": 800,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0008,
+              "action_sampling_size": 400,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0008,
+              "action_sampling_size": 200,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0016,
+              "action_sampling_size": 800,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0016,
+              "action_sampling_size": 400,
+              "model_path": "benchmark/model"
+            }
+          },
+          {
+            "name": "qdtree",
+            "available": true,
+            "config": {
+              "episode": 10,
+              "page_size": 100,
+              "sampling_ratio": 0.0016,
+              "action_sampling_size": 200,
+              "model_path": "benchmark/model"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  

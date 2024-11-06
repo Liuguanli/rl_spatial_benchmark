@@ -57,5 +57,19 @@ export LD_LIBRARY_PATH=/home/liuguanli/Documents/libtorch/lib:$LD_LIBRARY_PATH
 
 print_step $YELLOW "Step 3: Start Experiments"
 
+# python run_index_tuning.py
 
-python run_exp_from_config.py
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl.json
+
+# python run_exp_from_config.py example_config_debug_bmtree.json
+
+
+tree_types=("qdtree" "rlrtree" "bmtree")
+datasets=("us" "india" "australia" "uniform" "normal" "skewed")
+
+for tree in "${tree_types[@]}"; do
+  for dataset in "${datasets[@]}"; do
+    echo "Running experiment for ${tree} on ${dataset}"
+    python run_exp_from_config.py exp_config/index_tuning/${tree}_${dataset}.json
+  done
+done

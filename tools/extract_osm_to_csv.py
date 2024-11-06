@@ -1,8 +1,17 @@
 import osmium
 import sys
+import os
 import csv
 import random
 import pandas as pd
+import numpy as np
+
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(root_dir)
+from constants import *
+
+np.random.seed(SEED)
+random.seed(SEED)
 
 
 class NodeHandler(osmium.SimpleHandler):
@@ -35,15 +44,16 @@ def sample_data_reservoir(full_file, sample_file, num_samples=10000):
         writer = csv.writer(f)
         writer.writerows(reservoir)
 
-def sample_data(input_file, output_file, num_samples=1000):
+def sample_data(input_file, output_file, num_samples=[1000]):
 
     df = pd.read_csv(input_file)
     
-    num_samples = min(num_samples, len(df))
-    
-    sample_df = df.sample(n=num_samples)
-    
-    sample_df.to_csv(output_file + "_" +  str(num_samples) + ".csv", index=False)
+    for num_sample in num_samples:
+        num_sample = min(num_sample, len(df))
+        
+        sample_df = df.sample(n=num_sample)
+        
+        sample_df.to_csv(output_file + "_" +  str(num_sample) + ".csv", index=False)
 
 def main(osm_pbf_file, output_file, sample_output_file):
     handler = NodeHandler(output_file)
@@ -52,14 +62,15 @@ def main(osm_pbf_file, output_file, sample_output_file):
 
 if __name__ == '__main__':
 
-    # sample_data('data/real/dataset/india.csv', 'data/real/dataset/india', 100000000)
-    # sample_data('data/real/dataset/australia.csv', 'data/real/dataset/australia', 100000000)
-    # sample_data('data/real/dataset/us.csv', 'data/real/dataset/us', 100000000)
-    # sample_data('data/real/dataset/india.csv', 'data/real/dataset/india', 10000000)
-    # sample_data('data/real/dataset/australia.csv', 'data/real/dataset/australia', 10000000)
-    # sample_data('data/real/dataset/us.csv', 'data/real/dataset/us', 10000000)
+    data_sizes1 = [100000, 1000000, 20000000, 40000000, 60000000, 80000000]
+    # data_sizes1 = [1000000, 5000000, 10000000, 50000000]
 
-    sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', 50000000)
-    sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', 50000000)
-    sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', 5000000)
-    sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', 5000000)
+    sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', data_sizes1)
+    sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', data_sizes1)
+    # sample_data('data/real/dataset/australia_100000000.csv', 'data/real/dataset/australia', data_sizes1)
+
+
+    # sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', 50000000)
+    # sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', 50000000)
+    # sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', 5000000)
+    # sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', 5000000)

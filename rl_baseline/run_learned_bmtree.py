@@ -17,6 +17,7 @@ import time
 from utils.curves import ZorderModule, DesignQuiltsModule, HighQuiltsModule,  Z_Curve_Module
 
 
+# "${data_file}_${query_file}_bits_${bit_num}_depth_${tree_depth}_sample_${sample_size}.txt"
 
 
 '''Set the state_dim and action_dim, for now'''

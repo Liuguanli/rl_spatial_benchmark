@@ -1,7 +1,7 @@
 {
   "experiments": [
     {
-      "available": false,
+      "available": true,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -20,7 +20,7 @@
       "baseline": [
         {
           "name": "zorder",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -65,7 +65,7 @@
       "baseline": [
         {
           "name": "zorder",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -109,7 +109,7 @@
       "baseline": [
         {
           "name": "zorder",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -206,7 +206,7 @@
         },
         {
           "name": "rtree",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -250,7 +250,7 @@
         },
         {
           "name": "rtree",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,

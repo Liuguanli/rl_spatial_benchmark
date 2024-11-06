@@ -1,0 +1,8 @@
+{
+  "tree_depth": [8, 10, 12],
+  "sampling": [10000, 20000, 40000, 80000, 160000],
+  "bit_num": [16, 32],
+  "build_threshold": 20000,
+  "total_threshold": 200000,
+  "query_threshold": 10000
+}

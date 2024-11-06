@@ -1,9 +1,10 @@
 {
+  "is_HDD": false,
   "experiments": [
     {
       "data": {
-        "size": 100000000,
-        "distribution": "australia",
+        "size": 10000,
+        "distribution": "us",
         "dimensions": 2,
         "skewness": 1,
         "bounds": [
@@ -12,16 +13,14 @@
         ]
       },
       "workloads": [
-        "range_query_only.json", 
-        "point_query_only.json",
-        "knn_query_only.json"
+        "range_query_only.json"
        ],
       "baseline": [
         {
           "name": "bmtree",
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 10,
+            "tree_depth": 2,
             "sampling": 10000,
             "page_size": 100,
             "bit_num": 32

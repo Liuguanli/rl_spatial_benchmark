@@ -1,0 +1,32 @@
+{
+    "US": {
+        "bmtree": "_bits_32_depth_8_sample_10000",
+        "rlrtree": "_rlrtree_epoch_8_sample_80000",
+        "qdtree": "_episode_10_sampling_ratio_0.0001_action_space_400"
+    },
+    "INDIA": {
+        "bmtree": "_bits_32_depth_10_sample_10000",
+        "rlrtree": "_rlrtree_epoch_8_sample_40000",
+        "qdtree": "_episode_10_sampling_ratio_0.0016_action_space_400"
+    },
+    "AUS": {
+        "bmtree": "_bits_32_depth_10_sample_10000",
+        "rlrtree": "_rlrtree_epoch_8_sample_10000",
+        "qdtree": "_episode_10_sampling_ratio_0.0008_action_space_200"
+    },
+    "UNI": {
+        "bmtree": "_bits_32_depth_10_sample_10000",
+        "rlrtree": "_rlrtree_epoch_8_sample_40000",
+        "qdtree": "_episode_10_sampling_ratio_0.0004_action_space_800"
+    },
+    "NORM": {
+        "bmtree": "_bits_32_depth_10_sample_10000",
+        "rlrtree": "_rlrtree_epoch_6_sample_10000",
+        "qdtree": "_episode_10_sampling_ratio_0.0008_action_space_400"
+    },
+    "SKEW": {
+        "bmtree": "_bits_32_depth_10_sample_10000",
+        "rlrtree": "_rlrtree_epoch_6_sample_10000",
+        "qdtree": "_episode_10_sampling_ratio_0.0016_action_space_200"
+    }
+}

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 import shutil
 import subprocess
 import time
@@ -521,21 +522,31 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
 
             logger.info("Prepare BMTree")
 
-            # bmtree_output_default = BMTREE_OUTPUT_DEFAULT.format(
-            #     data_file_prefix=data_file_prefix,
-            #     query=file_name_prefix,
-            #     bit_num=bit_num,
-            #     tree_depth=tree_depth,
-            #     sample_size=sample_size,
-            # )
+            bmtree_model_output_default = BMTREE_MODEL_OUTPUT.format(
+                data_file_prefix=data_file_prefix,
+                query=file_name_prefix,
+                bit_num=bit_num,
+                tree_depth=tree_depth,
+                sample_size=sample_size,
+            )
 
-            # if not os.path.exists(bmtree_output_default):
-            # logger.info(f"{bmtree_output_default} NOT exists")
-        
+            is_train = not os.path.exists(bmtree_model_output_default)
+            if is_train:
+                logger.info(f"{bmtree_model_output_default} NOT exists")
+            else:
+                logger.info(f"{bmtree_model_output_default} exists")
+
+                # Try copying the file to the specified destination
+                try:
+                    shutil.copy(bmtree_model_output_default, BMTREE_MODEL_OUTPUT_DEFAULT)
+                    logger.info(f"Copied {bmtree_model_output_default} to {BMTREE_MODEL_OUTPUT_DEFAULT}")
+                except Exception as e:
+                    logger.error(f"Failed to copy {bmtree_model_output_default} to {BMTREE_MODEL_OUTPUT_DEFAULT}: {e}")
+                
             data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
             execute_command(data_transfer_command)
 
-            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name}"
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train}"
             elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
             data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
@@ -1766,27 +1777,27 @@ def remove_and_create_directory(directory_path):
 def main():
 
     global logger
-    configs = []
-    if RUN_EXAMPLE:
-        if RUN_ALL_BASELINE_EXAMPLE:
-            configs = ["example_config_all_baselines.json",
-                       "example_config_all_baselines_insert.json",
-                       "example_config_all_baselines_read_heavy.json",
-                       "example_config_all_baselines_write_heavy.json"]
+    # configs = []
+    # if RUN_EXAMPLE:
+    #     if RUN_ALL_BASELINE_EXAMPLE:
+    #         configs = ["example_config_all_baselines.json",
+    #                    "example_config_all_baselines_insert.json",
+    #                    "example_config_all_baselines_read_heavy.json",
+    #                    "example_config_all_baselines_write_heavy.json"]
             
-            configs = ["example_config_all_baselines.json"]
-        else: # for debug specific index
-            configs = ["example_config_fill_factor.json"]
-    else:
-        directory = CONFIG_DIR
-        # First run point_range_knn_queries to make sure queries are generated first for RL based.
-        special_candidate = "point_range_knn_queries"
-        for root, dirs, files in os.walk(directory):
-            if root.split("/")[-1] == special_candidate:
-                for file in files:
-                    if file.endswith(".json"):
-                        config_file_path = os.path.join(root, file)
-                        configs.append(config_file_path)
+    #         configs = ["example_config_all_baselines.json"]
+    #     else: # for debug specific index
+    #         configs = ["example_config_fill_factor.json"]
+    # else:
+    #     directory = CONFIG_DIR
+    #     # First run point_range_knn_queries to make sure queries are generated first for RL based.
+    #     special_candidate = "point_range_knn_queries"
+    #     for root, dirs, files in os.walk(directory):
+    #         if root.split("/")[-1] == special_candidate:
+    #             for file in files:
+    #                 if file.endswith(".json"):
+    #                     config_file_path = os.path.join(root, file)
+    #                     configs.append(config_file_path)
 
         # candidates = ["write_only", "balance_only", "write_heavy_only", "read_heavy_only"]
         # candidates = ["write_only", "read_heavy_only", "write_heavy_only"]
@@ -1798,6 +1809,11 @@ def main():
         #             config_file_path = os.path.join(root, file)
         #             configs.append(config_file_path)
     counter = 0
+    configs = []
+    for i, arg in enumerate(sys.argv[1:], start=1):
+        # print(f"Argument {i}: {arg}")
+        configs.append(arg)
+    print(configs)
 
     for config_file_path in configs:
         with open(config_file_path, "r") as json_file:
@@ -1806,6 +1822,12 @@ def main():
         logger = setup_logger(config_file_path)
 
         logger.info(f"-----------------Run config {config_file_path}-----------------")
+
+        is_HDD = config.get('is_HDD', True)
+
+        IS_HDD = is_HDD
+
+        DISK_TYPE = "HDD" if IS_HDD else "SSD"
 
         for experiment in config['experiments']:
             counter += 1
@@ -1837,6 +1859,8 @@ def setup_logger(config_file_path):
     return logger
 
 if __name__ == "__main__":
+
+
     main()
 # python tools/libspatialindex_data_adapter.py --type data --input data/real/dataset/us_10000.csv --output benchmark/libspatialindex/kdtree_data
 # test-kdtree-KDTreeBulkLoad kdtree benchmark/libspatialindex/kdtree_data path ./benchmark/tree 100 1.0 4096 0

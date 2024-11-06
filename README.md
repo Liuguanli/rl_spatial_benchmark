@@ -1,5 +1,16 @@
 # Benchmarking RL-enhacned Spatial Indices
 
+## TODO
+
+1. how to plot index tuning (grid search)
+2. where is the tuning results (json file)
+3. The implementation of other baselines
+4. how to plot other images.
+
+
+
+
+
 ## Setup
 
 
@@ -11,9 +22,11 @@ To run the experiments, you need to have LibTorch installed. Download it from th
 
 ### 2. Datasets
 
-The datasets required for the experiments can be downloaded from the following Dropbox link:
+The datasets and Workloads required for the experiments can be downloaded from the following Dropbox link:
 
-- [Download Datasets](https://drive.google.com/drive/folders/15fTAbMIuJSNF1o3t36NODuaahtt3O7IV)
+- [Download Datasets and Workloads](https://drive.google.com/drive/folders/15fTAbMIuJSNF1o3t36NODuaahtt3O7IV)
+
+(Synthetic datasets and all the queries can be generated, thus, these folders are empty.)
 
 After downloading, follow these steps:
 

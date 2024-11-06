@@ -27,3 +27,5 @@ benchmark/*.idx
 resources/
 
 temp/
+
+.DS_Store
