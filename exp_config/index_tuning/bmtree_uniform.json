@@ -130,7 +130,7 @@
         },
         {
           "name": "bmtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
@@ -163,7 +163,7 @@
         },
         {
           "name": "bmtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "tree_depth": 10,
