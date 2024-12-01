@@ -23,39 +23,31 @@ patterns = ['/', 'x', 'o',
             '\\', '+', '.', 
             '|', '-', '*']
 
-colors = ['#34568B',  # Royal Blue
-          '#FFD700',  # Gold
-          '#88CCEE',  # Light Blue
-          '#DDDDDD',  # Light Gray
-          '#555555',  # Dark Gray
-          '#FF7F00',  # Mango Orange
-          '#8B4513',  # Saddle Brown
-          '#2CA02C',  # Lime Green (soft enough for color blindness)
-          '#AA4499']  # Soft Purple
-
-
 colors = ['#A9A9F5', '#FFD700', '#88CCEE', '#FFCC99', '#FFA07A', '#FF6F61', '#B0E0E6', '#2CA02C', '#AA4499']
 
 
-colors = ['#B0E0E6', '#88CCEE', '#5599CC', '#B0E6B0', '#88DDAA', '#559966', '#FFD1B3', '#FF9966', '#FF6347']
-
-
-
+colors = ['#B0E0E6', '#88CCEE', '#5599CC', '#2A4A99',
+          '#FFD1B3', '#FF9966', '#FF6347', '#CC4F36',
+          '#B0E6B0', '#88DDAA', '#559966', '#2E664D']
 
 patterns = [None, '/', 'o', None, '\\', '.', None, '+', '*']
+patterns = [None, '-|', 'o', '-', None, '\\', '.', '*', None, '/', '+', 'x']
+patterns = [None, '/', 'o', '-', None, '\\', '.', '*', None, 'xx', '+', 'x']
+
+
 
 folder= "../../../../../应用/Overleaf/" + "Benchmarking RL Spatial Index"
 
 label_size = 24
 legend_size = 20
-width_total = 0.7
-spacing = 0.02
+width_total = 0.8
+spacing = 0.0
 fig_width = 13.5
 fig_height = 4
 
 
 
-def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom=1, top=None):
+def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom=1, top=None, legend_location="right"):
 
     
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
@@ -69,7 +61,7 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
     group_width = len(baseline_names) * width 
     
     for i, baseline in enumerate(baseline_names):
-        offset = int(i / 3) * spacing
+        offset = int(i / 4) * spacing
         adjusted_x = x - int(len(baseline_names) / 2) * width + i * width + offset
         ax.bar(adjusted_x, result[i], width=width, label=baseline, color=colors[i % len(colors)], hatch=patterns[i % len(patterns)], edgecolor='black', linestyle='--')
 
@@ -79,7 +71,7 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
     if top:
         ax.set_ylim(top=top)
     ax.set_ylabel(y_label, fontsize=label_size)
-    ax.set_xticks(x + spacing * (len(baseline_names) // 3 - 1) / 2) 
+    ax.set_xticks(x + spacing * (len(baseline_names) // 4 - 1) / 2) 
     ax.set_xticklabels(datasets, fontsize=label_size)
     ax.tick_params(axis='x', labelsize=label_size)
     ax.tick_params(axis='y', labelsize=label_size)
@@ -90,15 +82,28 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
         ax.set_yscale('log')
     
     if is_legend:
-        legend = ax.legend(
-            loc='upper center',
-            bbox_to_anchor=(1.11, 1.05),
-            fontsize=legend_size,
-            ncol=1,
-            borderaxespad=0.5,  # Border padding
-            handletextpad=0.5,  # Padding between legend marker and text
-            labelspacing=0.3    # Vertical space between legend entries
-        )
+        if legend_location == 'right':
+            legend = ax.legend(
+                loc='upper center',
+                bbox_to_anchor=(1.11, 1.05),
+                fontsize=legend_size,
+                ncol=1,
+                borderaxespad=0.5,  # Border padding
+                handletextpad=0.5,  # Padding between legend marker and text
+                labelspacing=0.3    # Vertical space between legend entries
+            )
+        if legend_location == 'top':
+            legend = plt.legend(
+                loc='upper center',          
+                bbox_to_anchor=(0.5, 1.37),  
+                ncol=6,                      
+                frameon=False,     
+                fontsize=legend_size,
+                handlelength=1.4,               # Adjusts the length of the legend handles
+                handletextpad=1,            # Reduces the space between handle and text
+                columnspacing=1,
+                labelspacing=0.1    # Vertical space between legend entries
+            )
         plt.setp(legend.get_title(), fontsize=legend_size)
         
     plt.tight_layout()
@@ -123,7 +128,7 @@ def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False
     bars = []
     
     for i, baseline in enumerate(baseline_names):
-        offset = int(i / 3) * spacing
+        offset = int(i / 4) * spacing
         adjusted_x = x - int(len(baseline_names) / 2) * width + i * width + offset
         # ax.bar(adjusted_x, result[i], width=width, label=baseline, color=colors[i % len(colors)], hatch=patterns[i % len(patterns)])
 
@@ -138,7 +143,7 @@ def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False
         ax.set_ylim(top=top)
     if y_label:
         ax.set_ylabel(y_label, fontsize=label_size)
-    ax.set_xticks(x + spacing * (len(baseline_names) // 3 - 1) / 2) 
+    ax.set_xticks(x + spacing * (len(baseline_names) // 4 - 1) / 2) 
     ax.set_xticklabels(datasets, fontsize=label_size)
     ax.tick_params(axis='x', labelsize=label_size)
     ax.tick_params(axis='y', labelsize=label_size)
@@ -193,7 +198,7 @@ def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False
 
 
 
-def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_log=False, title="", output_file_paths=None, bottom1=None, top1=None, bottom2=None, top2=None,legend_labels=[], legend_location="left"):
+def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom1=None, top1=None, bottom2=None, top2=None,legend_labels=[], legend_location="top"):
     
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(fig_width, fig_height), sharex=True, gridspec_kw={'height_ratios': [1, 1], 'hspace': 0})
     
@@ -208,7 +213,7 @@ def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_lo
     
     # Top plot (ax1)
     for i, baseline in enumerate(baseline_names):
-        offset = int(i / 3) * spacing
+        offset = int(i / 4) * spacing
         adjusted_x = x - int(len(baseline_names) / 2) * width + i * width + offset
         bar1 = ax1.bar(adjusted_x, [res[0] for res in result[i]], width=width, color=colors[i % len(colors)], hatch=patterns[i], alpha=1.0, edgecolor='black', linestyle='-.')
         # bar2 = ax1.bar(adjusted_x, [res[1] for res in result[i]], width=width, bottom=[res[0] for res in result[i]], color=colors[i % len(colors)], hatch=patterns[5], edgecolor='black', linestyle='-')
@@ -226,7 +231,7 @@ def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_lo
 
     # Bottom plot (ax2) with inverted y-axis
     for i, baseline in enumerate(baseline_names):
-        offset = int(i / 3) * spacing
+        offset = int(i / 4) * spacing
         adjusted_x = x - int(len(baseline_names) / 2) * width + i * width + offset
         # bar1 = ax2.bar(adjusted_x, [res[0] for res in result[i]], width=width, color=colors[i % len(colors)], hatch=patterns[4], alpha=1.0, edgecolor='black', linestyle='-.')
         bar2 = ax2.bar(adjusted_x, [res[1] for res in result[i]], width=width, color=colors[i % len(colors)], hatch=patterns[i], edgecolor='black', linestyle='-')
@@ -250,28 +255,40 @@ def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_lo
         ax2.set_yscale('log')
 
     from matplotlib.patches import Patch
-    io_legend_elements = [Patch(facecolor="white", alpha=1.0, edgecolor='black', hatch=patterns[4], linestyle='-', label=legend_labels[0]),
-                          Patch(facecolor="white", alpha=1.0, edgecolor='black', hatch=patterns[5], linestyle='-.', label=legend_labels[1])]
-    IO_legend = ax1.legend(handles=io_legend_elements, loc='upper left', bbox_to_anchor=(0.01, 1), fontsize=legend_size, ncol=2, frameon=False)
-    if legend_location == "right":
-        IO_legend = ax1.legend(handles=io_legend_elements, loc='upper right', bbox_to_anchor=(1.01, 1), fontsize=legend_size, ncol=2, frameon=False)
+    # io_legend_elements = [Patch(facecolor="white", alpha=1.0, edgecolor='black', hatch=patterns[4], linestyle='-', label=legend_labels[0]),
+                        #   Patch(facecolor="white", alpha=1.0, edgecolor='black', hatch=patterns[5], linestyle='-.', label=legend_labels[1])]
+    # IO_legend = ax1.legend(handles=io_legend_elements, loc='upper left', bbox_to_anchor=(0.01, 1), fontsize=legend_size, ncol=2, frameon=False)
+    # if legend_location == "right":
+    #     IO_legend = ax1.legend(handles=io_legend_elements, loc='upper right', bbox_to_anchor=(1.01, 1), fontsize=legend_size, ncol=2, frameon=False)
         
     # ax1.add_artist(IO_legend)
     
-    bar_legend_elements = [Patch(facecolor=colors[i % len(colors)], alpha=1.0, hatch=patterns[i], label=baseline_names[i]) for i in range(len(baseline_names))]
-    legend = ax1.legend(
-        bar_legend_elements,
-        baseline_names,
-        loc='upper center',
-        bbox_to_anchor=(1.11, 1.05),
-        fontsize=legend_size,
-        ncol=1,
-        borderaxespad=0.5,  # Border padding
-        handletextpad=0.5,  # Padding between legend marker and text
-        labelspacing=0.3    # Vertical space between legend entries
-    )
+    if is_legend:
+        bar_legend_elements = [Patch(facecolor=colors[i % len(colors)], alpha=1.0, hatch=patterns[i], label=baseline_names[i]) for i in range(len(baseline_names))]
+        if legend_location == 'right':
+            legend = ax1.legend(
+                bar_legend_elements,
+                baseline_names,
+                loc='upper center',
+                bbox_to_anchor=(1.11, 1.05),
+                fontsize=legend_size,
+                ncol=1,
+                borderaxespad=0.5,  # Border padding
+                handletextpad=0.5,  # Padding between legend marker and text
+                labelspacing=0.3    # Vertical space between legend entries
+            )
+        if legend_location == 'top':
+            legend = plt.legend(
+                loc='upper center',           # Place the legend at the top
+                bbox_to_anchor=(0.5, 1.15),   # Adjust position to move it outside the plot area if needed
+                ncol=6,                       # Number of columns
+                frameon=False,                # Optional: remove the border around the legend
+                handlelength=1,               # Adjusts the length of the legend handles
+                handletextpad=0.3,            # Reduces the space between handle and text
+                columnspacing=0.5   
+            )
     
-    plt.setp(legend.get_title(), fontsize=legend_size)
+        plt.setp(legend.get_title(), fontsize=legend_size)
     
     plt.tight_layout()
     
@@ -299,7 +316,7 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     linestyles = ['-', '--', '-.']
     combinations = [(m, ls) for m in markers for ls in linestyles]
     for i, baseline in enumerate(baseline_names):
-        offset = int(i / 3) * spacing
+        offset = int(i / 4) * spacing
         adjusted_x = x + offset
         ax.plot(adjusted_x, result[i], label=baseline, marker=markers[i], linestyle=linestyles[i%len(linestyles)], color=colors[i % len(colors)], markersize=10)
 
@@ -311,7 +328,7 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
         ax.set_ylim(top=top)
     ax.set_ylabel(y_label, fontsize=label_size)
     ax.set_xlabel(x_label, fontsize=label_size)
-    ax.set_xticks(x + spacing * (len(baseline_names) // 3 - 1) / 2)
+    ax.set_xticks(x + spacing * (len(baseline_names) // 4 - 1) / 2)
     ax.set_xticklabels(datasets, fontsize=label_size)
     ax.tick_params(axis='x', labelsize=label_size)
     ax.tick_params(axis='y', labelsize=label_size)
@@ -348,7 +365,7 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     plt.close(fig)
 
 
-def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax=None, x_label="", y_label="", is_log=False, title="", output_file_paths=None, x_bottom=None, x_top=None, y_bottom=None, y_top=None, show_legend=False):
+def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax=None, x_label="", y_label="", yticks=[], is_log=False, title="", output_file_paths=None, x_bottom=None, x_top=None, y_bottom=None, y_top=None, show_legend=False):
     label_size = 28
     legend_size = 22
 
@@ -383,8 +400,8 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
     if y_top is not None:
         ax.set_ylim(top=y_top)
         
-    # ax.set_ylabel(y_label, fontsize=label_size)
-    # ax.set_xlabel(x_label, fontsize=label_size)
+    ax.set_ylabel(y_label, fontsize=label_size)
+    ax.set_xlabel(x_label, fontsize=label_size)
     ax.tick_params(axis='x', labelsize=label_size + 2)
     ax.tick_params(axis='y', labelsize=label_size + 2)
 
@@ -427,7 +444,9 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
         )
     
         plt.setp(legend.get_title(), fontsize=legend_size)
-    
+
+    if yticks:
+        ax.set_yticks(yticks)
     ax.grid(True)  # Add grid
     
     # plt.tight_layout()
@@ -442,7 +461,7 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
     # plt.show()
     # plt.close(fig)
 
-def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", is_log=False, title="", output_file_paths=None, bottom=None, top=None, show_legend=False):
+def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", yticks=[], is_log=False, title="", output_file_paths=None, bottom=None, top=None, show_legend=False):
     label_size = 24
     legend_size = 20
 
@@ -461,7 +480,7 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", is
     linestyles = ['-', '--', '-.']
     combinations = [(m, ls) for m in markers for ls in linestyles]
     for i, baseline in enumerate(baseline_names):
-        offset = int(i / 3) * spacing
+        offset = int(i / 4) * spacing
         adjusted_x = x + offset
         ax.plot(adjusted_x, result[i], label=baseline, marker=markers[i], linestyle=linestyles[i%len(linestyles)], color=colors[i % len(colors)], markersize=10)
 
@@ -473,7 +492,7 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", is
         ax.set_ylim(top=top)
     ax.set_ylabel(y_label, fontsize=label_size + 2)
     ax.set_xlabel(x_label, fontsize=label_size + 2)
-    ax.set_xticks(x + spacing * (len(baseline_names) // 3 - 1) / 2)
+    ax.set_xticks(x + spacing * (len(baseline_names) // 4 - 1) / 2)
     ax.set_xticklabels(datasets, fontsize=label_size + 2)
     ax.tick_params(axis='x', labelsize=label_size + 2)
     ax.tick_params(axis='y', labelsize=label_size + 2)
@@ -506,7 +525,7 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", is
             loc='upper right',
             # bbox_to_anchor=(1.24, 1.05),
             fontsize=legend_size,
-            ncol=3,
+            ncol=4,
             borderaxespad=0.5,  # Border padding
             handletextpad=0.5,  # Padding between legend marker and text
             labelspacing=0.3,    # Vertical space between legend entries
@@ -528,46 +547,112 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", is
     plt.close(fig)
 
 
-def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabel, output_file_paths):
+# def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabel, is_log, is_legend, output_file_paths):
+#     # Sample data
+#     markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+']
+#     x = np.arange(1, 100)  # X-axis from 1 to 100
+    
+#     # Create plot
+#     plt.figure(figsize=(14, 4))
+    
+#     # Plot each baseline with a unique marker and color
+#     for i, baseline in enumerate(baselines):
+#         baseline_on_us = QueryPercentage[baseline][0]
+        
+#         # Plot the full line without markers
+#         plt.plot(x, baseline_on_us, color=colors[i], linewidth=4, label=display_baselines[i])
+    
+#         # Add markers at every 10th point
+#         plt.plot(x[::10], baseline_on_us[::10], color=colors[i], marker=markers[i % len(markers)], 
+#                  linestyle='None', markersize=10)  # Only markers, no line
+    
+#         # Add marker at the last point
+#         plt.plot(x[-1:], baseline_on_us[-1:], color=colors[i], marker=markers[i % len(markers)], 
+#                  linestyle='None', markersize=10)  # Only marker at the last point
+#     if is_log:
+#         plt.yscale('log')
+#     if xlabel:
+#         plt.xlabel(xlabel, fontsize=label_size)
+#     if ylabel:
+#         plt.ylabel(ylabel, fontsize=label_size)
+#     plt.tick_params(axis='x', labelsize=label_size)
+#     plt.tick_params(axis='y', labelsize=label_size)
+    
+#     # Show legend
+#     if is_legend:
+#         # plt.legend(ncol=3, 
+#         #         loc='upper left',
+#         #         # bbox_to_anchor=(1.24, 1.05),
+#         #         fontsize=legend_size,
+#         #         borderaxespad=0.3,  # Border padding
+#         #         handletextpad=0.3,  # Padding between legend marker and text
+#         #         labelspacing=0.3,    # Vertical space between legend entries
+#         #         frameon=False
+#         #         )
+#         plt.legend(
+#             loc='upper center',          
+#             bbox_to_anchor=(0.5, 1.37),  
+#             ncol=6,                      
+#             frameon=False,     
+#             fontsize=legend_size,
+#             borderaxespad=0.2,
+#             handletextpad=0.2,
+#             labelspacing=0.2,
+#         )
+    
+#     # Show grid
+#     plt.grid(True, linestyle="--")
+    
+#     if output_file_paths:
+#         for output_file_path in output_file_paths:
+#             if output_file_path.endswith(".pdf"):
+#                 plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+#             if output_file_path.endswith(".png"):
+#                 plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    
+#     plt.show()
+
+def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabel, is_log, is_legend, output_file_paths):
     # Sample data
     markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+']
     x = np.arange(1, 100)  # X-axis from 1 to 100
     
-    # Create plot
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(14, 4))
+    handles = []  # Store handles for legend
     
-    # Plot each baseline with a unique marker and color
     for i, baseline in enumerate(baselines):
         baseline_on_us = QueryPercentage[baseline][0]
         
-        # Plot the full line without markers
-        plt.plot(x, baseline_on_us, color=colors[i], linewidth=4, label=display_baselines[i])
-    
+        # Plot the line without markers
+        line, = plt.plot(x, baseline_on_us, color=colors[i], linewidth=4)
+        
         # Add markers at every 10th point
         plt.plot(x[::10], baseline_on_us[::10], color=colors[i], marker=markers[i % len(markers)], 
-                 linestyle='None', markersize=10)  # Only markers, no line
-    
+                 linestyle='None', markersize=10)
+        
         # Add marker at the last point
         plt.plot(x[-1:], baseline_on_us[-1:], color=colors[i], marker=markers[i % len(markers)], 
-                 linestyle='None', markersize=10)  # Only marker at the last point
+                 linestyle='None', markersize=10)
+        
+        # Create a handle for the legend using the line and marker
+        handles.append(plt.Line2D([0], [0], color=colors[i], marker=markers[i % len(markers)], 
+                                  linewidth=4, markersize=10, label=display_baselines[i]))
     
-    plt.xlabel(xlabel, fontsize=label_size)
-    plt.ylabel(ylabel, fontsize=label_size)
+    if is_log:
+        plt.yscale('log')
+    if xlabel:
+        plt.xlabel(xlabel, fontsize=label_size)
+    if ylabel:
+        plt.ylabel(ylabel, fontsize=label_size)
     plt.tick_params(axis='x', labelsize=label_size)
     plt.tick_params(axis='y', labelsize=label_size)
     
-    # Show legend
-    plt.legend(ncol=3, 
-               loc='upper left',
-            # bbox_to_anchor=(1.24, 1.05),
-            fontsize=legend_size,
-            borderaxespad=0.5,  # Border padding
-            handletextpad=0.5,  # Padding between legend marker and text
-            labelspacing=0.3,    # Vertical space between legend entries
-            frameon=False
-              )
+    if is_legend:
+        # Use custom handles with markers for the legend
+        plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 1.37), 
+                   ncol=6, frameon=False, fontsize=legend_size, 
+                   borderaxespad=0.2, handletextpad=0.2, labelspacing=0.2)
     
-    # Show grid
     plt.grid(True, linestyle="--")
     
     if output_file_paths:
