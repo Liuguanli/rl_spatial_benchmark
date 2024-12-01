@@ -1,22 +1,27 @@
 import pandas as pd
 import argparse
 import os
+import numpy as np
 
 def transform_data(input_file, output_file):
     df = pd.read_csv(input_file, header=None)
 
     # df[0] = pd.to_numeric(df[0], errors='coerce')
     # df[1] = pd.to_numeric(df[1], errors='coerce')
-
-
+    # print(df.head())
+    # print(df.tail())
+    # df = df.head()
     transformed_df = pd.DataFrame({
-        'Col1': 1,
-        'Col2': range(len(df)),
+        'Col1': 1, 
+        'Col2': range(len(df)), 
         'Col3': df[0], 
         'Col4': df[1], 
         'Col5': df[0], 
         'Col6': df[1]
     })
+
+    if df.shape[1] > 2:  # Check if there are more than two columns
+        transformed_df['Col7'] = df[2]
 
     transformed_df.to_csv(output_file, sep=' ', index=False, header=False)
 

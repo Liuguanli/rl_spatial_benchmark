@@ -1,7 +1,7 @@
 {
   "experiments": [
     {
-      "available": false,
+      "available": true,
       "data": {
         "size": 100000000,
         "dimensions": 2,

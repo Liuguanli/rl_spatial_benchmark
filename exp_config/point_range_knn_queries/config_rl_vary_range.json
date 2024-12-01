@@ -13,8 +13,6 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "knn_query_only.json",
         "range_query_only_vary.json",
         "range_query_only_vary_ratio.json"
        ],
@@ -24,7 +22,7 @@
           "available": false,
           "config": {
             "fill_factor": 1.0,
-            "tree_depth": 10,
+            "tree_depth": 12,
             "sampling": 10000,
             "page_size": 100,
             "bit_num": 32
@@ -38,8 +36,8 @@
             "fill_factor": 0.4,
             "model_path": "benchmark/model",
             "rtree_variant": "rlrtree",
-            "sample_size": 10000,
-            "epoch": 10
+            "sample_size": 80000,
+            "epoch": 8
           }
         },
         {
@@ -49,7 +47,7 @@
             "episode": 10,
             "page_size": 100,
             "sampling_ratio": 0.0001,
-            "action_sampling_size": 200,
+            "action_sampling_size": 400,
             "model_path": "benchmark/model"
           }
         }

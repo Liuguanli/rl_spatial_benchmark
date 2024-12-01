@@ -33,7 +33,6 @@ def convert_csv_to_json(csv_file, target_directory, bit_length=20):
     print(f"Converted {csv_file} to {json_file}")
 
 
-
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: python script.py <csv_file1> <csv_file2>")

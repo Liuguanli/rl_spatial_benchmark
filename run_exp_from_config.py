@@ -376,6 +376,132 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
         safe_remove(z_order_output_default)
         
 
+def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+    global logger
+    logger.info(f"run_zm: data_file_name:{data_file_name} baseline_config:{baseline_config}")
+    try:
+        is_real_data = data_file_name.startswith("data")
+        if is_real_data:
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
+
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 1.0)
+        bit_num = baseline_config.get("bit_num", 20)
+
+        z_order_output_default = Z_ORDER_SORTED_DEFAULT.format(
+            data_file_prefix=data_file_prefix,
+            bit_num=bit_num
+        )
+
+        data_file = RANK_SPACE_Z_ORDER_SORTED_OUTPUT
+
+        # deal with queries
+        all_queries = []
+        all_queries.extend(point_queries)
+        all_queries.extend(range_queries)
+        all_queries.extend(knn_queries)
+        query_list_str = " ".join(all_queries)
+
+        if not os.path.exists(z_order_output_default):
+
+            logger.info(f"{z_order_output_default} NOT exists")
+            transform_command = f"python tools/rank_space_z.py {ablosute_data_file_name} {RANK_SPACE_Z_ORDER_OUTPUT} {bit_num}"
+            elapsed_time_ns_order = execute_command(transform_command)
+
+            query_adapt_command = f"python tools/libspatialindex_zm_query_adapter.py --bits {bit_num} --data {ablosute_data_file_name} --query_list {query_list_str}"
+            execute_command(query_adapt_command)
+
+            format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file}"
+            # python tools/libspatialindex_data_adapter.py --type data --input benchmark/model/rankspace_z_order_data.csv --output benchmark/model/rankspace_z_sorted_data
+            execute_command(format_data_command)
+
+            copy_and_rename(data_file, z_order_output_default)
+
+        else:
+            copy_and_rename(z_order_output_default, data_file)
+
+            elapsed_time_ns_order = 0
+
+        logger.info("build zm")
+
+
+        build_output_path = ZM_BUILD_OUTPUT_PATH.format(
+                        data_file_prefix=data_file_prefix,
+                        bit_num=bit_num,
+                    )
+
+        # test-learnedindex-ZMBulkLoad benchmark/model/rankspace_z_sorted_data /media/liuguanli/DATA/zm 100 1 4096 0
+        command = f"test-learnedindex-ZMBulkLoad {data_file} {INDEX_PATH}/zm {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
+        result, elapsed_time_ns_build = execute_command_with_err(command)
+
+    
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+        with open(build_output_path, "w") as f:
+            if result:
+                f.write(result.stderr)
+            f.write(f"Elapsed Learn Time: {elapsed_time_ns_order}\n")
+            f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+            f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/zm.dat')}\n")
+            f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/zm.idx')}\n")
+
+
+        for range_file_name in range_queries:
+            file_name_prefix = range_file_name.rstrip('.csv')
+            # if is_real_data:
+            #     ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
+            # else:
+            #     ablosute_query_file_name = f"data/real/query/{range_file_name}"
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix + "_zm")
+
+            range_query_output_path = ZM_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
+            )
+
+            # test-learnedindex-ZMQuery benchmark/libspatialindex/us_100000000_range_1000_2_uniform_1_0.001x0.001_zm_1 /media/liuguanli/DATA/zm intersection 0
+            execute_range_query(data_file, query_file, range_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
+
+        for knn_file_name in knn_queries:
+            knn_file_name_prefix = knn_file_name.rstrip('.csv')
+            knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix + "_zm")
+
+            ks = ks_map.get(knn_file_name)
+            for k in ks:
+                knn_query_output_path = ZM_KNN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    knn_query_prefix=knn_file_name_prefix,
+                    k=k,
+                    bit_num=bit_num,
+                )
+                execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
+
+        for file_name in point_queries:
+            point_file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix + "_zm")
+            point_query_output_path = ZM_POINT_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                point_query_prefix=point_file_name_prefix,
+                bit_num=bit_num,
+            )
+            execute_point_query(query_file, data_file, point_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"fail: {e}")
+    
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files(index_name="zm")
+        safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
+        safe_remove(z_order_output_default)
+        
+
+
 def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
     global logger
@@ -418,20 +544,19 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
 
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
-        if point_queries or knn_queries:
-            build_output_path = RANK_SPACE_Z_BUILD_OUTPUT_PATH.format(
-                data_file_prefix=data_file_prefix,
-                bit_num=bit_num,
-            )
+        build_output_path = RANK_SPACE_Z_BUILD_OUTPUT_PATH.format(
+            data_file_prefix=data_file_prefix,
+            bit_num=bit_num,
+        )
 
-            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+        os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
 
-            with open(build_output_path, "w") as f:
-                if result:
-                    f.write(result.stderr)
-                f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
-                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rankspace.dat')}\n")
-                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rankspace.idx')}\n")
+        with open(build_output_path, "w") as f:
+            if result:
+                f.write(result.stderr)
+            f.write(f"Elapsed Time: {elapsed_time_ns_order + elapsed_time_ns_build}\n")
+            f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rankspace.dat')}\n")
+            f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rankspace.idx')}\n")
 
         for file_name in range_queries:
             file_name_prefix = file_name.rstrip('.csv')
@@ -493,6 +618,7 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
         # clean up intermediate files
         cleanup_intermediate_files(index_name="rankspace")
         safe_remove(RANK_SPACE_Z_ORDER_SORTED_OUTPUT)
+        safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
         safe_remove(rank_space_z_order_output_default)
 
 def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
@@ -1386,6 +1512,139 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
         safe_remove(QDTREE_DATA)
         # save_remove(QDTREE_QUERY)
 
+
+def run_platon(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+    global logger
+    logger.info(f"run_platon: data_file_name:{data_file_name} baseline_config:{baseline_config}")
+    try:
+        is_real_data = data_file_name.startswith("data")
+        if is_real_data:
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
+
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 1.0)
+
+        for range_file_name in range_queries:
+            file_name_prefix = range_file_name.rstrip('.csv')
+            if is_real_data:
+                ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
+            else:
+                ablosute_query_file_name = f"data/real/query/{range_file_name}"
+
+            logger.info("Prepare Platon")
+
+            platon_output_default = PLATON_PARTITION_OUTPUT.format(
+                data_file_prefix=data_file_prefix,
+                query=file_name_prefix
+            )
+
+            build_output_path = PLATON_BUILD_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                query=file_name_prefix,
+            )
+
+            is_train = not os.path.exists(platon_output_default)
+            if is_train:
+                logger.info(f"{platon_output_default} NOT exists")
+                data_transfer_command = f"python li_baseline/platon_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
+                execute_command(data_transfer_command)
+
+                learn_platon_command = f"bash li_baseline/learn_platon.sh {data_file_prefix} {file_name_prefix} {platon_output_default}"
+                elapsed_time_ns_learn = execute_command(learn_platon_command)
+            else:
+                logger.info(f"{platon_output_default} exists")
+                elapsed_time_ns_learn = 0
+                if os.path.exists(build_output_path):
+                    with open(build_output_path, "r") as f:
+                        for line in f:
+                            line = line.strip()
+                            if line.startswith("Elapsed Learn Time:"):
+                                elapsed_time_ns_learn = int(line.split(":")[1].strip())
+                                break
+
+            data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {PLATON_DATA}"
+            execute_command(data_adapter_command)
+
+            # command = f"test-rtree-PlatonBulkLoad {PLATON_DATA} {INDEX_PATH}/platon {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
+            command = f"test-rtree-PlatonBulkLoad {PLATON_DATA} {INDEX_PATH}/platon {page_size} {fill_factor} tgs {platon_output_default}"
+            result, elapsed_time_ns_build = execute_command_with_err(command)
+
+            os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+            with open(build_output_path, "w") as f:
+                if result:
+                    f.write(result.stderr)
+                f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/platon.dat')}\n")
+                f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/platon.idx')}\n")
+
+            data_file = PLATON_DATA
+
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            range_query_output_path = PLATON_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+            )
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="platon")
+
+            for knn_file_name in knn_queries:
+                knn_file_name_prefix = knn_file_name.rstrip('.csv')
+                knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
+
+                ks = ks_map.get(knn_file_name)
+                for k in ks:
+                    knn_query_output_path = PLATON_KNN_QUERY_OUTPUT_PATH.format(
+                        data_file_prefix=data_file_prefix,
+                        range_query_prefix=file_name_prefix,
+                        knn_query_prefix=knn_file_name_prefix,
+                        k=k
+                    )
+                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="platon")
+
+            for file_name in point_queries:
+                point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
+                point_query_output_path = PLATON_POINT_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    point_query_prefix=point_file_name_prefix,
+                )
+                execute_point_query(query_file, data_file, point_query_output_path, index_name="platon")
+
+            for file_name in insertions:
+                insert_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_file_name_prefix)
+                insert_output_path = PLATON_INSERT_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    insert_prefix=insert_file_name_prefix,
+                )
+                execute_insert(query_file, insert_output_path, index_name="platon")
+
+            for file_name in insert_points:
+                insert_point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_point_file_name_prefix)
+                insert_point_output_path = PLATON_INSERT_POINT_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    insert_point_prefix=insert_point_file_name_prefix,
+                )
+                execute_insert_point(query_file, insert_point_output_path, index_name="platon")
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"fail: {e}")
+    
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files(index_name="platon")
+        safe_remove(PLATON_DATA)
+
+
 def process_experiment(experiment):
 
     global logger
@@ -1762,6 +2021,10 @@ def process_experiment(experiment):
             run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
         elif baseline_name == "qdtree":
             run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+        elif baseline_name == "platon":
+            run_platon(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+        elif baseline_name == "zm":
+            run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
        
 
 def remove_and_create_directory(directory_path):
@@ -1859,8 +2122,6 @@ def setup_logger(config_file_path):
     return logger
 
 if __name__ == "__main__":
-
-
     main()
 # python tools/libspatialindex_data_adapter.py --type data --input data/real/dataset/us_10000.csv --output benchmark/libspatialindex/kdtree_data
 # test-kdtree-KDTreeBulkLoad kdtree benchmark/libspatialindex/kdtree_data path ./benchmark/tree 100 1.0 4096 0

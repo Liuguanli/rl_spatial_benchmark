@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import numpy as np
 import json
+import sys
+
 
 def convert_csv_to_npy(csv_file, target_directory):
     """
@@ -36,13 +38,13 @@ def convert_csv_to_npy(csv_file, target_directory):
         print("The CSV file does not contain at least two columns. Please check the file format.")
 
 
-def convert_to_geojson(input_csv, output_geojson):
+def convert_to_geojson(input_csv, target_directory):
     """
     Converts a CSV file containing rectangular bounds (minx, miny, maxx, maxy) without headers into a GeoJSON file.
     
     Parameters:
     input_csv (str): Path to the input CSV file.
-    output_geojson (str): Path to the output GeoJSON file.
+    target_directory (str): Path to the output GeoJSON file.
     """
     # Load the CSV file without headers and specify column names
     data = pd.read_csv(input_csv, header=None, names=["minx", "miny", "maxx", "maxy"])
@@ -84,7 +86,22 @@ def convert_to_geojson(input_csv, output_geojson):
         geojson["features"].append(feature)
     
     # Write the GeoJSON to a file
-    with open(output_geojson, 'w') as f:
+    geojson_file = os.path.join(target_directory, os.path.splitext(os.path.basename(input_csv))[0] + ".geojson")
+
+    with open(geojson_file, 'w') as f:
         json.dump(geojson, f, indent=2)
 
-    print(f"Converted {input_csv} to {output_geojson}")
+    print(f"Converted {input_csv} to {target_directory}")
+
+target_directory = "./benchmark/libspatialindex"
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python script.py <csv_file1> <csv_file2>")
+        sys.exit(1)
+    
+    csv_data, csv_query = sys.argv[1:3]
+    
+    convert_csv_to_npy(csv_data, target_directory)
+    
+    convert_to_geojson(csv_query, target_directory)

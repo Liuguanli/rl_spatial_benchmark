@@ -1,6 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-import geoplot as gplt
+# import geoplot as gplt
 from shapely import geometry
 import matplotlib.pyplot as plt 
 import numpy as np

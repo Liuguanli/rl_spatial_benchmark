@@ -48,6 +48,15 @@ Z_ORDER_SORTED_OUTPUT = "benchmark/model/z_sorted_data"
 Z_ORDER_OUTPUT = "benchmark/model/z_order_data.csv"
 Z_ORDER_SORTED_DEFAULT = "benchmark/model/z_order_data_{data_file_prefix}_bits_{bit_num}"
 
+ZM_DATA = "benchmark/libspatialindex/zm_data"
+ZM_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/build/{data_file_prefix}_bits_{bit_num}.txt"
+ZM_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/range/{data_file_prefix}_{range_query_prefix}_bits_{bit_num}.txt"
+ZM_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/knn/{data_file_prefix}_{knn_query_prefix}_k_{k}_bits_{bit_num}.txt"
+ZM_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/point/{data_file_prefix}_{point_query_prefix}_bits_{bit_num}.txt"
+# ZM_PARTITION_OUTPUT_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}.txt"
+# ZM_PARTITION_OUTPUT_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}.txt"
+
+
 RANK_SPACE_Z_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rankspace_zorder/build/{data_file_prefix}_bits_{bit_num}.txt"
 RANK_SPACE_Z_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rankspace_zorder/range/{data_file_prefix}_{range_query_prefix}_bits_{bit_num}.txt"
 RANK_SPACE_Z_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rankspace_zorder/knn/{data_file_prefix}_{knn_query_prefix}_k_{k}_bits_{bit_num}.txt"
@@ -69,6 +78,16 @@ BMTREE_OUTPUT_DEFAULT = "benchmark/model/bmtree_sorted_data_{data_file_prefix}_{
 BMTREE_OUTPUT = "benchmark/model/bmtree_sorted_data"
 BMTREE_MODEL_OUTPUT = "benchmark/model/learned_bmtree_{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
 BMTREE_MODEL_OUTPUT_DEFAULT = "rl_baseline/Learned-BMTree/learned_bmtree.txt"
+
+PLATON_PARTITION_OUTPUT = "benchmark/model/platon_partition_{data_file_prefix}_{query}.txt"
+PLATON_DATA = "benchmark/libspatialindex/platon_data"
+
+PLATON_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/platon/build/{data_file_prefix}_{query}.txt"
+PLATON_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/platon/range/{data_file_prefix}_{range_query_prefix}.txt"
+PLATON_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/platon/knn/{data_file_prefix}_{range_query_prefix}_{knn_query_prefix}_k_{k}.txt"
+PLATON_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/platon/point/{data_file_prefix}_{range_query_prefix}_{point_query_prefix}.txt"
+PLATON_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/platon/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}.txt"
+PLATON_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/platon/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}.txt"
 
 RTREE_DATA = "benchmark/libspatialindex/rtree_data"
 RTREE_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rtree/build/{data_file_prefix}_{variant}.txt"

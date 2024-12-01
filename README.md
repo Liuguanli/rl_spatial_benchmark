@@ -259,3 +259,10 @@ bash run_all.sh
 ![Read heavy insert P99](./figs/exp_sigmod/read_heavy_insert_time_P99.png)
 <!-- ![Balcanced splits](./figs/exp_sigmod/balanced_splits.png) -->
 
+
+
+
+india: 13785.6596865654
+australia: 19068.329280138016
+normal: 9638.290929555893
+uniform: 9372.92283153534

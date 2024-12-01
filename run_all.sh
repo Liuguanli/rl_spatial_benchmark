@@ -64,12 +64,28 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py example_config_debug_bmtree.json
 
 
-tree_types=("qdtree" "rlrtree" "bmtree")
-datasets=("us" "india" "australia" "uniform" "normal" "skewed")
 
-for tree in "${tree_types[@]}"; do
-  for dataset in "${datasets[@]}"; do
-    echo "Running experiment for ${tree} on ${dataset}"
-    python run_exp_from_config.py exp_config/index_tuning/${tree}_${dataset}.json
-  done
-done
+
+
+####################### Tuning RLESIs Start ######################################
+# tree_types=("qdtree" "rlrtree" "bmtree")
+# datasets=("us" "india" "australia" "uniform" "normal" "skewed")
+
+# for tree in "${tree_types[@]}"; do
+#   for dataset in "${datasets[@]}"; do
+#     echo "Running experiment for ${tree} on ${dataset}"
+#     python run_exp_from_config.py exp_config/index_tuning/${tree}_${dataset}.json
+#   done
+# done
+####################### Tuning RLESIs End ########################################
+
+# python run_exp_from_config.py exp_config/test_platon.json
+# python run_exp_from_config.py exp_config/write_only/config_platon.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_platon.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_platon.json
+python run_exp_from_config.py exp_config/test_zm.json
+# python run_exp_from_config.py exp_config/test_zm_debug.json
+# python run_exp_from_config.py exp_config/test_us_latency.json
+python run_exp_from_config.py exp_config/test_cardinality_25m.json
+python run_exp_from_config.py exp_config/test_cardinality_50m.json
+python run_exp_from_config.py exp_config/test_cardinality_75m.json

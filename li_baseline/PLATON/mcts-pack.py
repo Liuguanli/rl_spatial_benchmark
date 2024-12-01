@@ -1,6 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-import geoplot as gplt
+# import geoplot as gplt
 from shapely import geometry
 import matplotlib.pyplot as plt 
 import matplotlib
@@ -8,7 +8,7 @@ from PIL import Image
 import copy
 import time
 import numpy as np
-import cupy as cp
+# import cupy as cp
 import math
 import csv
 import argparse
@@ -25,29 +25,34 @@ parser = argparse.ArgumentParser(description="R-tree Monte Carlo Tree Search Opt
 parser.add_argument('--input_data_file', type=str, required=True, help='Path to the input GeoJSON Data file for queries')
 parser.add_argument('--input_query_file', type=str, required=True, help='Path to the input GeoJSON Query file for queries')
 parser.add_argument('--output_file', type=str, required=True, help='Path to the output CSV file for action list')
+
+file_dir = "./benchmark/libspatialindex"
+
 args = parser.parse_args()
 
 # set data size
 
-n = 1000000
+n = 100000000
 
 # set number of queries
-n_queries = 10000
+n_queries = 1000
 
 # set number of test queries
-n_queries_test = 10000
+n_queries_test = 1000
 
 # set tree size
 branch = 100
-nlevel = 3
+nlevel = 4
+
+roll_out_count = 10
 
 # find the bounds of your geodataframe
 x_min, y_min, x_max, y_max = 0, 0, 1, 1
 extent = (0, 0, 1, 1)
 
-data_type = "rect_0_0.001"
-input_data_file = "./data/data_{}_{}.npy".format(data_type, n)
-input_data_file = args.input_data_file
+# data_type = "rect_0_0.001"
+# input_data_file = "./data/data_{}_{}.npy".format(data_type, n)
+input_data_file = os.path.join(file_dir, args.input_data_file + ".npy")
 dataList = np.load(input_data_file)
 
 # add z order value to column4
@@ -60,10 +65,11 @@ dataList = np.load(input_data_file)
 # dataList = np.delete(dataList, 4, 1)
 # dataList = np.delete(dataList, 4, 1)
 
-query_type = "aspect_0.01_0.001"
+# query_type = "aspect_0.01_0.001"
 
-input_query_file = './data/query_{}_train_{}.geojson'.format(query_type, n_queries)
-input_query_file = args.input_query_file
+# input_query_file = './data/query_{}_train_{}.geojson'.format(query_type, n_queries)
+input_query_file = os.path.join(file_dir, args.input_query_file + ".geojson")
+
 query_gdf = gpd.read_file(input_query_file)
 print(query_gdf.head())
 
@@ -123,7 +129,7 @@ while queue:
             sampleRate = 1
             state = Node(RtreeEnv(env.partitionList[idx][5], env.partitionList[idx][1], env.branch, env.level, env.sampleQueryList, posRange=env.partitionList[idx][3], sampleRate=sampleRate), 0, [], maxReward, None, 100, normalizeFactor)
             roll_out_start = time.time()
-            for _ in range(100):
+            for _ in range(roll_out_count):
                 # print("roll out no {}".format(_))
                 mctsTree.do_rollout(state)
             # print("roll out time: {}".format(time.time() - roll_out_start))
@@ -154,16 +160,16 @@ print("MCTS training totalReward: {}, totalIO: {}, total number of skipped block
 # print("number of actions in actionList: {}".format(len(actionList)))
 
 # Ensure that the directory 'cut_list' exists
-output_directory = "./cut_list"
-if not os.path.exists(output_directory):
-    os.makedirs(output_directory)
+# output_directory = "./cut_list"
+# if not os.path.exists(output_directory):
+#     os.makedirs(output_directory)
 
 
 # Write the actionList to the output file
-output_file = "mcts_{}_{}_{}_{}".format(data_type, n, query_type, n_queries)
+# output_file = "mcts_{}_{}_{}_{}".format(data_type, n, query_type, n_queries)
 output_file = args.output_file
 
-output_file = os.path.join("./cut_list", output_file)
+# output_file = os.path.join("./cut_list", output_file)
 
 with open(output_file, 'w') as csvfile:
     writer = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)

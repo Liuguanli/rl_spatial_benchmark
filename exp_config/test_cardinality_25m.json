@@ -1,0 +1,128 @@
+{
+  "experiments": [
+    {
+      "available": true,
+      "data": {
+        "size": 25000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "point_query_only.json",
+        "range_query_only.json",
+        "knn_query_only.json"
+      ],
+      "baseline": [
+        {
+          "name": "zm",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "platon",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
+          }
+        },
+        {
+          "name": "zorder",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "kdtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
+          }
+        },
+        {
+          "name": "rankspace",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rstar",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        },
+        {
+          "name": "kdgreedy",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
+          }
+        },
+        {
+          "name": "bmtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "tree_depth": 12,
+            "sampling": 10000,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rlrtree",
+          "available": false,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "model_path": "benchmark/model",
+            "rtree_variant": "rlrtree",
+            "sample_size": 80000,
+            "epoch": 8
+          }
+        },
+        {
+          "name": "qdtree",
+          "available": false,
+          "config": {
+            "episode": 10,
+            "page_size": 100,
+            "fill_factor": 1.0,
+            "sampling_ratio": 0.0001,
+            "action_sampling_size": 400,
+            "model_path": "benchmark/model"
+          }
+        }
+      ]
+    }
+  ]
+}
