@@ -5,6 +5,8 @@ import csv
 import random
 
 import numpy as np
+np.bool = bool
+
 import pickle
 import copy
 from gym.spaces import Tuple, Box, Discrete, Dict

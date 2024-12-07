@@ -15,7 +15,7 @@ REAL_QUERY_PATH = "data/real/query"
 SYNTHETIC_WORKLOAD_PATH = "data/synthetic/workloads"
 REAL_WORKLOAD_PATH = "data/real/workloads"
 
-IS_HDD = True
+IS_HDD = False
 
 INDEX_PATH = "/media/liuguanli/DATA" if IS_HDD else "./benchmark"
 

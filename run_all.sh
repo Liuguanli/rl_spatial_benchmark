@@ -83,9 +83,14 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/write_only/config_platon.json
 # python run_exp_from_config.py exp_config/write_heavy_only/config_platon.json
 # python run_exp_from_config.py exp_config/read_heavy_only/config_platon.json
-python run_exp_from_config.py exp_config/test_zm.json
 # python run_exp_from_config.py exp_config/test_zm_debug.json
 # python run_exp_from_config.py exp_config/test_us_latency.json
-python run_exp_from_config.py exp_config/test_cardinality_25m.json
-python run_exp_from_config.py exp_config/test_cardinality_50m.json
-python run_exp_from_config.py exp_config/test_cardinality_75m.json
+
+
+# python run_exp_from_config.py exp_config/test_zorder_debug.json
+# python run_exp_from_config.py exp_config/test_cardinality_25m.json
+# python run_exp_from_config.py exp_config/test_cardinality_50m.json
+# python run_exp_from_config.py exp_config/test_cardinality_75m.json
+# python run_exp_from_config.py exp_config/test_zm.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_range.json
+python run_exp_from_config.py exp_config/point_range_knn_queries/config_all_SSD.json

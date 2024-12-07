@@ -13,6 +13,7 @@ import constants
 from constants import *
 
 
+
 def execute_command(command):
 
     global logger
@@ -415,7 +416,7 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
             query_adapt_command = f"python tools/libspatialindex_zm_query_adapter.py --bits {bit_num} --data {ablosute_data_file_name} --query_list {query_list_str}"
             execute_command(query_adapt_command)
 
-            format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file}"
+            format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {RANK_SPACE_Z_ORDER_OUTPUT} --output {data_file} --is_learned True"
             # python tools/libspatialindex_data_adapter.py --type data --input benchmark/model/rankspace_z_order_data.csv --output benchmark/model/rankspace_z_sorted_data
             execute_command(format_data_command)
 
@@ -2086,11 +2087,11 @@ def main():
 
         logger.info(f"-----------------Run config {config_file_path}-----------------")
 
-        is_HDD = config.get('is_HDD', True)
+        # is_HDD = config.get('is_HDD', True)
 
-        IS_HDD = is_HDD
+        # constants.IS_HDD = is_HDD
 
-        DISK_TYPE = "HDD" if IS_HDD else "SSD"
+        # constants.DISK_TYPE = "HDD" if constants.IS_HDD else "SSD"
 
         for experiment in config['experiments']:
             counter += 1

@@ -3,7 +3,7 @@ import argparse
 import os
 import numpy as np
 
-def transform_data(input_file, output_file):
+def transform_data(input_file, output_file, is_learned):
     df = pd.read_csv(input_file, header=None)
 
     # df[0] = pd.to_numeric(df[0], errors='coerce')
@@ -20,8 +20,9 @@ def transform_data(input_file, output_file):
         'Col6': df[1]
     })
 
-    if df.shape[1] > 2:  # Check if there are more than two columns
-        transformed_df['Col7'] = df[2]
+    if is_learned:
+        if df.shape[1] > 2:  # Check if there are more than two columns
+            transformed_df['Col7'] = df[2]
 
     transformed_df.to_csv(output_file, sep=' ', index=False, header=False)
 
@@ -104,13 +105,14 @@ def main():
     parser.add_argument('--input', type=str, required=True, help='Path to the input CSV file.')
     parser.add_argument('--output', type=str, required=True, help='Path to save the transformed CSV file.')
     parser.add_argument('--is_scaled', action='store_true', help='If set, scale the data.')
+    parser.add_argument('--is_learned', type=bool, default=False, help='If learned')
 
     parser.add_argument("--frequency", type=int, nargs='+', help="Frequency of insertions and point queries.")
 
     args = parser.parse_args()
 
     if args.type == 'data':
-        transform_data(args.input, args.output) #, args.is_scaled)
+        transform_data(args.input, args.output, args.is_learned) #, args.is_scaled)
     elif args.type == 'range_query':
         transform_range_query(args.input, args.output)
     elif args.type == 'knn_query':

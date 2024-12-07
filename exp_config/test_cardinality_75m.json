@@ -20,7 +20,7 @@
       "baseline": [
         {
           "name": "zm",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100,
@@ -112,7 +112,7 @@
         },
         {
           "name": "qdtree",
-          "available": false,
+          "available": true,
           "config": {
             "episode": 10,
             "page_size": 100,

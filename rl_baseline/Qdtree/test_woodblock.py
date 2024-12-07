@@ -52,6 +52,8 @@
 
 
 import numpy as np
+np.bool = bool
+
 import gym
 from gym.spaces import Box, Discrete
 import torch

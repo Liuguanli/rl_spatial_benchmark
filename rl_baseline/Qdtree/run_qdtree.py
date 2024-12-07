@@ -5,6 +5,7 @@ import parser
 
 import gym
 import numpy as np
+np.bool = bool
 import ray
 import torch
 import torch.optim as optim

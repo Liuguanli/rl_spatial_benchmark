@@ -649,9 +649,9 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
     
     if is_legend:
         # Use custom handles with markers for the legend
-        plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.5, 1.37), 
-                   ncol=6, frameon=False, fontsize=legend_size, 
-                   borderaxespad=0.2, handletextpad=0.2, labelspacing=0.2)
+        plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.465, 1.25), 
+                   ncol=6, frameon=False, fontsize=legend_size - 2, 
+                   borderaxespad=0.15, handletextpad=0.15, labelspacing=0.15)
     
     plt.grid(True, linestyle="--")
     
