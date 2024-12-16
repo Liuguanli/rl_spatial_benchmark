@@ -13,8 +13,6 @@
         ]
       },
       "workloads": [
-        "point_query_only.json", 
-        "knn_query_only.json",
         "range_query_only_vary.json",
         "range_query_only_vary_ratio.json"
        ],

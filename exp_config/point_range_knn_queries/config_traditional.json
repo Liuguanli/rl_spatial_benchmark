@@ -1,7 +1,7 @@
 {
   "experiments": [
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -162,7 +162,7 @@
         },
         {
           "name": "rtree",
-          "available": false,
+          "available": true,
           "config": {
             "page_size": 100,
             "fill_factor": 0.4,
@@ -171,6 +171,7 @@
         },
         {
           "name": "kdtree",
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -178,7 +179,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -215,6 +216,7 @@
         },
         {
           "name": "kdtree",
+          "available": true,
           "config": {
             "page_size": 100
           }
@@ -222,7 +224,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -259,6 +261,7 @@
         },
         {
           "name": "kdtree",
+          "available": true,
           "config": {
             "page_size": 100
           }

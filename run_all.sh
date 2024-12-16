@@ -93,4 +93,14 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/test_cardinality_75m.json
 # python run_exp_from_config.py exp_config/test_zm.json
 # python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_range.json
-python run_exp_from_config.py exp_config/point_range_knn_queries/config_all_SSD.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_all_SSD.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy_vary_range.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_k.json
+# python run_exp_from_config.py exp_config/test_zm.json
+
+# python run_exp_from_config.py exp_config/test_bmtree_impr_debug.json
+# python run_exp_from_config.py exp_config/test_bmtree_impr.json
+python run_exp_from_config.py exp_config/test_sp.json
+
+

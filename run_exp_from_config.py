@@ -673,7 +673,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
             data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
             execute_command(data_transfer_command)
 
-            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train}"
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train} {0}"
             elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
             data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
@@ -783,6 +783,168 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         cleanup_intermediate_files(index_name="bmtree")
         safe_remove(BMTREE_OUTPUT)
         # safe_remove(bmtree_output_default)
+
+def run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+    global logger
+    logger.info(f"run_bmtree-impr: data_file_name:{data_file_name} baseline_config:{baseline_config}")
+    try:
+        is_real_data = data_file_name.startswith("data")
+        if is_real_data:
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
+
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 1.0)
+        tree_depth = baseline_config.get("tree_depth", 1)
+        sample_size = baseline_config.get("sampling", 10000)
+        bit_num = baseline_config.get("bit_num", 20)
+
+        for range_file_name in range_queries:
+            file_name_prefix = range_file_name.rstrip('.csv')
+            if is_real_data:
+                ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
+            else:
+                ablosute_query_file_name = f"data/real/query/{range_file_name}"
+
+            logger.info("Prepare BMTree-Impr")
+
+            bmtree_model_output_default = BMTREEIMPR_MODEL_OUTPUT.format(
+                data_file_prefix=data_file_prefix,
+                query=file_name_prefix,
+                bit_num=bit_num,
+                tree_depth=tree_depth,
+                sample_size=sample_size,
+            )
+
+            is_train = not os.path.exists(bmtree_model_output_default)
+            if is_train:
+                logger.info(f"{bmtree_model_output_default} NOT exists")
+            else:
+                logger.info(f"{bmtree_model_output_default} exists")
+
+                # Try copying the file to the specified destination
+                try:
+                    shutil.copy(bmtree_model_output_default, BMTREEIMPR_MODEL_OUTPUT_DEFAULT)
+                    logger.info(f"Copied {bmtree_model_output_default} to {BMTREEIMPR_MODEL_OUTPUT_DEFAULT}")
+                except Exception as e:
+                    logger.error(f"Failed to copy {bmtree_model_output_default} to {BMTREEIMPR_MODEL_OUTPUT_DEFAULT}: {e}")
+                
+            data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
+            execute_command(data_transfer_command)
+
+            cost_method = 1
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train} {cost_method}"
+            elapsed_time_ns_learn = execute_command(learn_bmtree_command)
+
+            data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREEIMPR_INPUT} --output {BMTREEIMPR_OUTPUT}"
+            execute_command(data_adapter_command)
+
+            # copy_and_rename(BMTREE_OUTPUT, bmtree_output_default)
+            # else:
+            #     copy_and_rename(bmtree_output_default, BMTREE_OUTPUT)
+                # elapsed_time_ns_learn = 0
+
+            # build bmtree sfcrtree
+            command = f"test-rtree-SFCRTreeBulkLoad {BMTREEIMPR_OUTPUT} {INDEX_PATH}/bmtree_impr {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
+            result, elapsed_time_ns_build = execute_command_with_err(command)
+
+            if point_queries or knn_queries:
+                build_output_path = BMTREEIMPR_BUILD_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    query=file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size,
+                )
+
+                os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+                with open(build_output_path, "w") as f:
+                    if result:
+                        f.write(result.stderr)
+                    f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                    f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/bmtree_impr.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/bmtree_impr.idx')}\n")
+
+            data_file = BMTREEIMPR_OUTPUT
+
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            range_query_output_path = BMTREEIMPR_RANGE_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
+                tree_depth=tree_depth,
+                sample_size=sample_size,
+            )
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="bmtree_impr")
+
+            for knn_file_name in knn_queries:
+                knn_file_name_prefix = knn_file_name.rstrip('.csv')
+                knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
+
+                ks = ks_map.get(knn_file_name)
+                for k in ks:
+                    knn_query_output_path = BMTREEIMPR_KNN_QUERY_OUTPUT_PATH.format(
+                        data_file_prefix=data_file_prefix,
+                        range_query_prefix=file_name_prefix,
+                        bit_num=bit_num,
+                        tree_depth=tree_depth,
+                        sample_size=sample_size,
+                        knn_query_prefix=knn_file_name_prefix,
+                        k=k
+                    )
+                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="bmtree_impr")
+
+            for file_name in point_queries:
+                point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
+                point_query_output_path = BMTREEIMPR_POINT_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    point_query_prefix=point_file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size
+                )
+                execute_point_query(query_file, data_file, point_query_output_path, index_name="bmtree_impr")
+
+            for file_name in insertions:
+                insert_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_file_name_prefix)
+                insert_output_path = BMTREEIMPR_INSERT_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    insert_prefix=insert_file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size
+                )
+                execute_insert(query_file, insert_output_path, index_name="bmtree_impr")
+
+            for file_name in insert_points:
+                insert_point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_point_file_name_prefix)
+                insert_point_output_path = BMTREEIMPR_INSERT_POINT_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    insert_point_prefix=insert_point_file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size
+                )
+                execute_insert_point(query_file, insert_point_output_path, index_name="bmtree_impr")
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"fail: {e}")
+    
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files(index_name="bmtree_impr")
+        safe_remove(BMTREEIMPR_OUTPUT)
 
 def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
 
@@ -2026,7 +2188,8 @@ def process_experiment(experiment):
             run_platon(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
         elif baseline_name == "zm":
             run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
-       
+        elif baseline_name == "bmtree_impr":
+            run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
 
 def remove_and_create_directory(directory_path):
 

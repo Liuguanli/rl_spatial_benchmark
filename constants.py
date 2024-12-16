@@ -15,7 +15,7 @@ REAL_QUERY_PATH = "data/real/query"
 SYNTHETIC_WORKLOAD_PATH = "data/synthetic/workloads"
 REAL_WORKLOAD_PATH = "data/real/workloads"
 
-IS_HDD = False
+IS_HDD = True
 
 INDEX_PATH = "/media/liuguanli/DATA" if IS_HDD else "./benchmark"
 
@@ -78,6 +78,19 @@ BMTREE_OUTPUT_DEFAULT = "benchmark/model/bmtree_sorted_data_{data_file_prefix}_{
 BMTREE_OUTPUT = "benchmark/model/bmtree_sorted_data"
 BMTREE_MODEL_OUTPUT = "benchmark/model/learned_bmtree_{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
 BMTREE_MODEL_OUTPUT_DEFAULT = "rl_baseline/Learned-BMTree/learned_bmtree.txt"
+
+BMTREEIMPR_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/bmtree_impr/build/{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/bmtree_impr/range/{data_file_prefix}_{range_query_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/bmtree_impr/knn/{data_file_prefix}_{range_query_prefix}_{knn_query_prefix}_k_{k}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/bmtree_impr/point/{data_file_prefix}_{range_query_prefix}_{point_query_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/bmtree_impr/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/bmtree_impr/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_INPUT = "rl_baseline/Learned-BMTree/sorted_data_with_sfc.csv"
+BMTREEIMPR_OUTPUT_DEFAULT = "benchmark/model/bmtree_impr_sorted_data_{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}"
+BMTREEIMPR_OUTPUT = "benchmark/model/bmtree_impr_sorted_data"
+BMTREEIMPR_MODEL_OUTPUT = "benchmark/model/learned_bmtree_impr_{data_file_prefix}_{query}_bits_{bit_num}_depth_{tree_depth}_sample_{sample_size}.txt"
+BMTREEIMPR_MODEL_OUTPUT_DEFAULT = "rl_baseline/Learned-BMTree/learned_bmtree_impr.txt"
+
 
 PLATON_PARTITION_OUTPUT = "benchmark/model/platon_partition_{data_file_prefix}_{query}.txt"
 PLATON_DATA = "benchmark/libspatialindex/platon_data"

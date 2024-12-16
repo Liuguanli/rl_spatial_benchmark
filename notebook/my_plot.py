@@ -54,10 +54,11 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
     width = width_total / len(baseline_names)
     x = np.arange(len(datasets))
 
+
+
     # plt.minorticks_on()
     ax.minorticks_on() # Enable minor ticks only on the y-axis
 
-    
     group_width = len(baseline_names) * width 
     
     for i, baseline in enumerate(baseline_names):
@@ -365,7 +366,7 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     plt.close(fig)
 
 
-def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax=None, x_label="", y_label="", yticks=[], is_log=False, title="", output_file_paths=None, x_bottom=None, x_top=None, y_bottom=None, y_top=None, show_legend=False):
+def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax=None, x_label="", y_label="", yticks=[], is_log=False, title="", output_file_paths=None, x_bottom=None, x_top=None, y_bottom=None, y_top=None, show_legend=False, is_x_ticks=False, is_y_ticks=True):
     label_size = 28
     legend_size = 22
 
@@ -383,12 +384,12 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
         # print(i, x[i], sizes)
         for j in range(len(x[i])):
             # marker_size = 40 * np.log(sizes[j] / 1000)
-            marker_size = 50
+            marker_size = 100
             ax.scatter(x[i][j], y[i][j], label=baseline, marker=markers[i % len(markers)], color=colors[i % len(colors)], facecolors='none', s=marker_size)
 
         for j in range(len(highlight_x[i])):
             # marker_size = 40 * np.log(sizes[j] / 1000)
-            marker_size = 50 * 2
+            marker_size = 100
             ax.scatter(highlight_x[i][j], highlight_y[i][j], label=baseline, marker=markers[i % len(markers)], color=colors[i % len(colors)], s=marker_size)
 
     if x_bottom is not None:
@@ -440,13 +441,17 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
             borderaxespad=0.2,  # Border padding
             handletextpad=0.2,  # Padding between legend marker and text
             labelspacing=0.3,    # Vertical space between legend entries
-            frameon=False
+            # frameon=False
         )
     
         plt.setp(legend.get_title(), fontsize=legend_size)
 
     if yticks:
         ax.set_yticks(yticks)
+    if not is_y_ticks:
+        ax.set_yticklabels(['' for _ in range(len(yticks))])
+    if not is_x_ticks:
+        ax.set_xticklabels(['',''])
     ax.grid(True)  # Add grid
     
     # plt.tight_layout()
@@ -614,17 +619,20 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", yt
 
 def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabel, is_log, is_legend, output_file_paths):
     # Sample data
-    markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+']
+    # markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+']
+    markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+', 'h', 'H', '|']
+    linestyles = ['-', '--', ':', '-.']
     x = np.arange(1, 100)  # X-axis from 1 to 100
     
-    plt.figure(figsize=(14, 4))
+    plt.figure(figsize=(16, 4))
     handles = []  # Store handles for legend
     
     for i, baseline in enumerate(baselines):
         baseline_on_us = QueryPercentage[baseline][0]
         
         # Plot the line without markers
-        line, = plt.plot(x, baseline_on_us, color=colors[i], linewidth=4)
+        linestyle = linestyles[i % len(linestyles)]
+        line, = plt.plot(x, baseline_on_us, color=colors[i], linewidth=2)
         
         # Add markers at every 10th point
         plt.plot(x[::10], baseline_on_us[::10], color=colors[i], marker=markers[i % len(markers)], 

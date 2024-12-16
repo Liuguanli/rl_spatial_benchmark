@@ -3,8 +3,8 @@
 sub_dir="./rl_baseline"
 
 # Check if two arguments are passed
-if [ "$#" -ne 7 ]; then
-    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num> <absolute_file_name> <is_train>"
+if [ "$#" -ne 8 ]; then
+    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num> <absolute_file_name> <is_train> <cost_method>"
     exit 1
 fi
 
@@ -16,6 +16,7 @@ sample_size=$4
 bit_num=$5
 absolute_data_file=$6
 is_train=$7
+cost_method=$8
 
 echo "is_train: $is_train"
 
@@ -28,7 +29,7 @@ if [ "$is_train" = "True" ]; then
 
 learn_bmtree="exp_opt_fast.py"
 
-train_command="python $learn_bmtree --data $data_file --query $query_file --action_depth $tree_depth --data_sample_points $sample_size --bit_length $bit_num $bit_num"
+train_command="python $learn_bmtree --data $data_file --query $query_file --action_depth $tree_depth --data_sample_points $sample_size --cost_method $cost_method --bit_length $bit_num $bit_num"
 
 # Print the full command (optional)
 echo "Train Command: $train_command"
@@ -110,6 +111,15 @@ echo "Removed data file $data_file and query file $query_file after training."
 
 cd ../../
 
-bmtree_path="benchmark/model/learned_bmtree_${data_file}_${query_file}_bits_${bit_num}_depth_${tree_depth}_sample_${sample_size}.txt"
 
-mv "rl_baseline/Learned-BMTree/learned_bmtree.txt" $bmtree_path
+if [ "$cost_method" -eq 1 ]; then
+    suffix="impr"
+else
+    suffix=""
+fi
+
+bmtree_path="benchmark/model/learned_bmtree_${suffix}_${data_file}_${query_file}_bits_${bit_num}_depth_${tree_depth}_sample_${sample_size}.txt"
+
+mv "rl_baseline/Learned-BMTree/learned_bmtree.txt" "$bmtree_path"
+
+
