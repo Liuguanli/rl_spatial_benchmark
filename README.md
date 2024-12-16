@@ -1,15 +1,33 @@
 # Benchmarking RL-enhacned Spatial Indices
 
-## TODO
+## Table of Contents
+- [Setup](#setup)
+  - [1. Libraries](#1-libraries)
+  - [2. Datasets](#2-datasets)
+    - [Real Datasets](#real-datasets)
+    - [Synthetic Datasets](#synthetic-datasets)
+  - [3. Configuration](#3-configuration)
+    - [Configs](#configs)
+  - [4. Prerequisites Before Running Experiments](#4-prerequisites-before-running-experiments)
+- [Experiments](#experiments)
+  - [Index Tuning](#index-tuning)
+  - [Index Building](#index-building)
+  - [Read-only Workloads](#read-only-workloads)
+    - [Point Query](#point-query)
+    - [Range Query](#range-query)
+    - [Range Query Varying range](#range-query-varying-range)
+    - [Range Query Varying Aspect Ratio](#range-query-varying-aspect-ratio)
+    - [Knn Query](#knn-query)
+    - [Knn Query (Varying k)](#knn-query-varying-k)
+  - [Varying Cardinality](#varying-cardinality)
+  - [Write-only Workload](#write-only-workload)
+  - [Write-heavy Workload](#write-heavy-workload)
+  - [Read-heavy Workload](#read-heavy-workload)
+  - [HDD vs. SSD](#hdd-vs-ssd)
+  - [Overall](#overall)
 
-1. how to plot index tuning (grid search)
-2. where is the tuning results (json file)
-3. The implementation of other baselines
-4. how to plot other images.
 
-
-
-
+---
 
 ## Setup
 
@@ -33,25 +51,22 @@ After downloading, follow these steps:
 1. Create a `data` folder in the root directory of your project (`./`).
 2. Move all downloaded files to `./data/`.
 
-### 3. Dataset Distributions
 
-Here are some visualizations of the dataset distributions used in the experiments:
-
-#### Real Data
+#### Real Datasets
 
 - ![Real data](./figs/data_img/real_dataset_10000_density.png)
 
 - ![Real data point distribution](./figs/data_img/real_dataset_10000_hist_point.png)
 - ![Real data range distribution](./figs/data_img/real_dataset_10000_hist_range.png)
 
-#### Synthetic Data
+#### Synthetic Datasets
 
 - ![Synthetic data](./figs/data_img/synthetic_dataset_10000_density.png)
 
 - ![Synthetic data point distribution](./figs/data_img/synthetic_dataset_10000_hist_point.png)
 - ![Synthetic data range distribution](./figs/data_img/synthetic_dataset_10000_hist_range.png)
 
-### 4. Configuration
+### 3. Configuration
 #### Configs
 
 Ensure that the experiment configurations are correctly set up by checking the `\exp_config` folder. Adjust the configurations as necessary for your experiments. For example:
@@ -118,10 +133,10 @@ Ensure that the experiment configurations are correctly set up by checking the `
       - **bit_num**: (For rankspace) The number of bits used in the rank space method.
 
 
-### Prerequisites Before Running Experiments
+### 4. Prerequisites Before Running Experiments
 
 1. **Install Extended Libspatialindex**:
-   - Follow the instructions in the [Installation Guide](https://github.com/AI-DB-UoM/libspatialindex/blob/master/INSTALL) to install the extended version of `libspatialindex`.
+   - Follow the instructions in the INSTALL.md in **libspatialindex** to install the extended version of `libspatialindex`.
 
 2. **Verify Installation**:
    - Run `check_env.sh` to verify that `libspatialindex` is correctly installed.
@@ -129,7 +144,7 @@ Ensure that the experiment configurations are correctly set up by checking the `
 3. **Update Environment Variables**:
    - Replace the following line in your environment setup:
      ```bash
-     export LD_LIBRARY_PATH=/home/liuguanli/Documents/libtorch/lib:$LD_LIBRARY_PATH
+     export LD_LIBRARY_PATH=xxxx/libtorch/lib:$LD_LIBRARY_PATH
      ```
    - with the path to your own installed `libtorch` library.
 
@@ -137,44 +152,13 @@ Ensure that the experiment configurations are correctly set up by checking the `
    - In `run_exp_from_config.py`, set `RUN_EXAMPLE=True` if you want to run the example configurations.
    - To run experiments:
      - Use `point_range_knn_queries` for all query-only workloads.
-     - Use `["write_only", "read_heavy_only", "write_heavy_only"]` for insertion-related workloads.
+     - Use `write_only, read_heavy_only, write_heavy_only` for insertion-related workloads.
 
-```python
-def main():
+  ```bash
+    python run_exp_from_config.py exp_config/test_xxx.json
+  ```
 
-    global logger
-    configs = []
-    if RUN_EXAMPLE:
-        if RUN_ALL_BASELINE_EXAMPLE:
-            configs = ["example_config_all_baselines.json",
-                       "example_config_all_baselines_insert.json",
-                       "example_config_all_baselines_read_heavy.json",
-                       "example_config_all_baselines_write_heavy.json"]
-            configs = ["example_config_all_baselines_point_rank_space_100m.json"]
-        else: # for debug specific index
-            configs = ["example_config_debug_bmtree.json"]
-    else:
-        directory = CONFIG_DIR
-        # First run point_range_knn_queries to make sure queries are generated first for RL based.
-        special_candidate = "point_range_knn_queries"
-        for root, dirs, files in os.walk(directory):
-            if root.split("/")[-1] == special_candidate:
-                for file in files:
-                    if file.endswith(".json"):
-                        config_file_path = os.path.join(root, file)
-                        configs.append(config_file_path)
-
-        candidates = ["write_only", "read_heavy_only", "write_heavy_only"]
-        for root, dirs, files in os.walk(directory):
-            if root.split("/")[-1] not in candidates:
-                continue
-            for file in files:
-                if file.endswith(".json"):
-                    config_file_path = os.path.join(root, file)
-                    configs.append(config_file_path)
-```
-
-### Run experiments
+## Experiments
 
 To run all the experiments, simply execute the following command in your terminal:
 
@@ -188,6 +172,19 @@ bash run_all.sh
 ![Index size](./figs/exp_sigmod/index_size.png)
 ![Node number](./figs/exp_sigmod/node_number.png)
 
+### Index Tuning
+
+Use range query latency
+
+
+![Index Tuning Time](./figs/exp_sigmod/all_query_time_build_time.png)
+
+Use range query I/O
+
+![Index Tuning I/O](./figs/exp_sigmod/all_query_time_build_time_IO.png)
+
+
+
 ### Read-only workloads
 
 
@@ -197,33 +194,56 @@ bash run_all.sh
 ![Point I/O](./figs/exp_sigmod/point_IO.png)
 ![Point query P50](./figs/exp_sigmod/point_query_P50.png)
 ![Point query P99](./figs/exp_sigmod/point_query_P99.png)
+![Point query P1-P99](./figs/exp_sigmod/point_query_percentiles.png)
+
 
 #### Range query
 
 ![Range query time](./figs/exp_sigmod/range_query_time.png)
 ![Range query I/O](./figs/exp_sigmod/range_query_IO.png)
-![Range query P50](./figs/exp_sigmod/range_query_P50.png)
 ![Range query P99](./figs/exp_sigmod/range_query_P99.png)
+![Range query P1-P99](./figs/exp_sigmod/range_query_percentiles.png)
+
+#### Range query (varying range)
+![Range query time varying range](./figs/exp_sigmod/range_query_time_varying_range.png)
+
+![Range query time varying range I/O](./figs/exp_sigmod/range_query_IO_varying_range.png)
+
+
+#### Range query (varying aspect ratio)
+![Range query time varying range](./figs/exp_sigmod/range_query_time_varying_aspect_ratio.png)
+
+![Range query time varying range I/O](./figs/exp_sigmod/range_query_IO_varying_aspect_ratio.png)
+
 
 #### Knn query
 
 ![Knn query time](./figs/exp_sigmod/knn_query_time.png)
 ![Knn query I/O](./figs/exp_sigmod/knn_query_IO.png)
-![Knn query P50](./figs/exp_sigmod/knn_query_P50.png)
 ![Knn query P99](./figs/exp_sigmod/knn_query_P99.png)
-
+![Knn query P1-P99](./figs/exp_sigmod/knn_query_percentiles.png)
 
 #### Knn query (varying k)
 
 ![Knn query time varying k](./figs/exp_sigmod/knn_query_time_varying_k.png)
 ![Knn query I/O varying k](./figs/exp_sigmod/knn_query_IO_varying_k.png)
-![Knn query P50 varying k](./figs/exp_sigmod/knn_query_P50_varying_k.png)
 ![Knn query P99 varying k](./figs/exp_sigmod/knn_query_P99_varying_k.png)
+
+#### Varying Cardinality
+
+Point query
+![Point query](./figs/exp_sigmod/range_query_time_varying_cardinality.png)
+
+Range query
+![Range query](./figs/exp_sigmod/point_query_time_varying_cardinality.png)
+
+KNN query
+![KNN query](./figs/exp_sigmod/knn_query_time_varying_cardinality.png)
+
 
 ### Write-only workload
 
 ![Write only](./figs/exp_sigmod/write_only.png)
-![Write only P50](./figs/exp_sigmod/write_only_P50.png)
 ![Write only P99](./figs/exp_sigmod/write_only_P99.png)
 ![Write only reads](./figs/exp_sigmod/write_only_reads.png)
 ![Write only writes](./figs/exp_sigmod/write_only_writes.png)
@@ -233,21 +253,9 @@ bash run_all.sh
 
 ![Write heavy query time](./figs/exp_sigmod/write_heavy_query_time.png)
 ![Write heavy insert time](./figs/exp_sigmod/write_heavy_insert_time.png)
-![Write heavy query P50](./figs/exp_sigmod/write_heavy_query_time_P50.png)
 ![Write heavy query P99](./figs/exp_sigmod/write_heavy_query_time_P99.png)
-![Write heavy insert P50](./figs/exp_sigmod/write_heavy_insert_time_P50.png)
 ![Write heavy insert P99](./figs/exp_sigmod/write_heavy_insert_time_P99.png)
 ![Write heavy splits](./figs/exp_sigmod/write_heavy_splits.png)
-
-<!-- ### Balanced workload
-
-![Balcanced query time](./figs/exp_sigmod/balanced_query_time.png)
-![Balcancedinsert time](./figs/exp_sigmod/balanced_insert_time.png)
-![Balcancedquery P50](./figs/exp_sigmod/balanced_query_P50.png)
-![Balcanced query P99](./figs/exp_sigmod/balanced_query_time_P99.png)
-![Balcanced insert P50](./figs/exp_sigmod/balanced_insert_time_P50.png)
-![Balcanced insert P99](./figs/exp_sigmod/balanced_insert_time_P99.png)
-![Balcanced splits](./figs/exp_sigmod/balanced_splits.png) -->
 
 
 ### Read-heavy workload
@@ -260,9 +268,23 @@ bash run_all.sh
 <!-- ![Balcanced splits](./figs/exp_sigmod/balanced_splits.png) -->
 
 
+### HDD vs. SSD
+
+![Point query](./figs/exp_sigmod/hdd_vs_ssd.png)
 
 
-india: 13785.6596865654
-australia: 19068.329280138016
-normal: 9638.290929555893
-uniform: 9372.92283153534
+### Overall
+
+![Overall](./figs/exp_sigmod/spider.png)
+
+
+
+![Overall Score](./figs/exp_sigmod/overall_spider.png)
+
+
+### Improvement
+
+![Improvement](./figs/exp_sigmod/bmtree_improved.png)
+![Improvement](./figs/exp_sigmod/bmtree_improved_time.png)
+
+
