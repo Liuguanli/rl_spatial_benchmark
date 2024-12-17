@@ -157,15 +157,14 @@ Ensure that the experiment configurations are correctly set up by checking the `
    - Uncomment the code in `run_all.sh` to run.
 
     ```bash
-  ####################### Traditional Start ######################################
-  python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional.json
-  python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional_vary_range.json
+    ####################### Traditional Start ######################################
+    python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional.json
+    python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional_vary_range.json
 
-  python run_exp_from_config.py exp_config/write_only/config_traditional.json
-  python run_exp_from_config.py exp_config/write_heavy_only/config_traditional.json
-  python run_exp_from_config.py exp_config/read_heavy_only/config_traditional.json
-  ####################### Traditional End ######################################
-
+    python run_exp_from_config.py exp_config/write_only/config_traditional.json
+    python run_exp_from_config.py exp_config/write_heavy_only/config_traditional.json
+    python run_exp_from_config.py exp_config/read_heavy_only/config_traditional.json
+    ####################### Traditional End ######################################
     ```
 
 5. **Run Experiments**:
