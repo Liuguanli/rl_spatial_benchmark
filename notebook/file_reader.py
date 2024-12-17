@@ -43,7 +43,7 @@ class TreeProperties:
         self.QueryVariance = kwargs.get('Query variance', 0)
         self.QueryStdDev = kwargs.get('Query stdDev', 0)
         self.QueryP50 = kwargs.get('Query p50', kwargs.get('Query P50', 0))
-        self.QueryP99 = kwargs.get('Query p99', kwargs.get('Query P50', 0))
+        self.QueryP99 = kwargs.get('Query p99', kwargs.get('Query P99', 0))
 
         self.QueryPercentage = [kwargs.get(f'Query P{i}', 0) for i in range(1, 100, 1)]
 

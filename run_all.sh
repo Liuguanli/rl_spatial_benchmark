@@ -57,15 +57,6 @@ export LD_LIBRARY_PATH=/home/liuguanli/Documents/libtorch/lib:$LD_LIBRARY_PATH
 
 print_step $YELLOW "Step 3: Start Experiments"
 
-# python run_index_tuning.py
-
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl.json
-
-# python run_exp_from_config.py example_config_debug_bmtree.json
-
-
-
-
 
 ####################### Tuning RLESIs Start ######################################
 # tree_types=("qdtree" "rlrtree" "bmtree")
@@ -79,28 +70,63 @@ print_step $YELLOW "Step 3: Start Experiments"
 # done
 ####################### Tuning RLESIs End ########################################
 
+
+####################### RLESI Start ######################################
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_range.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_k.json
+
+# python run_exp_from_config.py exp_config/write_only/config_rl.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_rl.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_rl.json
+####################### RLESI End ######################################
+
+
+####################### Traditional Start ######################################
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional_vary_range.json
+
+# python run_exp_from_config.py exp_config/write_only/config_traditional.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_traditional.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_traditional.json
+####################### Traditional End ######################################
+
+
+####################### Advanced Start ######################################
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy.json
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy_vary_range.json
+
+# python run_exp_from_config.py exp_config/write_only/config_greedy.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_greedy.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_greedy.json
+####################### Advanced End ######################################
+
+
+####################### LSI Start ######################################
 # python run_exp_from_config.py exp_config/test_platon.json
+# python run_exp_from_config.py exp_config/test_zm.json
+
 # python run_exp_from_config.py exp_config/write_only/config_platon.json
 # python run_exp_from_config.py exp_config/write_heavy_only/config_platon.json
 # python run_exp_from_config.py exp_config/read_heavy_only/config_platon.json
-# python run_exp_from_config.py exp_config/test_zm_debug.json
-# python run_exp_from_config.py exp_config/test_us_latency.json
+####################### LSI End ######################################
 
 
-# python run_exp_from_config.py exp_config/test_zorder_debug.json
+
+####################### HDD vs. SSD Start ######################################
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_all_SSD.json
+####################### HDD vs. SSD End ######################################
+
+
+####################### Varying Cardinality Start ######################################
 # python run_exp_from_config.py exp_config/test_cardinality_25m.json
 # python run_exp_from_config.py exp_config/test_cardinality_50m.json
 # python run_exp_from_config.py exp_config/test_cardinality_75m.json
-# python run_exp_from_config.py exp_config/test_zm.json
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_range.json
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_all_SSD.json
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional.json
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy_vary_range.json
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_k.json
-# python run_exp_from_config.py exp_config/test_zm.json
+####################### Varying Cardinality End ######################################
 
-# python run_exp_from_config.py exp_config/test_bmtree_impr_debug.json
+
+####################### BMTree Improvement Start ######################################
 # python run_exp_from_config.py exp_config/test_bmtree_impr.json
-python run_exp_from_config.py exp_config/test_sp.json
+####################### Varying Cardinality End ######################################
+
 
 
