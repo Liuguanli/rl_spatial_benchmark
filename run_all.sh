@@ -18,6 +18,9 @@ LIGHTCYAN='\033[1;36m'
 WHITE='\033[1;37m'
 NC='\033[0m' # No Color
 
+# load .env 
+export $(grep -v '^#' .env | xargs)
+
 # Print step with dynamic color
 print_step() {
     local color=$1
@@ -53,7 +56,11 @@ echo -e "${GREEN}BMTree is installed.${NC}"
 print_sub_step $YELLOW "Step 2.2: Prepare RLRtree"
 print_sub_step $YELLOW "Step 2.3: Prepare Qd-tree"
 
-export LD_LIBRARY_PATH=/home/liuguanli/Documents/libtorch/lib:$LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH=$TORCH_LIB_PATH:$LD_LIBRARY_PATH
+
+# load .env 
+export $(grep -v '^#' .env | xargs)
 
 print_step $YELLOW "Step 3: Start Experiments"
 

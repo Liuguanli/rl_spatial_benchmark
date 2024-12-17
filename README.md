@@ -135,36 +135,53 @@ Ensure that the experiment configurations are correctly set up by checking the `
 
 ### 4. Prerequisites Before Running Experiments
 
-1. **Install Extended Libspatialindex**:
+1. **Configure .env**
+  ```bash
+    HDD_PATH="xxx"
+    SSD_PATH="xxx"
+    TORCH_LIB_PATH=xxx/libtorch/lib
+  ```
+
+2. **Install Extended Libspatialindex**:
    - Follow the instructions in the INSTALL.md in **libspatialindex** to install the extended version of `libspatialindex`.
 
-2. **Verify Installation**:
+3. **Verify Installation**:
    - Run `check_env.sh` to verify that `libspatialindex` is correctly installed.
 
-3. **Update Environment Variables**:
-   - Replace the following line in your environment setup:
-     ```bash
-     export LD_LIBRARY_PATH=xxxx/libtorch/lib:$LD_LIBRARY_PATH
-     ```
-   - with the path to your own installed `libtorch` library.
-
-4. **Configure and Run Experiments**:
-   - In `run_exp_from_config.py`, set `RUN_EXAMPLE=True` if you want to run the example configurations.
+4. **Configure Experiments**:
+   <!-- - In `run_exp_from_config.py`, set `RUN_EXAMPLE=True` if you want to run the example configurations. -->
    - To run experiments:
      - Use `point_range_knn_queries` for all query-only workloads.
      - Use `write_only, read_heavy_only, write_heavy_only` for insertion-related workloads.
 
-  ```bash
-    python run_exp_from_config.py exp_config/test_xxx.json
-  ```
+   - Uncomment the code in `run_all.sh` to run.
 
-## Experiments
+    ```bash
+  ####################### Traditional Start ######################################
+  python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional.json
+  python run_exp_from_config.py exp_config/point_range_knn_queries/config_traditional_vary_range.json
+
+  python run_exp_from_config.py exp_config/write_only/config_traditional.json
+  python run_exp_from_config.py exp_config/write_heavy_only/config_traditional.json
+  python run_exp_from_config.py exp_config/read_heavy_only/config_traditional.json
+  ####################### Traditional End ######################################
+
+    ```
+
+5. **Run Experiments**:
 
 To run all the experiments, simply execute the following command in your terminal:
 
 ```bash
 bash run_all.sh
 ```
+
+6. **Plot Figures**:
+  
+  Use notebooks under `./notebook`
+
+## Experiments
+
 
 ### Index building
 
@@ -174,12 +191,12 @@ bash run_all.sh
 
 ### Index Tuning
 
-Use range query latency
+Use range query latency to choose the optimal configuration.
 
 
 ![Index Tuning Time](./figs/exp_sigmod/all_query_time_build_time.png)
 
-Use range query I/O
+Use range query I/O to choose the optimal configuration.
 
 ![Index Tuning I/O](./figs/exp_sigmod/all_query_time_build_time_IO.png)
 

@@ -1,4 +1,8 @@
-# constants.py
+import os
+from dotenv import load_dotenv
+
+# load .env
+load_dotenv()
 
 SEED = 42
 
@@ -17,7 +21,9 @@ REAL_WORKLOAD_PATH = "data/real/workloads"
 
 IS_HDD = True
 
-INDEX_PATH = "/media/liuguanli/DATA" if IS_HDD else "./benchmark"
+HDD_PATH = os.getenv('HDD_PATH')
+SSD_PATH = os.getenv('SSD_PATH')
+INDEX_PATH = HDD_PATH if IS_HDD else SSD_PATH
 
 # use this flag to remove generated files if space is limited
 SAVE_SPACE = False

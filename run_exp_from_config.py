@@ -435,7 +435,6 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
                         bit_num=bit_num,
                     )
 
-        # test-learnedindex-ZMBulkLoad benchmark/model/rankspace_z_sorted_data /media/liuguanli/DATA/zm 100 1 4096 0
         command = f"test-learnedindex-ZMBulkLoad {data_file} {INDEX_PATH}/zm {page_size} {fill_factor} {BLOCK_SIZE} {BUFFER}"
         result, elapsed_time_ns_build = execute_command_with_err(command)
 
@@ -465,7 +464,6 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
                 bit_num=bit_num,
             )
 
-            # test-learnedindex-ZMQuery benchmark/libspatialindex/us_100000000_range_1000_2_uniform_1_0.001x0.001_zm_1 /media/liuguanli/DATA/zm intersection 0
             execute_range_query(data_file, query_file, range_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
 
         for knn_file_name in knn_queries:

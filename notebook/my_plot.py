@@ -451,7 +451,9 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
     if not is_y_ticks:
         ax.set_yticklabels(['' for _ in range(len(yticks))])
     if not is_x_ticks:
-        ax.set_xticklabels(['',''])
+        # ax.set_xticklabels(['',''])
+        ax.tick_params(labelbottom=False)
+
     ax.grid(True)  # Add grid
     
     # plt.tight_layout()

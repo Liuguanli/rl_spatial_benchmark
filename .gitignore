@@ -29,3 +29,7 @@ resources/
 temp/
 
 .DS_Store
+
+run_all_sigmod26.sh
+
+NOTE.md
