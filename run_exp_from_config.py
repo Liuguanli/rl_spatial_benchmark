@@ -13,7 +13,6 @@ import constants
 from constants import *
 
 
-
 def execute_command(command):
 
     global logger

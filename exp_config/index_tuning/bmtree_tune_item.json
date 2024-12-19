@@ -1,0 +1,41 @@
+{
+    "experiments": [
+        {
+            "available": true,
+            "data": {
+                "size": 100000000,
+                "dimensions": 2,
+                "distribution": "skewed",
+                "skewness": 4,
+                "bounds": [
+                    [
+                        0,
+                        1
+                    ],
+                    [
+                        0,
+                        1
+                    ]
+                ]
+            },
+            "workloads": [
+                "range_query_only.json",
+                "point_query_only.json",
+                "knn_query_only_25.json"
+            ],
+            "baseline": [
+                {
+                    "name": "bmtree",
+                    "available": true,
+                    "config": {
+                        "fill_factor": 1.0,
+                        "tree_depth": 12,
+                        "sampling": 80000,
+                        "page_size": 100,
+                        "bit_num": 32
+                    }
+                }
+            ]
+        }
+    ]
+}

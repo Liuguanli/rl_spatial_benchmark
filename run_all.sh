@@ -98,21 +98,20 @@ print_step $YELLOW "Step 3: Start Experiments"
 ####################### Traditional End ######################################
 
 
-####################### Advanced Start ######################################
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy.json
-# python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy_vary_range.json
+###################### Advanced Start ######################################
+python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy.json
+python run_exp_from_config.py exp_config/point_range_knn_queries/config_greedy_vary_range.json
 
 # python run_exp_from_config.py exp_config/write_only/config_greedy.json
 # python run_exp_from_config.py exp_config/write_heavy_only/config_greedy.json
 # python run_exp_from_config.py exp_config/read_heavy_only/config_greedy.json
-####################### Advanced End ######################################
+###################### Advanced End ######################################
 
 
 ####################### LSI Start ######################################
 # python run_exp_from_config.py exp_config/test_platon.json
 # python run_exp_from_config.py exp_config/test_zm.json
 
-# python run_exp_from_config.py exp_config/write_only/config_platon.json
 # python run_exp_from_config.py exp_config/write_heavy_only/config_platon.json
 # python run_exp_from_config.py exp_config/read_heavy_only/config_platon.json
 ####################### LSI End ######################################

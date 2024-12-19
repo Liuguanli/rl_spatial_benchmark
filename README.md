@@ -26,11 +26,9 @@
   - [HDD vs. SSD](#hdd-vs-ssd)
   - [Overall](#overall)
 
-
 ---
 
 ## Setup
-
 
 ### 1. Libraries
 
@@ -154,7 +152,7 @@ Ensure that the experiment configurations are correctly set up by checking the `
      - Use `point_range_knn_queries` for all query-only workloads.
      - Use `write_only, read_heavy_only, write_heavy_only` for insertion-related workloads.
 
-   - Uncomment the code in `run_all.sh` to run.
+   - Uncomment the code in `run_all.sh` to run. For example:
 
     ```bash
     ####################### Traditional Start ######################################

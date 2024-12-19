@@ -27,7 +27,7 @@ INDEX_PATH = HDD_PATH if IS_HDD else SSD_PATH
 
 # use this flag to remove generated files if space is limited
 SAVE_SPACE = False
-RUN_EXHAUSTIVE_SEARCH = False  # TODO uncomment the printing code first in e.g., libspatialindex/test/rtree/RTreeQuery.cc line 77
+RUN_EXHAUSTIVE_SEARCH = False 
 RUN_EXAMPLE = False
 RUN_ALL_BASELINE_EXAMPLE = False
 

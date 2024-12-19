@@ -20,7 +20,7 @@
       "baseline": [
         {
           "name": "kdtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100
@@ -56,7 +56,7 @@
       "baseline": [
         {
           "name": "kdtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100
@@ -92,7 +92,7 @@
       "baseline": [
         {
           "name": "kdtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100
@@ -128,7 +128,7 @@
       "baseline": [
         {
           "name": "kdtree",
-          "available": true,
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100
@@ -164,7 +164,43 @@
       "baseline": [
         {
           "name": "kdtree",
+          "available": false,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
+          }
+        },
+        {
+          "name": "kdgreedy",
           "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "point_query_only.json",
+        "range_query_only.json",
+        "knn_query_only.json"
+      ],
+      "baseline": [
+        {
+          "name": "kdtree",
+          "available": false,
           "config": {
             "fill_factor": 1.0,
             "page_size": 100

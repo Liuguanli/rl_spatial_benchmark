@@ -109,12 +109,12 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
         
     plt.tight_layout()
     
-    if output_file_paths:
-        for output_file_path in output_file_paths:
-            if output_file_path.endswith(".pdf"):
-                plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
-            if output_file_path.endswith(".png"):
-                plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    # if output_file_paths:
+    #     for output_file_path in output_file_paths:
+    #         if output_file_path.endswith(".pdf"):
+    #             plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+    #         if output_file_path.endswith(".png"):
+    #             plt.savefig(output_file_path, format='png', bbox_inches='tight')
     
     plt.show()
     plt.close(fig)
@@ -186,12 +186,12 @@ def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False
     
     plt.tight_layout()
     
-    if output_file_paths:
-        for output_file_path in output_file_paths:
-            if output_file_path.endswith(".pdf"):
-                plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
-            if output_file_path.endswith(".png"):
-                plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    # if output_file_paths:
+    #     for output_file_path in output_file_paths:
+    #         if output_file_path.endswith(".pdf"):
+    #             plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+    #         if output_file_path.endswith(".png"):
+    #             plt.savefig(output_file_path, format='png', bbox_inches='tight')
 
     
     plt.show()
@@ -293,12 +293,12 @@ def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_le
     
     plt.tight_layout()
     
-    if output_file_paths:
-        for output_file_path in output_file_paths:
-            if output_file_path.endswith(".pdf"):
-                plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
-            if output_file_path.endswith(".png"):
-                plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    # if output_file_paths:
+    #     for output_file_path in output_file_paths:
+    #         if output_file_path.endswith(".pdf"):
+    #             plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+    #         if output_file_path.endswith(".png"):
+    #             plt.savefig(output_file_path, format='png', bbox_inches='tight')
 
     plt.show()
     plt.close(fig)
@@ -355,12 +355,12 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     
     plt.tight_layout()
     
-    if output_file_paths:
-        for output_file_path in output_file_paths:
-            if output_file_path.endswith(".pdf"):
-                plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
-            if output_file_path.endswith(".png"):
-                plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    # if output_file_paths:
+    #     for output_file_path in output_file_paths:
+    #         if output_file_path.endswith(".pdf"):
+    #             plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+    #         if output_file_path.endswith(".png"):
+    #             plt.savefig(output_file_path, format='png', bbox_inches='tight')
     
     plt.show()
     plt.close(fig)
@@ -543,12 +543,12 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", yt
 
     plt.tight_layout()
     
-    if output_file_paths:
-        for output_file_path in output_file_paths:
-            if output_file_path.endswith(".pdf"):
-                plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
-            if output_file_path.endswith(".png"):
-                plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    # if output_file_paths:
+    #     for output_file_path in output_file_paths:
+    #         if output_file_path.endswith(".pdf"):
+    #             plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+    #         if output_file_path.endswith(".png"):
+    #             plt.savefig(output_file_path, format='png', bbox_inches='tight')
     
     plt.show()
     plt.close(fig)
@@ -665,11 +665,11 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
     
     plt.grid(True, linestyle="--")
     
-    if output_file_paths:
-        for output_file_path in output_file_paths:
-            if output_file_path.endswith(".pdf"):
-                plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
-            if output_file_path.endswith(".png"):
-                plt.savefig(output_file_path, format='png', bbox_inches='tight')
+    # if output_file_paths:
+    #     for output_file_path in output_file_paths:
+    #         if output_file_path.endswith(".pdf"):
+    #             plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+    #         if output_file_path.endswith(".png"):
+    #             plt.savefig(output_file_path, format='png', bbox_inches='tight')
     
     plt.show()
