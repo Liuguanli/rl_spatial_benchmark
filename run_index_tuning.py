@@ -70,7 +70,7 @@ def save_json(data, file_path):
         json.dump(data, f, indent=4)
 
 
-def estimate_build_cost(p):
+def is_build_required(p):
     global p_opt
     if not p_opt:
         p_opt = p
@@ -122,7 +122,7 @@ def exec(config_file, modifications, tree_type, total_build):
     elif tree_type == 'bmtree':
         p = {'key1': modifications['tree_depth'], 'key2': modifications['sampling']}
     
-    if estimate_build_cost(p):
+    if is_build_required(p):
         # os.system(f"python run_exp_from_config.py {config_file}")
         dataset = modifications['distribution']
         if dataset in ["uniform", "normal", "skewed"]:

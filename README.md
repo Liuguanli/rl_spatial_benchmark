@@ -9,6 +9,7 @@
   - [3. Configuration](#3-configuration)
     - [Configs](#configs)
   - [4. Prerequisites Before Running Experiments](#4-prerequisites-before-running-experiments)
+- [Framework Implementations](#framework-implementations)
 - [Experiments](#experiments)
   - [Index Tuning](#index-tuning)
   - [Index Building](#index-building)
@@ -176,6 +177,28 @@ bash run_all.sh
 6. **Plot Figures**:
   
   Use notebooks under `./notebook`
+
+## Framework Implementations
+
+![Framework](./figs/data_img/Framework.png)
+
+We propose a benchmarking framework 
+to ensure a consistent and comprehensive evaluation of 
+RLESIs, while facilitating their training, deployment, and integration into spatial systems. This framework consists of two modules: the index training module **ITM** and the index building module **IBM**.
+ITM provides a unified environment for the training of RLESIs through *trainer*, which is based on PyTorch. The trainer standardizes the training process of RLESIs and outputs the trained RL models.
+IBM extends the functionality of a disk-based spatial index library *libspatialindex, enabling the integration of RLESIs into spatial systems.
+A critical component of IBM is the *loader*, which uses the C++ API of PyTorch to load trained RL models produced by ITM. This seamless integration supports the construction of RLESIs while preserving compatibility with traditional disk-based indexing techniques.
+
+
+In IBM, we enhance the capabilities of libspatialindex to meet the requirements of our experimental study, as the original indices in libspatialindex do not fully satisfy our needs.
+For DP-based indices, R-tree and R*-tree are originally supported, we 
+integrate the implementation of PLATON, and add two new functions for RLR-tree to select a subtree and split a node.
+For SP-based indices, we implement Kd-tree, which also serves as the foundation for GKd-tree and Qd-tree.
+GKd-tree uses a heuristic algorithm for node splitting, while Qd-tree uses model predictions.
+For MP-based indices, libspatialindex supports bulk-loading by loading an ordered dataset input file.
+Therefore, we enable ZR-tree, ZRR-tree, and BM-tree by providing the ordered data points.
+While ZM-index is implemented from scratch by changing the storage format of non-leaf nodes, integrating index learning, and adding point and range query methods with model prediction.
+
 
 ## Experiments
 
