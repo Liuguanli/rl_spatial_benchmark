@@ -33,3 +33,6 @@ temp/
 run_all_sigmod26.sh
 
 NOTE.md
+
+.env
+
