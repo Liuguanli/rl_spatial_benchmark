@@ -165,7 +165,9 @@ Ensure that the experiment configurations are correctly set up by checking the `
   ```
 
 2. **Install Extended Libspatialindex**:
-   - Follow the instructions in the INSTALL.md in **libspatialindex** to install the extended version of `libspatialindex`.
+   - unzip *libspatialindex.zip*
+   - Follow the instructions in the README.md in **libspatialindex** to setup `libspatialindex`.
+   - Follow the instructions in the INSTALL.md in **libspatialindex** to install `libspatialindex`.
 
 3. **Verify Installation**:
    - Run `check_env.sh` to verify that `libspatialindex` is correctly installed.
