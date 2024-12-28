@@ -1,6 +1,7 @@
 # Benchmarking RL-enhacned Spatial Indices
 
 ## Table of Contents
+- [Framework Implementations](#framework-implementations)
 - [Setup](#setup)
   - [1. Libraries](#1-libraries)
   - [2. Datasets](#2-datasets)
@@ -9,7 +10,6 @@
   - [3. Configuration](#3-configuration)
     - [Configs](#configs)
   - [4. Prerequisites Before Running Experiments](#4-prerequisites-before-running-experiments)
-- [Framework Implementations](#framework-implementations)
 - [Experiments](#experiments)
   - [Index Tuning](#index-tuning)
   - [Index Building](#index-building)
@@ -26,8 +26,31 @@
   - [Read-heavy Workload](#read-heavy-workload)
   - [HDD vs. SSD](#hdd-vs-ssd)
   - [Overall](#overall)
+  - [Improvement](#improvement)
 
 ---
+
+## Framework Implementations
+
+![Framework](./figs/data_img/Framework.png)
+
+We propose a benchmarking framework 
+to ensure a consistent and comprehensive evaluation of 
+RLESIs, while facilitating their training, deployment, and integration into spatial systems. This framework consists of two modules: the index training module **ITM** and the index building module **IBM**.
+ITM provides a unified environment for the training of RLESIs through *trainer*, which is based on PyTorch. The trainer standardizes the training process of RLESIs and outputs the trained RL models.
+IBM extends the functionality of a disk-based spatial index library *libspatialindex, enabling the integration of RLESIs into spatial systems.
+A critical component of IBM is the *loader*, which uses the C++ API of PyTorch to load trained RL models produced by ITM. This seamless integration supports the construction of RLESIs while preserving compatibility with traditional disk-based indexing techniques.
+
+
+In IBM, we enhance the capabilities of libspatialindex to meet the requirements of our experimental study, as the original indices in libspatialindex do not fully satisfy our needs.
+For DP-based indices, R-tree and R*-tree are originally supported, we 
+integrate the implementation of PLATON, and add two new functions for RLR-tree to select a subtree and split a node.
+For SP-based indices, we implement Kd-tree, which also serves as the foundation for GKd-tree and Qd-tree.
+GKd-tree uses a heuristic algorithm for node splitting, while Qd-tree uses model predictions.
+For MP-based indices, libspatialindex supports bulk-loading by loading an ordered dataset input file.
+Therefore, we enable ZR-tree, ZRR-tree, and BM-tree by providing the ordered data points.
+While ZM-index is implemented from scratch by changing the storage format of non-leaf nodes, integrating index learning, and adding point and range query methods with model prediction.
+
 
 ## Setup
 
@@ -178,63 +201,47 @@ bash run_all.sh
   
   Use notebooks under `./notebook`
 
-## Framework Implementations
-
-![Framework](./figs/data_img/Framework.png)
-
-We propose a benchmarking framework 
-to ensure a consistent and comprehensive evaluation of 
-RLESIs, while facilitating their training, deployment, and integration into spatial systems. This framework consists of two modules: the index training module **ITM** and the index building module **IBM**.
-ITM provides a unified environment for the training of RLESIs through *trainer*, which is based on PyTorch. The trainer standardizes the training process of RLESIs and outputs the trained RL models.
-IBM extends the functionality of a disk-based spatial index library *libspatialindex, enabling the integration of RLESIs into spatial systems.
-A critical component of IBM is the *loader*, which uses the C++ API of PyTorch to load trained RL models produced by ITM. This seamless integration supports the construction of RLESIs while preserving compatibility with traditional disk-based indexing techniques.
-
-
-In IBM, we enhance the capabilities of libspatialindex to meet the requirements of our experimental study, as the original indices in libspatialindex do not fully satisfy our needs.
-For DP-based indices, R-tree and R*-tree are originally supported, we 
-integrate the implementation of PLATON, and add two new functions for RLR-tree to select a subtree and split a node.
-For SP-based indices, we implement Kd-tree, which also serves as the foundation for GKd-tree and Qd-tree.
-GKd-tree uses a heuristic algorithm for node splitting, while Qd-tree uses model predictions.
-For MP-based indices, libspatialindex supports bulk-loading by loading an ordered dataset input file.
-Therefore, we enable ZR-tree, ZRR-tree, and BM-tree by providing the ordered data points.
-While ZM-index is implemented from scratch by changing the storage format of non-leaf nodes, integrating index learning, and adding point and range query methods with model prediction.
-
 
 ## Experiments
 
-
-### Index building
-
-![Index build time](./figs/exp_sigmod/build.png)
-![Index size](./figs/exp_sigmod/index_size.png)
-![Node number](./figs/exp_sigmod/node_number.png)
-
 ### Index Tuning
 
-Use range query latency to choose the optimal configuration.
-
+We use range query latency to choose the optimal configuration. 
 
 ![Index Tuning Time](./figs/exp_sigmod/all_query_time_build_time.png)
 
-Use range query I/O to choose the optimal configuration.
+We use range query I/O to choose the optimal configuration. To ensure simplicity and consistency in the paper's implementation and analysis, we rely on latency as the primary criterion for choosing the optimal configuration.
+
 
 ![Index Tuning I/O](./figs/exp_sigmod/all_query_time_build_time_IO.png)
 
+### Index building
+
+The first two figures below are consistent with the figures presented in the paper.
+
+![Index build time](./figs/exp_sigmod/build.png)
+![Index size](./figs/exp_sigmod/index_size.png)
+
+ This one reports the number of nodes in each index strucutre, where ZM-index has the least. This is becasue we set a relatively large leaf node capacity to be consistent with the feature of ZM-index.
+
+![Node number](./figs/exp_sigmod/node_number.png)
 
 
 ### Read-only workloads
 
-
 #### Point query
+
+The figures below are consistent with those presented in the paper, except that Point I/O is not included.
 
 ![Point query time](./figs/exp_sigmod/point_query.png)
 ![Point I/O](./figs/exp_sigmod/point_IO.png)
-![Point query P50](./figs/exp_sigmod/point_query_P50.png)
 ![Point query P99](./figs/exp_sigmod/point_query_P99.png)
 ![Point query P1-P99](./figs/exp_sigmod/point_query_percentiles.png)
 
 
 #### Range query
+
+These four figures below are consistent with the figures presented in the paper.
 
 ![Range query time](./figs/exp_sigmod/range_query_time.png)
 ![Range query I/O](./figs/exp_sigmod/range_query_IO.png)
@@ -242,18 +249,25 @@ Use range query I/O to choose the optimal configuration.
 ![Range query P1-P99](./figs/exp_sigmod/range_query_percentiles.png)
 
 #### Range query (varying range)
+
+The figures below are consistent with those presented in the paper, except that the I/O results shown here are not included in the paper.
+
 ![Range query time varying range](./figs/exp_sigmod/range_query_time_varying_range.png)
 
 ![Range query time varying range I/O](./figs/exp_sigmod/range_query_IO_varying_range.png)
 
 
 #### Range query (varying aspect ratio)
+
+The figures below are consistent with those presented in the paper, except that the I/O results shown here are not included in the paper.
+
 ![Range query time varying range](./figs/exp_sigmod/range_query_time_varying_aspect_ratio.png)
 
 ![Range query time varying range I/O](./figs/exp_sigmod/range_query_IO_varying_aspect_ratio.png)
 
 
 #### Knn query
+The figures below are consistent with those presented in the paper, except that the I/O results shown here are not included in the paper.
 
 ![Knn query time](./figs/exp_sigmod/knn_query_time.png)
 ![Knn query I/O](./figs/exp_sigmod/knn_query_IO.png)
@@ -261,6 +275,8 @@ Use range query I/O to choose the optimal configuration.
 ![Knn query P1-P99](./figs/exp_sigmod/knn_query_percentiles.png)
 
 #### Knn query (varying k)
+
+The figures below are consistent with those presented in the paper, except that the I/O results shown here are not included in the paper.
 
 ![Knn query time varying k](./figs/exp_sigmod/knn_query_time_varying_k.png)
 ![Knn query I/O varying k](./figs/exp_sigmod/knn_query_IO_varying_k.png)
@@ -280,6 +296,8 @@ KNN query
 
 ### Write-only workload
 
+The figures below are consistent with those presented in the paper, except that the number of node reads and writes are not included.
+
 ![Write only](./figs/exp_sigmod/write_only.png)
 ![Write only P99](./figs/exp_sigmod/write_only_P99.png)
 ![Write only reads](./figs/exp_sigmod/write_only_reads.png)
@@ -287,6 +305,8 @@ KNN query
 ![Write only splits](./figs/exp_sigmod/write_only_splits.png)
 
 ### Write-heavy workload
+
+The figures below are consistent with those presented in the paper, except that the P99 of query and insertion latency are not included.
 
 ![Write heavy query time](./figs/exp_sigmod/write_heavy_query_time.png)
 ![Write heavy insert time](./figs/exp_sigmod/write_heavy_insert_time.png)
@@ -296,13 +316,14 @@ KNN query
 
 
 ### Read-heavy workload
+
+The figures below are consistent with those presented in the paper, except that the P99 of query and insertion latency are not included.
+
 ![Read heavy query time](./figs/exp_sigmod/read_heavy_query_time.png)
 ![Read heavy insert time](./figs/exp_sigmod/read_heavy_insert_time.png)
-![Read heavy query P50](./figs/exp_sigmod/read_heavy_query_time_P50.png)
 ![Read heavy query P99](./figs/exp_sigmod/read_heavy_query_time_P99.png)
-![Read heavy insert P50](./figs/exp_sigmod/read_heavy_insert_time_P50.png)
 ![Read heavy insert P99](./figs/exp_sigmod/read_heavy_insert_time_P99.png)
-<!-- ![Balcanced splits](./figs/exp_sigmod/balanced_splits.png) -->
+
 
 
 ### HDD vs. SSD
@@ -314,14 +335,14 @@ KNN query
 
 ![Overall](./figs/exp_sigmod/spider.png)
 
-
+This figure below represents an alternative form of the radar figure, using stacked bars to illustrate the scores of each index across all metrics. The length of each stacked bar indicates the cumulative score, with longer bars representing higher overall performance. The index with the tallest bar achieves the highest total score, indicating the best overall performance among the indices.
 
 ![Overall Score](./figs/exp_sigmod/overall_spider.png)
 
 
 ### Improvement
 
-![Improvement](./figs/exp_sigmod/bmtree_improved.png)
+The figures below are consistent with those presented in the paper, except that the improvement of I/O is not included.
 ![Improvement](./figs/exp_sigmod/bmtree_improved_time.png)
 
-
+![Improvement](./figs/exp_sigmod/bmtree_improved.png)
