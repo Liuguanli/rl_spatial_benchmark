@@ -1,7 +1,7 @@
 # Benchmarking RL-enhacned Spatial Indices
 
 ## Table of Contents
-- [Framework Implementations](#framework-implementations)
+- [Benchmarking Framework](#benchmarking-framework)
 - [Setup](#setup)
   - [1. Libraries](#1-libraries)
   - [2. Datasets](#2-datasets)
@@ -30,7 +30,7 @@
 
 ---
 
-## Framework Implementations
+## Benchmarking Framework
 
 ![Framework](./figs/data_img/Framework.png)
 
