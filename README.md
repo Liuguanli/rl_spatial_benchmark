@@ -157,7 +157,7 @@ Ensure that the experiment configurations are correctly set up by checking the `
 
 ### 4. Prerequisites Before Running Experiments
 
-1. **Configure .env**
+1. **Configure .env following .env_example**
   ```bash
     HDD_PATH="xxx"
     SSD_PATH="xxx"
