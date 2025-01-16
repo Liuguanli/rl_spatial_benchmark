@@ -107,6 +107,7 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/read_heavy_only/config_greedy.json
 ###################### Advanced End ######################################
 
+# python run_exp_from_config.py exp_config/index_tuning/bmtree_us_more.json
 
 ####################### LSI Start ######################################
 # python run_exp_from_config.py exp_config/test_platon.json
@@ -137,31 +138,31 @@ print_step $YELLOW "Step 3: Start Experiments"
 
 
 ####################### RLEST Write Only Start ######################################
-python run_exp_from_config.py exp_config/write_only/config_rl.json
+# python run_exp_from_config.py exp_config/write_only/config_rl.json
 ####################### RLEST Write Only End ######################################
 
 
 ####################### RLEST Write Heavy Start ######################################
-python run_exp_from_config.py exp_config/write_heavy_only/config_rl.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_rl.json
 ####################### RLEST Write Heavy End ######################################
 
 
 ####################### RLEST Read Heavy Start ######################################
-python run_exp_from_config.py exp_config/read_heavy_only/config_rl.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_rl.json
 ####################### RLEST Read Heavy End ######################################
 
 
 ####################### Greedy Write Only Start ######################################
-python run_exp_from_config.py exp_config/write_only/config_greedy.json
+# python run_exp_from_config.py exp_config/write_only/config_greedy.json
 ####################### Greedy Write Only End ######################################
 
 
 ####################### Greedy Write Heavy Start ######################################
-python run_exp_from_config.py exp_config/write_heavy_only/config_greedy.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_greedy.json
 ####################### Greedy Write Heavy End ######################################
 
 
 ####################### Greedy Read Heavy Start ######################################
-python run_exp_from_config.py exp_config/read_heavy_only/config_greedy.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_greedy.json
 ####################### Greedy Read Heavy End ######################################
 

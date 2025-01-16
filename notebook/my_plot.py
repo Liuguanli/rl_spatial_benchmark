@@ -43,18 +43,17 @@ legend_size = 20
 width_total = 0.8
 spacing = 0.0
 fig_width = 13.5
-fig_height = 4
+fig_height_no_legend = 3.2
+fig_height_legend = 4
 
 
 
 def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom=1, top=None, legend_location="right"):
 
-    
+    fig_height = fig_height_legend if is_legend else fig_height_no_legend
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
     width = width_total / len(baseline_names)
     x = np.arange(len(datasets))
-
-
 
     # plt.minorticks_on()
     ax.minorticks_on() # Enable minor ticks only on the y-axis
@@ -121,6 +120,8 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
 
 def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False, title="", output_file_paths=None, bottom=1, top=None, legend_labels=[], legend_location="left"):
     
+    fig_height = fig_height_legend
+
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
     width = width_total / len(baseline_names)
     x = np.arange(len(datasets))
@@ -201,6 +202,8 @@ def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False
 
 def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom1=None, top1=None, bottom2=None, top2=None,legend_labels=[], legend_location="top"):
     
+    fig_height = fig_height_legend if is_legend else fig_height_no_legend
+
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(fig_width, fig_height), sharex=True, gridspec_kw={'height_ratios': [1, 1], 'hspace': 0})
     
     width = width_total / len(baseline_names)
@@ -626,7 +629,9 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
     linestyles = ['-', '--', ':', '-.']
     x = np.arange(1, 100)  # X-axis from 1 to 100
     
-    plt.figure(figsize=(16, 4))
+    fig_height = fig_height_legend if is_legend else fig_height_no_legend
+
+    plt.figure(figsize=(16, fig_height))
     handles = []  # Store handles for legend
     
     for i, baseline in enumerate(baselines):
