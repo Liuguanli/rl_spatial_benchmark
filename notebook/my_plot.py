@@ -63,6 +63,15 @@ def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_l
     for i, baseline in enumerate(baseline_names):
         offset = int(i / 4) * spacing
         adjusted_x = x - int(len(baseline_names) / 2) * width + i * width + offset
+        if sum(result[i]) == 0:
+            # ax.bar(adjusted_x, 1, "Not Available", width=width, label=baseline, color=colors[i % len(colors)], hatch=patterns[i % len(patterns)], edgecolor='black', linestyle='--')
+            not_available_bottom_1 = bottom * 2 if is_log else bottom * 1.1
+            not_available_bottom_2 = bottom * 3 if is_log else bottom * 1.2
+            for j in range(len(datasets)):  # Iterate over datasets
+                ax.scatter(adjusted_x[j], not_available_bottom_1, marker='x', color=colors[i % len(colors)], s=100)  # Add cross marker
+                ax.text(adjusted_x[j], not_available_bottom_2, "Not Available", 
+                        ha='center', va='bottom', color='red', fontsize=10, rotation=90)
+
         ax.bar(adjusted_x, result[i], width=width, label=baseline, color=colors[i % len(colors)], hatch=patterns[i % len(patterns)], edgecolor='black', linestyle='--')
 
     # if not is_log:

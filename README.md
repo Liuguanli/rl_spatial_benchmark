@@ -27,7 +27,7 @@
   - [HDD vs. SSD](#hdd-vs-ssd)
   - [Overall](#overall)
   - [Improvement](#improvement)
-
+- [References](#references)
 ---
 
 ## Benchmarking Framework
@@ -37,10 +37,10 @@
 We propose a benchmarking framework 
 to ensure a consistent and comprehensive evaluation of 
 RLESIs, while facilitating their training, deployment, and integration into spatial systems. This framework consists of two modules: the index training module **ITM** and the index building module **IBM**.
-ITM provides a unified environment for the training of RLESIs through *trainer*, which is based on PyTorch. The trainer standardizes the training process of RLESIs and outputs the trained RL models.
-IBM extends the functionality of a disk-based spatial index library *libspatialindex, enabling the integration of RLESIs into spatial systems.
-A critical component of IBM is the *loader*, which uses the C++ API of PyTorch to load trained RL models produced by ITM. This seamless integration supports the construction of RLESIs while preserving compatibility with traditional disk-based indexing techniques.
 
+ITM provides a unified environment for the training of RLESIs through *trainer*, which is based on PyTorch. The trainer standardizes the training process of RLESIs and outputs the trained RL models.
+IBM extends the functionality of a disk-based spatial index library *libspatialindex*, enabling the integration of RLESIs into spatial systems.
+A critical component of IBM is the *loader*, which uses the C++ API of PyTorch to load trained RL models produced by ITM. This seamless integration supports the construction of RLESIs while preserving compatibility with traditional disk-based indexing techniques.
 
 In IBM, we enhance the capabilities of libspatialindex to meet the requirements of our experimental study, as the original indices in libspatialindex do not fully satisfy our needs.
 For DP-based indices, R-tree and R*-tree are originally supported, we 
@@ -74,18 +74,31 @@ After downloading, follow these steps:
 2. Move all downloaded files to `./data/`.
 
 
+We evaluate all baselines using six datasets: three synthetic datasets representing uniform, normal, and skewed distributions, and three real-world datasets derived from OpenStreetMap, capturing spatial points from three countries. Each dataset consists of 100M spatial points, following configurations used in previous studies.
+
+In the figure below, we visualize the spatial data by sampling 10,000 points (colored blue) from each of the six datasets and overlay 20 generated range queries (colored red). Additionally, histograms on the x and y axes illustrate the data distributions, highlighting the distinct characteristics of each dataset.
+
+The US and INDIA datasets exhibit normal distributions across both dimensions but differ in key characteristics. The US dataset demonstrates a concentrated distribution within specific ranges, with sparse scattering in other areas. In contrast, the INDIA dataset exhibits a more uniform distribution across the spatial domain, reflecting its diverse geography. The AUS dataset features a skewed distribution, indicating a biased spread of data.
+
+Our choice of these real datasets provides a comprehensive basis for evaluating various data distributions. For specific evaluations, such as varying query ranges and k-values, we use the US dataset as the default, studying trends in query performance under changing conditions, which aligns with prior studies.
+
+
 #### Real Datasets
 
-- ![Real data](./figs/data_img/real_dataset_10000_density.png)
-
+<!-- - ![Real data](./figs/data_img/real_dataset_10000_density.png) -->
+Data with query points. 
 - ![Real data point distribution](./figs/data_img/real_dataset_10000_hist_point.png)
+
+Data with query ranges. 
 - ![Real data range distribution](./figs/data_img/real_dataset_10000_hist_range.png)
 
 #### Synthetic Datasets
 
-- ![Synthetic data](./figs/data_img/synthetic_dataset_10000_density.png)
-
+<!-- - ![Synthetic data](./figs/data_img/synthetic_dataset_10000_density.png) -->
+Data with query points. 
 - ![Synthetic data point distribution](./figs/data_img/synthetic_dataset_10000_hist_point.png)
+
+Data with query ranges. 
 - ![Synthetic data range distribution](./figs/data_img/synthetic_dataset_10000_hist_range.png)
 
 ### 3. Configuration
@@ -209,10 +222,11 @@ bash run_all.sh
 ### Index Tuning
 
 We use range query latency to choose the optimal configuration. 
-
+**The image below is used in the paper**
 ![Index Tuning Time](./figs/exp_sigmod/all_query_time_build_time.png)
 
 We use range query I/O to choose the optimal configuration. To ensure simplicity and consistency in the paper's implementation and analysis, we rely on latency as the primary criterion for choosing the optimal configuration.
+**The image below is NOT used in the paper**
 
 
 ![Index Tuning I/O](./figs/exp_sigmod/all_query_time_build_time_IO.png)
@@ -313,7 +327,7 @@ The figures below are consistent with those presented in the paper, except that 
 ![Write heavy query time](./figs/exp_sigmod/write_heavy_query_time.png)
 ![Write heavy insert time](./figs/exp_sigmod/write_heavy_insert_time.png)
 ![Write heavy query P99](./figs/exp_sigmod/write_heavy_query_time_P99.png)
-![Write heavy insert P99](./figs/exp_sigmod/write_heavy_insert_time_P99.png)
+<!-- ![Write heavy insert P99](./figs/exp_sigmod/write_heavy_insert_time_P99.png) -->
 ![Write heavy splits](./figs/exp_sigmod/write_heavy_splits.png)
 
 
@@ -324,8 +338,7 @@ The figures below are consistent with those presented in the paper, except that 
 ![Read heavy query time](./figs/exp_sigmod/read_heavy_query_time.png)
 ![Read heavy insert time](./figs/exp_sigmod/read_heavy_insert_time.png)
 ![Read heavy query P99](./figs/exp_sigmod/read_heavy_query_time_P99.png)
-![Read heavy insert P99](./figs/exp_sigmod/read_heavy_insert_time_P99.png)
-
+<!-- ![Read heavy insert P99](./figs/exp_sigmod/read_heavy_insert_time_P99.png)-->
 
 
 ### HDD vs. SSD
@@ -348,3 +361,12 @@ The figures below are consistent with those presented in the paper, except that 
 ![Improvement](./figs/exp_sigmod/bmtree_improved_time.png)
 
 ![Improvement](./figs/exp_sigmod/bmtree_improved.png)
+
+
+### References
+
+- [libspatialindex](https://github.com/libspatialindex/libspatialindex)  
+
+- [PLATON](https://github.com/Jamesyang2333/PLATON)  
+
+- [BMTree](https://github.com/gravesprite/Learned-BMTree)  
