@@ -1990,7 +1990,7 @@ def process_experiment(experiment):
         absolute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
         if not os.path.exists(absolute_data_file_name):
             # copy to project data directory
-            shutil.copy(os.path.join("/home/research/datasets/", data_file_name), absolute_data_file_name)
+            shutil.copy(os.path.join(DATA_SET_PATH, data_file_name), absolute_data_file_name)
 
         base_name, extension = os.path.splitext(os.path.basename(absolute_data_file_name))
 

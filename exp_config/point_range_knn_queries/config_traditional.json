@@ -1,6 +1,138 @@
 {
   "experiments": [
     {
+      "available": true,
+      "data": {
+        "size": 5668549,
+        "dimensions": 2,
+        "distribution": "tiger_linearwater",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "kdtree",
+          "available": true,
+          "config": {
+            "page_size": 100
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 8180866,
+        "dimensions": 2,
+        "distribution": "tiger_blocks",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "kdtree",
+          "available": true,
+          "config": {
+            "page_size": 100
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 17813006,
+        "dimensions": 2,
+        "distribution": "tiger_roads",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json", 
+        "knn_query_only.json"
+       ],
+      "baseline": [
+        {
+          "name": "zorder",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100,
+            "bit_num": 32
+          }
+        },
+        {
+          "name": "rtree",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "quadratic"
+          }
+        },
+        {
+          "name": "kdtree",
+          "available": true,
+          "config": {
+            "page_size": 100
+          }
+        }
+      ]
+    },
+    {
       "available": false,
       "data": {
         "size": 100000000,
@@ -134,7 +266,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,
@@ -224,7 +356,7 @@
       ]
     },
     {
-      "available": true,
+      "available": false,
       "data": {
         "size": 100000000,
         "dimensions": 2,

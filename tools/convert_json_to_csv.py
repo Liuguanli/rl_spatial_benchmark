@@ -20,5 +20,5 @@ def convert_json_to_csv(json_file, target_directory):
     print(f"Converted {json_file} to {csv_file}")
 
 # Example usage
-json_file_path = '/home/research/datasets/OSM_100000000.json'
-convert_json_to_csv(json_file_path, "/home/research/datasets")
+# json_file_path = '/home/research/datasets/OSM_100000000.json'
+# convert_json_to_csv(json_file_path, "/home/research/datasets")

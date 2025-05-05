@@ -30,7 +30,20 @@ def convert_data_to_int_bits(data_frame, bit_length, offset=0):
 
 def process_file(input_file, output_file, bits_per_dimension, offset=0):
     # Load data from the input file
-    df = pd.read_csv(input_file, header=None)
+
+    is_tiger = "tiger" in input_file
+    if is_tiger:
+        df_raw = pd.read_csv(input_file, header=0, usecols=["minx", "miny", "maxx", "maxy"],
+                            dtype={"minx": float, "miny": float, "maxx": float, "maxy": float})
+        
+        x_center = (df_raw["minx"] + df_raw["maxx"]) / 2
+        y_center = (df_raw["miny"] + df_raw["maxy"]) / 2
+        
+        df = pd.concat([x_center, y_center], axis=1)
+        df.columns = [0, 1] 
+    else:
+
+        df = pd.read_csv(input_file, header=None)
     df_copy = df.copy()
     adjusted_df = convert_data_to_int_bits(df_copy, bits_per_dimension, offset)
 

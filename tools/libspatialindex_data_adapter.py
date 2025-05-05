@@ -4,21 +4,35 @@ import os
 import numpy as np
 
 def transform_data(input_file, output_file, is_learned):
-    df = pd.read_csv(input_file, header=None)
+    if "tiger" in input_file:
+        df = pd.read_csv(input_file, usecols=["minx", "miny", "maxx", "maxy"],
+                        dtype={"minx": float, "miny": float, "maxx": float, "maxy": float})
+        
+        # 构造新的 DataFrame
+        transformed_df = pd.DataFrame({
+            'Col1': [1] * len(df),
+            'Col2': list(range(len(df))),
+            'Col3': df['minx'].values,
+            'Col4': df['miny'].values,
+            'Col5': df['maxx'].values,
+            'Col6': df['maxy'].values
+        })
+    else:
+        df = pd.read_csv(input_file, header=None)
 
-    # df[0] = pd.to_numeric(df[0], errors='coerce')
-    # df[1] = pd.to_numeric(df[1], errors='coerce')
-    # print(df.head())
-    # print(df.tail())
-    # df = df.head()
-    transformed_df = pd.DataFrame({
-        'Col1': 1, 
-        'Col2': range(len(df)), 
-        'Col3': df[0], 
-        'Col4': df[1], 
-        'Col5': df[0], 
-        'Col6': df[1]
-    })
+        # df[0] = pd.to_numeric(df[0], errors='coerce')
+        # df[1] = pd.to_numeric(df[1], errors='coerce')
+        # print(df.head())
+        # print(df.tail())
+        # df = df.head()
+        transformed_df = pd.DataFrame({
+            'Col1': 1, 
+            'Col2': range(len(df)), 
+            'Col3': df[0], 
+            'Col4': df[1], 
+            'Col5': df[0], 
+            'Col6': df[1]
+        })
 
     if is_learned:
         if df.shape[1] > 2:  # Check if there are more than two columns

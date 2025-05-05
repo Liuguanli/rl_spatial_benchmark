@@ -19,6 +19,9 @@ REAL_QUERY_PATH = "data/real/query"
 SYNTHETIC_WORKLOAD_PATH = "data/synthetic/workloads"
 REAL_WORKLOAD_PATH = "data/real/workloads"
 
+DATA_SET_PATH = "/home/research/datasets/"
+DATA_SET_PATH = "/media/liuguanli/T7/Ubuntu_Datasets/RL_spatial_data/real/dataset/"
+
 IS_HDD = True
 
 HDD_PATH = os.getenv('HDD_PATH')

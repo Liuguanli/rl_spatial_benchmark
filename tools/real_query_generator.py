@@ -10,9 +10,18 @@ from constants import *
 
 np.random.seed(SEED)
 
-def generate_range_queries(data_file, n_queries, dimensions, query_range, distribution='uniform', skewness=None):
 
-    df = pd.read_csv(data_file, header=None)
+def generate_range_queries(data_file, n_queries, dimensions, query_range, distribution='uniform', skewness=None, use_center_from_mbr=False):
+
+    if use_center_from_mbr:
+        df = pd.read_csv(data_file)
+        df['x'] = (df['minx'] + df['maxx']) / 2
+        df['y'] = (df['miny'] + df['maxy']) / 2
+        df = df[['x', 'y']]
+        dimensions = 2
+    else:
+        df = pd.read_csv(data_file, header=None)
+
     # Initialize an empty list to store the generated queries.
     queries = []
     bounds = [(df[col].min(), df[col].max()) for col in df.columns]
@@ -74,8 +83,17 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
     return queries
 
 
-def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None):
-    df = pd.read_csv(data_file, header=None)
+def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None, use_center_from_mbr=False):
+    
+    if use_center_from_mbr:
+        df = pd.read_csv(data_file)
+        df['x'] = (df['minx'] + df['maxx']) / 2
+        df['y'] = (df['miny'] + df['maxy']) / 2
+        df = df[['x', 'y']]
+        dimensions = 2
+    else:
+        df = pd.read_csv(data_file, header=None)
+
     mean = df.mean().values
     std = df.std().values
 
@@ -252,12 +270,14 @@ def main():
 
     args = parser.parse_args()
 
+    is_tiger = "tiger" in args.data
+
     if args.query_type == 'range':
         if not args.query_range:
             parser.error("--query_range is required for range queries.")
-        queries = generate_range_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, skewness=args.skewness)
+        queries = generate_range_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, skewness=args.skewness, use_center_from_mbr=is_tiger)
     elif args.query_type == 'knn':
-        queries = generate_knn_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
+        queries = generate_knn_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness, use_center_from_mbr=is_tiger)
     elif args.query_type == 'point':
         queries = generate_point_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness)
     elif args.query_type == 'insert':
