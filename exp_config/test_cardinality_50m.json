@@ -112,7 +112,7 @@
         },
         {
           "name": "qdtree",
-          "available": true,
+          "available": false,
           "config": {
             "episode": 10,
             "page_size": 100,
@@ -120,6 +120,14 @@
             "sampling_ratio": 0.0001,
             "action_sampling_size": 400,
             "model_path": "benchmark/model"
+          }
+        },
+        {
+          "name": "lisa",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
           }
         }
       ]

@@ -20,7 +20,7 @@ SYNTHETIC_WORKLOAD_PATH = "data/synthetic/workloads"
 REAL_WORKLOAD_PATH = "data/real/workloads"
 
 DATA_SET_PATH = "/home/research/datasets/"
-DATA_SET_PATH = "/media/liuguanli/T7/Ubuntu_Datasets/RL_spatial_data/real/dataset/"
+# DATA_SET_PATH = "/media/liuguanli/T7/Ubuntu_Datasets/RL_spatial_data/real/dataset/"
 
 IS_HDD = True
 
@@ -64,6 +64,14 @@ ZM_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLO
 ZM_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/point/{data_file_prefix}_{point_query_prefix}_bits_{bit_num}.txt"
 # ZM_PARTITION_OUTPUT_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}.txt"
 # ZM_PARTITION_OUTPUT_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/zm/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}.txt"
+
+LISA_DATA = "benchmark/libspatialindex/lisa_data"
+LISA_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/lisa/build/{data_file_prefix}.txt"
+LISA_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/lisa/range/{data_file_prefix}_{range_query_prefix}.txt"
+LISA_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/lisa/knn/{data_file_prefix}_{knn_query_prefix}_k_{k}.txt"
+LISA_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/lisa/point/{data_file_prefix}_{point_query_prefix}.txt"
+LISA_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/lisa/insert/{data_file_prefix}_{insert_prefix}.txt"
+LISA_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/lisa/insert_point/{data_file_prefix}_{insert_point_prefix}.txt"
 
 
 RANK_SPACE_Z_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rankspace_zorder/build/{data_file_prefix}_bits_{bit_num}.txt"
