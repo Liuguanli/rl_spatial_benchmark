@@ -52,6 +52,46 @@ def generate_range_queries(n_queries, dimensions, distribution, query_range, bou
 
     return queries
 
+def generate_join_queries(n_queries, dimensions, distribution, query_range, bounds, skewness=None):
+    queries = []
+    query_range = [query_range[d] * (bounds[d][1] - bounds[d][0]) for d in range(dimensions)]
+
+    if distribution == 'uniform':
+        adjusted_bounds = [(b[0] + r/2, b[1] - r/2) for b, r in zip(bounds, query_range)]
+        centers = np.random.uniform(low=[b[0] for b in adjusted_bounds], high=[b[1] for b in adjusted_bounds], size=(n_queries, dimensions))
+    elif distribution == 'normal':
+        centers = np.zeros((n_queries, dimensions))
+        for d in range(dimensions):
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            # centers[:, d] = np.random.normal(loc=mean, scale=std, size=n_queries)
+            centers[:, d] = np.clip(np.random.normal(loc=mean, scale=std, size=n_queries), bounds[d][0] + query_range[d]/2, bounds[d][1] - query_range[d]/2)
+    elif distribution == 'skewed' and skewness is not None:
+        centers = np.zeros((n_queries, dimensions))
+        for d in range(dimensions):
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            skewed_data = np.random.normal(loc=mean, scale=std, size=n_queries) ** skewness
+            centers[:, d] = np.clip(skewed_data, bounds[d][0] + query_range[d]/2, bounds[d][1] - query_range[d]/2)
+    else:
+        raise ValueError("Unsupported distribution type")
+
+    # Generate query bounds
+    for center in centers:
+        min_bounds = []
+        max_bounds = []
+        for c, r, b in zip(center, query_range, bounds):
+            min_bound = max(c - r/2, b[0])
+            min_bound = min(min_bound, b[1] - r)
+            max_bound = min(c + r/2, b[1])
+            max_bound = max(max_bound, min_bound + r)
+            min_bounds.append(min_bound)
+            max_bounds.append(max_bound)
+        query_bounds = min_bounds + max_bounds
+        queries.append(query_bounds)
+
+    return queries
+
 
 def generate_knn_queries(n_queries, dimensions, distribution, bounds, skewness=None):
     if distribution == 'uniform':
@@ -197,7 +237,7 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate queries for synthetic data.")
-    parser.add_argument("--query_type", type=str, choices=['range', 'knn', 'point', 'insert', 'insert_point'], required=True, help="Type of query to generate (range or knn).")
+    parser.add_argument("--query_type", type=str, choices=['range', 'knn', 'point', 'insert', 'insert_point', 'join'], required=True, help="Type of query to generate (range or knn).")
     parser.add_argument("--n_queries", type=int, required=True, help="Number of queries to generate.")
     parser.add_argument("--dimensions", type=int, required=True, help="Number of dimensions for the data points.")
     parser.add_argument("--distribution", type=str, required=True, choices=['uniform', 'normal', 'skewed'], help="Distribution of the query centers (uniform, normal, skewed).")
@@ -215,14 +255,16 @@ def main():
     # Only for insert_point
     parser.add_argument("--frequency", type=int, nargs='+', help="Frequency of insertions and point queries.")
 
-
-
     args = parser.parse_args()
 
     if args.query_type == 'range':
         if not args.query_range:
             parser.error("--query_range is required for range queries.")
         queries = generate_range_queries(n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, bounds=args.bounds, skewness=args.skewness)
+    elif args.query_type == 'join':
+        if not args.query_range:
+            parser.error("--query_range is required for range queries.")
+        queries = generate_join_queries(n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, bounds=args.bounds, skewness=args.skewness)
     elif args.query_type == 'knn':
         queries = generate_knn_queries(n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, bounds=args.bounds, skewness=args.skewness)
     elif args.query_type == 'point':
@@ -235,6 +277,16 @@ def main():
     if args.query_type == 'range':
         range_str = "x".join([str(_) for _ in args.query_range])
         file_name = RANGE_QUERY_FILENAME_TEMPLATE.format(
+            query_type=args.query_type,
+            n_queries=args.n_queries,
+            dimensions=args.dimensions,
+            distribution=args.distribution,
+            skewness=args.skewness,
+            range_str=range_str
+        )
+    elif args.query_type == 'join':
+        range_str = "x".join([str(_) for _ in args.query_range])
+        file_name = JOIN_QUERY_FILENAME_TEMPLATE.format(
             query_type=args.query_type,
             n_queries=args.n_queries,
             dimensions=args.dimensions,

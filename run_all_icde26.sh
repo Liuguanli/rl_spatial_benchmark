@@ -63,7 +63,8 @@ print_step $YELLOW "Step 3: Start Experiments"
 
 ####################### Tuning RLESIs Start ######################################
 # tree_types=("qdtree" "rlrtree" "bmtree")
-# datasets=("us" "india" "australia" "uniform" "normal" "skewed")
+# # datasets=("us" "india" "australia" "uniform" "normal" "skewed")
+# datasets=("us")
 
 # for tree in "${tree_types[@]}"; do
 #   for dataset in "${datasets[@]}"; do
@@ -82,6 +83,24 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/write_heavy_only/config_rl.json
 # python run_exp_from_config.py exp_config/read_heavy_only/config_rl.json
 ####################### RLESI End ######################################
+
+
+####################### Spatial Join Start ######################################
+# python run_exp_from_config.py exp_config/join_only/config_traditional.json
+
+# python run_exp_from_config.py exp_config/join_only/test_platon.json
+
+
+# python run_exp_from_config.py exp_config/join_only/config_greedy.json
+# python run_exp_from_config.py exp_config/join_only/test_zm.json
+
+python run_exp_from_config.py exp_config/join_only/config_rl.json
+
+# python run_exp_from_config.py exp_config/join_only/test_lisa.json
+
+
+
+####################### Spatial Join End ######################################
 
 
 ####################### Traditional Start ######################################
@@ -109,15 +128,18 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/test_zm.json
 # python run_exp_from_config.py exp_config/test_lisa.json
 
-python run_exp_from_config.py exp_config/write_only/config_ls.json
-python run_exp_from_config.py exp_config/write_heavy_only/config_ls.json
-python run_exp_from_config.py exp_config/read_heavy_only/config_ls.json
+# python run_exp_from_config.py exp_config/write_only/config_ls.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_ls.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_ls.json
+
+# python run_exp_from_config.py exp_config/write_only/config_zm.json
+# python run_exp_from_config.py exp_config/write_heavy_only/config_zm.json
+# python run_exp_from_config.py exp_config/read_heavy_only/config_zm.json
 
 # python run_exp_from_config.py exp_config/write_only/config_platon.json
 # python run_exp_from_config.py exp_config/write_heavy_only/config_platon.json
 # python run_exp_from_config.py exp_config/read_heavy_only/config_platon.json
 ####################### LSI End ######################################
-
 
 
 ####################### HDD vs. SSD Start ######################################
@@ -126,15 +148,13 @@ python run_exp_from_config.py exp_config/read_heavy_only/config_ls.json
 
 
 ####################### Varying Cardinality Start ######################################
-python run_exp_from_config.py exp_config/test_cardinality_25m.json
-python run_exp_from_config.py exp_config/test_cardinality_50m.json
-python run_exp_from_config.py exp_config/test_cardinality_75m.json
+# python run_exp_from_config.py exp_config/test_cardinality_25m.json
+# python run_exp_from_config.py exp_config/test_cardinality_50m.json
+# python run_exp_from_config.py exp_config/test_cardinality_75m.json
 ####################### Varying Cardinality End ######################################
 
 
 ####################### BMTree Improvement Start ######################################
 # python run_exp_from_config.py exp_config/test_bmtree_impr.json
 ####################### Varying Cardinality End ######################################
-
-
 

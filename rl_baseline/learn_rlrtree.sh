@@ -3,8 +3,8 @@
 sub_dir="./rl_baseline"
 
 # Check if two arguments are passed
-if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 <data_file_name> <query_file_name> <epoch> <sample_size>"
+if [ "$#" -ne 7 ]; then
+    echo "Usage: $0 <data_file_name> <query_file_name> <epoch> <sample_size> <learning_rate> <gamma> <rl_method>"
     exit 1
 fi
 
@@ -16,16 +16,19 @@ data_file=$1
 query_file=$2
 epoch=$3
 sample_size=$4
+learning_rate=$5
+gamma=$6
+rl_method=$7
 
 train_choose_subtree="model_ChooseSubtree.py"
 train_split="model_Split.py"
 compile_sh="compile.sh"
 
 compile_rtree_command="sh $compile_sh"
-train_choose_subtree_command="python $sub_dir/RLRTree/$train_choose_subtree -dataset_filename $data_file -queryset_filename $query_file -epoch $epoch -sample_size $sample_size"
-train_train_split_command="python $sub_dir/RLRTree/$train_split -dataset_filename $data_file -queryset_filename $query_file -epoch $epoch -sample_size $sample_size"
+train_choose_subtree_command="python $sub_dir/RLRTree/$train_choose_subtree -gamma $gamma -lr $learning_rate -rl_method $rl_method -dataset_filename $data_file -queryset_filename $query_file -epoch $epoch -sample_size $sample_size"
+train_train_split_command="python $sub_dir/RLRTree/$train_split -gamma $gamma -lr $learning_rate -dataset_filename $data_file -queryset_filename $query_file -epoch $epoch -sample_size $sample_size"
 
-# Execute the training command
+# Execute the training command 
 # cd "${sub_dir}/RLRTree" 
 
 pushd $sub_dir/RLRTree

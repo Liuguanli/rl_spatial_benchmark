@@ -1,0 +1,31 @@
+{
+  "experiments": [
+    {
+      "available": true,
+      "data": {
+        "size": 25000000,
+        "dimensions": 2,
+        "distribution": "us",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "range_query_only.json",
+        "spatial_join_only.json"
+      ],
+      "baseline": [
+        {
+          "name": "lisa",
+          "available": true,
+          "config": {
+            "fill_factor": 1.0,
+            "page_size": 100
+          }
+        }
+      ]
+    }
+  ]
+}

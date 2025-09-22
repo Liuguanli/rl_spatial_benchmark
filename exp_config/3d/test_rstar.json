@@ -1,0 +1,64 @@
+{
+  "experiments": [
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 3,
+        "distribution": "nyc",
+        "skewness": 1,
+        "bounds": [
+          [0, 1],
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "point_query_only_3d.json",
+        "range_query_only_3d.json",
+        "knn_query_only_25_3d.json"
+      ],
+      "baseline": [
+        {
+          "name": "rstar",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        }
+      ]
+    },
+    {
+      "available": true,
+      "data": {
+        "size": 100000000,
+        "dimensions": 3,
+        "distribution": "skewed",
+        "skewness": 4,
+        "bounds": [
+          [0, 1],
+          [0, 1],
+          [0, 1]
+        ]
+      },
+      "workloads": [
+        "point_query_only_3d.json",
+        "range_query_only_3d.json",
+        "knn_query_only_25_3d.json"
+      ],
+      "baseline": [
+        {
+          "name": "rstar",
+          "available": true,
+          "config": {
+            "page_size": 100,
+            "fill_factor": 0.4,
+            "rtree_variant": "rstar"
+          }
+        }
+      ]
+    }
+  ]
+}

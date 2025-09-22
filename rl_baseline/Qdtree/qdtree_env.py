@@ -21,6 +21,7 @@ class QdtreeEnv(MultiAgentEnv):
 
     def __init__(self, config):
         super().__init__()
+        # print(config)
         self.leaf_threshold = config.get("leaf_threshold", 100)
         self.dataset_path = config["dataset_path"]
         self.workload_path = config["workload_path"]
@@ -45,6 +46,7 @@ class QdtreeEnv(MultiAgentEnv):
         # Define action and observation spaces
         self.action_space = Discrete(self.action_sampling_size)  # Assume 2 actions per dimension (split at median, quartiles, etc.)
         # self.observation_space = Box(low=0, high=1, shape=(32 * 2 * self.dimension + self.dimension + self.action_sampling_size,), dtype=np.float32)
+        
         self.observation_space = Box(low=0, high=1, shape=(32 * 2 * self.dimension,), dtype=np.float32)
 
         self.reset()
@@ -102,14 +104,13 @@ class QdtreeEnv(MultiAgentEnv):
 
             for row in reader:
                 rectangle = []
-                length = len(row) // self.dimension
+                length = len(row) // 2
 
                 for i in range(length):
                     dim_value = []
                     dim_value.append(float(row[i]))
                     dim_value.append(float(row[i + self.dimension]))
                     rectangle.append(dim_value)
-
                 rectangles.append(rectangle)
 
         return rectangles
@@ -123,10 +124,10 @@ class QdtreeEnv(MultiAgentEnv):
             dim_actions = []
             for rect in self.query_rectangles:
                 dim_actions.append((i, rect[i][0]))
-                dim_actions.append((i, rect[i][i]))
+                dim_actions.append((i, rect[i][1]))
             actions.append(sorted(dim_actions, key=lambda x: x[1]))
 
-        sample_size = sample_size // self.dimension
+        sample_size = sample_size // 2
         sample_size += 1 # will remove the first sampled rectangle since the split value can be 0.0
 
         if is_sample:
@@ -212,8 +213,8 @@ class QdtreeEnv(MultiAgentEnv):
             right_domain = copy.deepcopy(node.domain)
             right_domain[split_dim][0] = split_value
 
-            left_node = Node(points=left_points, capacity=self.leaf_threshold, domain=left_domain, id=node.id*2+1)
-            right_node = Node(points=right_points, capacity=self.leaf_threshold, domain=right_domain, id=node.id*2+2)
+            left_node = Node(dimension=self.dimension, points=left_points, capacity=self.leaf_threshold, domain=left_domain, id=node.id*2+1)
+            right_node = Node(dimension=self.dimension, points=right_points, capacity=self.leaf_threshold, domain=right_domain, id=node.id*2+2)
 
             node.left = left_node
             node.right = right_node
@@ -292,26 +293,39 @@ class QdtreeEnv(MultiAgentEnv):
         node.reward = normalised_reward
         return skip, normalised_reward
     
-
     def _is_interacted(self, rec1, rec2):
-
-        low_x_1 = rec1[0][0]
-        high_x_1 = rec1[0][1]
-
-        low_y_1 = rec1[1][0]
-        high_y_1 = rec1[1][1]
-
-        low_x_2 = rec2[0][0]
-        high_x_2 = rec2[0][1]
-
-        low_y_2 = rec2[1][0]
-        high_y_2 = rec2[1][1]
-
-        if low_x_1 > high_x_2 or high_x_1 < low_x_2:
-            return False
-        
-        if low_y_1 > high_y_2 or high_y_1 < low_y_2:
-            return False
-        
+        """
+        Check whether two hyper-rectangles (rec1, rec2) intersect.
+        rec1/rec2: list of [low, high] for each dimension
+        self.dimension: number of dimensions
+        """
+        for d in range(self.dimension):
+            low1, high1 = rec1[d]
+            low2, high2 = rec2[d]
+            # If they are disjoint in this dimension, no intersection
+            if low1 > high2 or high1 < low2:
+                return False
         return True
+
+    # def _is_interacted(self, rec1, rec2):
+
+    #     low_x_1 = rec1[0][0]
+    #     high_x_1 = rec1[0][1]
+
+    #     low_y_1 = rec1[1][0]
+    #     high_y_1 = rec1[1][1]
+
+    #     low_x_2 = rec2[0][0]
+    #     high_x_2 = rec2[0][1]
+
+    #     low_y_2 = rec2[1][0]
+    #     high_y_2 = rec2[1][1]
+
+    #     if low_x_1 > high_x_2 or high_x_1 < low_x_2:
+    #         return False
+        
+    #     if low_y_1 > high_y_2 or high_y_1 < low_y_2:
+    #         return False
+        
+    #     return True
     

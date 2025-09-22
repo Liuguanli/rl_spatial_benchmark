@@ -68,7 +68,11 @@ def transform_json_to_csv(data, output_filename):
     transformed_df.to_csv(os.path.join("./benchmark/libspatialindex", output_filename), sep=' ', index=False, header=False)
 
 
-def process_all_queries(input, query_list, bits):
+def process_all_queries(args):
+    input = args.data
+    query_list = args.query_list
+    bits = args.bits
+    dim = args.dimensions
     df = calculate_rank(input)
     print(df)
     if query_list:
@@ -85,24 +89,44 @@ def process_all_queries(input, query_list, bits):
 
             for index, row in query_.iterrows():
                 if "point" in query_file or "knn" in query_file:
-                    x1, y1 = row[0], row[1]
-                    x2, y2 = row[0], row[1]
-                    x_min_rank = get_rank(df, 0, x1, 'min')
-                    x_max_rank = get_rank(df, 0, x2, 'max')
-                    y_min_rank = get_rank(df, 1, y1, 'min')
-                    y_max_rank = get_rank(df, 1, y2, 'max')
+                    mins = row.iloc[:dim].to_numpy()
+                    maxs = mins
                 else:
-                    x1, y1, x2, y2 = row[0], row[1], row[2], row[3]
-                    x_min_rank = get_rank(df, 0, x1, 'min')
-                    x_max_rank = get_rank(df, 0, x2, 'max')
-                    y_min_rank = get_rank(df, 1, y1, 'min')
-                    y_max_rank = get_rank(df, 1, y2, 'max')
+                    mins = row.iloc[:dim].to_numpy()
+                    maxs = row.iloc[dim:2*dim].to_numpy()
+                
+                min_ranks = [get_rank(df, d, mins[d], 'min') for d in range(dim)]
+                max_ranks = [get_rank(df, d, maxs[d], 'max') for d in range(dim)]
 
-                key_min = interleave_bits([x_min_rank, y_min_rank], bits)
-                key_max = interleave_bits([x_max_rank, y_max_rank], bits)
+                key_min = interleave_bits(min_ranks, bits)
+                key_max = interleave_bits(max_ranks, bits)
+                # if "point" in query_file or "knn" in query_file:
+                #     x1, y1 = row[0], row[1]
+                #     x2, y2 = row[0], row[1]
+                #     x_min_rank = get_rank(df, 0, x1, 'min')
+                #     x_max_rank = get_rank(df, 0, x2, 'max')
+                #     y_min_rank = get_rank(df, 1, y1, 'min')
+                #     y_max_rank = get_rank(df, 1, y2, 'max')
+                # else:
+                #     x1, y1, x2, y2 = row[0], row[1], row[2], row[3]
+                #     x_min_rank = get_rank(df, 0, x1, 'min')
+                #     x_max_rank = get_rank(df, 0, x2, 'max')
+                #     y_min_rank = get_rank(df, 1, y1, 'min')
+                #     y_max_rank = get_rank(df, 1, y2, 'max')
 
+                # key_min = interleave_bits([x_min_rank, y_min_rank], bits)
+                # key_max = interleave_bits([x_max_rank, y_max_rank], bits)
+                res = {
+                    "key_min": key_min,
+                    "key_max": key_max,
+                }
+                for i in range(dim):
+                    res [f'x{i+1}'] = mins[i]
+                    res [f'y{i+1}'] = maxs[i]
+                
+                results.append(res)
 
-                results.append({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2, 'key_min': key_min, 'key_max': key_max})
+                # results.append({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2, 'key_min': key_min, 'key_max': key_max})
 
             query_file_name = os.path.splitext(query_file)[0] + "_zm"
             print(f"Processing query file (without extension): {query_file_name}")
@@ -117,10 +141,11 @@ def main():
     parser.add_argument('--bits', type=int, default=20, help='Number of bits per dimension for Z-order calculation.')
     parser.add_argument('--data', type=str, required=True, help='Path to the input CSV file.')
     parser.add_argument("--query_list", type=str, nargs='+', help="A list of queries.")
+    parser.add_argument("--dimensions", type=int, required=False, default=2, help="Number of dimensions for the data points.")
 
     args = parser.parse_args()
 
-    process_all_queries(args.data, args.query_list, args.bits)
+    process_all_queries(args)
 
     # calculate_rank(args.data)
 

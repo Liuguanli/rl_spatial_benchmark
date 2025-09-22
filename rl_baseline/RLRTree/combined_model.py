@@ -267,8 +267,8 @@ class SplitLearner:
         self.reference_tree.SetSplitStrategy(config.reference_tree_spl_strategy)
 
         if self.config.network == 'strategy':
-            self.network = DQN(self.config.state_dim, self.config.inter_dim, self.config.action_space)
-            self.target_network = DQN(self.config.state_dim, self.config.inter_dim, self.config.action_space)
+            self.network = DQN2(self.config.state_dim, self.config.inter_dim, self.config.action_space)
+            self.target_network = DQN2(self.config.state_dim, self.config.inter_dim, self.config.action_space)
         if self.config.network == 'spl_loc':
             self.network = DQN2()
             self.target_network = DQN2()
@@ -281,7 +281,6 @@ class SplitLearner:
             self.insertion_network = Agent(gamma=0.95, epsilon=0.0, alpha=0.003, maxMemorySize=5000, batch_size=64, action_space_size=self.config.action_space)
             self.temp_network = Agent(gamma=0.95, epsilon=0.1, alpha=0.003, maxMemorySize=5000, batch_size=64, action_space_size=self.config.action_space)
             self.temp_network_final = Agent(gamma=0.95, epsilon=0.1, alpha=0.003, maxMemorySize=5000, batch_size=64, action_space_size=self.config.action_space)
-
 
 
         self.target_network.load_state_dict(self.network.state_dict())

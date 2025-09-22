@@ -42,7 +42,7 @@ parser.add_argument('-reference_tree_ins_strategy', help='default insert strateg
 parser.add_argument('-reference_tree_spl_strategy', help='default split strategy for reference tree', default='SPL_MIN_OVERLAP')
 parser.add_argument('-action_space', type=int, help='number of possible actions', default=2)
 parser.add_argument('-batch_size', type=int, help='batch_size', default=64)
-parser.add_argument('-state_dim', type=int, help='input dimension', default=25)
+parser.add_argument('-state_dim', type=int, help='input dimension', default=8)
 parser.add_argument('-inter_dim', type=int, help='internal dimension', default=64)
 parser.add_argument('-memory_cap', type=int, help='memory capacity', default=5000)
 parser.add_argument('-lr', type=float, help='learning rate', default=0.01)
@@ -55,7 +55,7 @@ parser.add_argument('-min_epsilon', type=float, help='minimum epsilon', default=
 parser.add_argument('-max_entry', type=int, help='maximum entry a node can hold', default=50)
 parser.add_argument('-query_for_reward', type=int, help='number of query used for reward', default=3)
 parser.add_argument('-splits_for_update', type=int, help='number of splits for a reward computation', default=5)
-parser.add_argument('-parts', type=int, help='number of parts to train', default=5)
+parser.add_argument('-parts', type=int, help='number of parts to train', default=20)
 parser.add_argument('-network', choices=['strategy', 'spl_loc', 'spl_loc_short', 'sort_spl_loc'], help='which network is used for training', default='sort_spl_loc')
 parser.add_argument('-teacher_forcing', type=float, help='the percentage of splits that are with teacher forcing technique', default=0.1)
 parser.add_argument('-data_distribution', choices=['uniform', 'skew', 'gaussian', 'china', 'india'], help='data set distribution', default='gaussian')
@@ -72,6 +72,8 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         self.linear1 = nn.Linear(input_dimension, inter_dimension)
         self.linear2 = nn.Linear(inter_dimension, output_dimension)
+        self.device = torch.device('cuda:3' if torch.cuda.is_available() else 'cpu')
+        self.to(self.device)
 
     def forward(self, x):
         m = nn.SELU()
@@ -158,8 +160,8 @@ class SplitLearner:
         self.reference_tree.SetSplitStrategy(config.reference_tree_spl_strategy)
 
         if self.config.network == 'strategy':
-            self.network = DQN(self.config.state_dim, self.config.inter_dim, self.config.action_space)
-            self.target_network = DQN(self.config.state_dim, self.config.inter_dim, self.config.action_space)
+            self.network = DQN2(self.config.state_dim, self.config.inter_dim, self.config.action_space)
+            self.target_network = DQN2(self.config.state_dim, self.config.inter_dim, self.config.action_space)
         if self.config.network == 'spl_loc':
             self.network = DQN2()
             self.target_network = DQN2()

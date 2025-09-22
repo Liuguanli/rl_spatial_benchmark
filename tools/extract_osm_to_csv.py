@@ -63,11 +63,11 @@ def main(osm_pbf_file, output_file, sample_output_file):
 if __name__ == '__main__':
 
     # data_sizes1 = [100000, 1000000, 20000000, 40000000, 60000000, 80000000]
-    data_sizes1 = [25000000, 50000000, 75000000]
+    data_sizes1 = [1000000]
     # data_sizes1 = [1000000, 5000000, 10000000, 50000000]
 
     # sample_data('data/real/dataset/india_100000000.csv', 'data/real/dataset/india', data_sizes1)
-    sample_data('data/real/dataset/us_100000000.csv', 'data/real/dataset/us', data_sizes1)
+    sample_data('data/real/dataset/us_10000000.csv', 'data/real/dataset/us', data_sizes1)
     # sample_data('data/real/dataset/australia_100000000.csv', 'data/real/dataset/australia', data_sizes1)
 
 

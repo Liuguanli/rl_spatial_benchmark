@@ -33,6 +33,7 @@ colors = ['#B0E0E6', '#88CCEE', '#5599CC', '#2A4A99',
 patterns = [None, '/', 'o', None, '\\', '.', None, '+', '*']
 patterns = [None, '-|', 'o', '-', None, '\\', '.', '*', None, '/', '+', 'x']
 patterns = [None, '/', 'o', '-', None, '\\', '.', '*', None, 'xx', '+', 'x']
+patterns = [None, '/', 'o', '-', None,  '/', 'o', '-', None,  '/', 'o', '-']
 
 
 
@@ -49,7 +50,6 @@ fig_height_legend = 4
 
 
 def plot_hist(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom=1, top=None, legend_location="right"):
-
     fig_height = fig_height_legend if is_legend else fig_height_no_legend
     fig, ax = plt.subplots(figsize=(fig_width, fig_height))
     width = width_total / len(baseline_names)
@@ -207,8 +207,6 @@ def plot_hist_stack(datasets, baseline_names, result, y_label=None, is_log=False
     plt.show()
     plt.close(fig)
 
-
-
 def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom1=None, top1=None, bottom2=None, top2=None,legend_labels=[], legend_location="top"):
     
     fig_height = fig_height_legend if is_legend else fig_height_no_legend
@@ -315,7 +313,6 @@ def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_le
     plt.show()
     plt.close(fig)
 
-
 def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=False, title="", output_file_paths=None, bottom=None, top=None):
     label_size = 24
     legend_size = 20
@@ -378,7 +375,7 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     plt.close(fig)
 
 
-def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax=None, x_label="", y_label="", yticks=[], is_log=False, title="", output_file_paths=None, x_bottom=None, x_top=None, y_bottom=None, y_top=None, show_legend=False, is_x_ticks=False, is_y_ticks=True):
+def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax=None, x_label="", y_label="", yticks=[], is_log=False, title="", output_file_paths=None, x_bottom=None, x_top=None, y_bottom=None, y_top=None, show_legend=False, is_x_ticks=False, is_y_ticks=True, marker=None, color=None, marker_size=100):
     label_size = 28
     legend_size = 22
 
@@ -396,8 +393,12 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
         # print(i, x[i], sizes)
         for j in range(len(x[i])):
             # marker_size = 40 * np.log(sizes[j] / 1000)
-            marker_size = 100
-            ax.scatter(x[i][j], y[i][j], label=baseline, marker=markers[i % len(markers)], color=colors[i % len(colors)], facecolors='none', s=marker_size)
+            # marker_size = 100
+            if not marker:
+                marker = markers[i % len(markers)]
+            if not color:
+                color = colors[i % len(colors)]
+            ax.scatter(x[i][j], y[i][j], label=baseline, marker=marker, color=color, facecolors='none', s=marker_size)
 
         for j in range(len(highlight_x[i])):
             # marker_size = 40 * np.log(sizes[j] / 1000)
@@ -412,7 +413,7 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
         ax.set_ylim(bottom=y_bottom)
     if y_top is not None:
         ax.set_ylim(top=y_top)
-        
+
     ax.set_ylabel(y_label, fontsize=label_size)
     ax.set_xlabel(x_label, fontsize=label_size)
     ax.tick_params(axis='x', labelsize=label_size + 2)
@@ -634,7 +635,8 @@ def plot_line_small(datasets, baseline_names, result, x_label="", y_label="", yt
 def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabel, is_log, is_legend, output_file_paths):
     # Sample data
     # markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+']
-    markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+', 'h', 'H', '|']
+    # markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+', 'h', 'H', '|']
+    markers = ['o', 's', '^', 'D']
     linestyles = ['-', '--', ':', '-.']
     x = np.arange(1, 100)  # X-axis from 1 to 100
     
@@ -648,9 +650,17 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
         
         # Plot the line without markers
         linestyle = linestyles[i % len(linestyles)]
-        line, = plt.plot(x, baseline_on_us, color=colors[i], linewidth=2)
+        line, = plt.plot(x, baseline_on_us, linestyle=linestyle, color=colors[i], linewidth=2)
         
-        # Add markers at every 10th point
+        # # Add markers at every 10th point
+        # plt.plot(x[::10], baseline_on_us[::10], color=colors[i], marker=markers[i % len(markers)], 
+        #          linestyle='None', markersize=10)
+        
+        # # Add marker at the last point
+        # plt.plot(x[-1:], baseline_on_us[-1:], color=colors[i], marker=markers[i % len(markers)], 
+        #          linestyle='None', markersize=10)
+
+           # Add markers at every 10th point
         plt.plot(x[::10], baseline_on_us[::10], color=colors[i], marker=markers[i % len(markers)], 
                  linestyle='None', markersize=10)
         
@@ -660,7 +670,7 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
         
         # Create a handle for the legend using the line and marker
         handles.append(plt.Line2D([0], [0], color=colors[i], marker=markers[i % len(markers)], 
-                                  linewidth=4, markersize=10, label=display_baselines[i]))
+                                  linestyle=linestyle, linewidth=4, markersize=10, label=display_baselines[i]))
     
     if is_log:
         plt.yscale('log')
@@ -673,9 +683,11 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
     
     if is_legend:
         # Use custom handles with markers for the legend
-        plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.465, 1.25), 
-                   ncol=6, frameon=False, fontsize=legend_size - 2, 
-                   borderaxespad=0.15, handletextpad=0.15, labelspacing=0.15)
+        plt.legend(handles=handles, loc='upper center', bbox_to_anchor=(0.465, 1.28), 
+                   ncol=6, frameon=False, fontsize=legend_size-1, 
+                   borderaxespad=0.25, handletextpad=0.25, labelspacing=0.25,
+                   handlelength=2.5,
+                    handleheight=1.5,    )
     
     plt.grid(True, linestyle="--")
     

@@ -65,7 +65,8 @@ parser.add_argument('-max_entry', type=int, help='maximum entry a node can hold'
 parser.add_argument('-query_for_reward', type=int, help='number of query used for reward', default=5)
 parser.add_argument('-splits_for_update', type=int, help='number of splits for a reward computation', default=20)
 parser.add_argument('-parts', type=int, help='number of parts to train', default=5)
-parser.add_argument('-network', choices=['strategy', 'spl_loc'], help='which network is used for training', default='strategy')
+# parser.add_argument('-network', choices=['strategy', 'spl_loc'], help='which network is used for training', default='strategy')
+parser.add_argument('-network', choices=['strategy', 'spl_loc', 'spl_loc_short', 'sort_spl_loc'], help='which network is used for training', default='sort_spl_loc')
 # below options are specially for insertion
 parser.add_argument('-data_distribution', choices=['uniform', 'skew', 'gaussian', 'china', 'india'], help='data set distribution', default='gaussian')
 parser.add_argument('-training_data_distribution', choices=['nil', 'uniform'], help='training data set distribution if different', default='nil')
@@ -73,7 +74,7 @@ parser.add_argument('-data_set_size', type=int, help='data set size', default=20
 parser.add_argument('-training_set_size', type=int, help='training set size', default=100000)
 parser.add_argument('-reward_comp_freq', type=int, help='insertion reward computation frequency', default=10)
 parser.add_argument('-action_space_size', type=int, help='action space size for top k child nodes', default=2)
-parser.add_argument('-rl_method', choices=[0,1], help='0: RL for enlargement; 1: RL for no enlargement', default=0)
+parser.add_argument('-rl_method', type=int, choices=[0,1], help='0: RL for enlargement; 1: RL for no enlargement', default=0)
 parser.add_argument('-model_number', type=int, help='which insertion training model', default=10)
 parser.add_argument('-reference_tree_type', choices=['rtree', 'rrstar'], help='which reference tree to use', default='rtree')
 
@@ -292,11 +293,18 @@ class SplitLearner:
                 self.reference_tree.SetSplitStrategy(config.reference_tree_spl_strategy)
 
                 if self.config.network == 'strategy':
-                        self.network = DQN(self.config.state_dim, self.config.inter_dim, self.config.action_space)
-                        self.target_network = DQN(self.config.state_dim, self.config.inter_dim, self.config.action_space)
+                        self.network = DQN2(self.config.state_dim, self.config.inter_dim, self.config.action_space)
+                        self.target_network = DQN2(self.config.state_dim, self.config.inter_dim, self.config.action_space)
                 if self.config.network == 'spl_loc':
                         self.network = DQN2()
                         self.target_network = DQN2()
+                if self.config.network == 'spl_loc_short':
+                        self.network = DQN2(60, 60, 12)
+                        self.target_network = DQN2(60, 60, 12)
+                if self.config.network == 'sort_spl_loc': # the final one!
+                        self.network = DQN2(self.config.action_space * 4, self.config.inter_dim, self.config.action_space)
+                        self.target_network = DQN2(self.config.action_space * 4, self.config.inter_dim, self.config.action_space)
+                        
 
                 self.target_network.load_state_dict(self.network.state_dict())
                 self.target_network.eval()

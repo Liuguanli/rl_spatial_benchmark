@@ -81,7 +81,7 @@ def cleanup_intermediate_files(index_name):
 
     safe_remove(Z_ORDER_OUTPUT)
     safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
-    safe_remove(BMTREE_INPUT)
+    # safe_remove(BMTREE_INPUT)
     safe_remove(CHOOSE_SUBTREE_MODEL_NAME)
     safe_remove(SPLIT_MODEL_NAME)
     safe_remove(QDTREE_MODEL_NAME)
@@ -160,6 +160,35 @@ def execute_range_query(data_file, query_file, range_query_output_path, test_fil
         run_exhaustive_search(data_file, query_file, query_type="range")
     
     logger.info("Finish range query")
+
+
+def execute_spatial_join(data_file, query_file, spatial_join_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
+
+    global logger
+
+    logger.info(f"execute_spatial_join: data_file:{data_file} query_file:{query_file} spatial_join_output_path:{spatial_join_output_path} test_file:{test_file}")
+
+    if RUN_EXHAUSTIVE_SEARCH:
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} selfjoin {BUFFER} > {INDEX_PATH}/res"
+    else:
+        command = f"{test_file} {query_file} {INDEX_PATH}/{index_name} selfjoin {BUFFER}"
+
+    logger.info(f"execute_spatial_join: {command}")
+
+    # result = subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE, text=True)
+    result, elapsed_time_ns_join = execute_command_with_err(command)
+    
+    os.makedirs(os.path.dirname(spatial_join_output_path), exist_ok=True)
+
+    with open(spatial_join_output_path, "w") as f:
+        if result:
+            f.write(result.stderr)
+        f.write(f"Elapsed Time: {elapsed_time_ns_join}\n")
+
+    if RUN_EXHAUSTIVE_SEARCH:
+        run_exhaustive_search(data_file, query_file, query_type="join")
+    
+    logger.info("Finish spatial join")
 
 
 def execute_knn_query(k, query_file, data_file, knn_query_output_path, test_file="test-rtree-RTreeQuery", index_name="tree"):
@@ -250,7 +279,14 @@ def execute_insert_point(query_file, insert_point_output_path, test_file="test-r
     logger.info("Finish insert_point")
     
 
-def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+def run_zorder(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_zorder: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -323,6 +359,16 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
             execute_range_query(data_file, query_file, range_query_output_path, "test-rtree-RTreeQuery", index_name="zorder")
 
+        for file_name in spatial_joins:
+            file_name_prefix = file_name.rstrip('.csv')
+            join_output_path = Z_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
+            )
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            execute_spatial_join(data_file, query_file, join_output_path, "test-rtree-RTreeQuery", index_name="zorder")
+
         for file_name in knn_queries:
             file_name_prefix = file_name.rstrip('.csv')
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
@@ -376,7 +422,14 @@ def run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map
         safe_remove(z_order_output_default)
         
 
-def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+def run_zm(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_zm: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -404,6 +457,7 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
         all_queries.extend(point_queries)
         all_queries.extend(range_queries)
         all_queries.extend(knn_queries)
+        all_queries.extend(spatial_joins)
         query_list_str = " ".join(all_queries)
 
         if not os.path.exists(z_order_output_default):
@@ -451,19 +505,23 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
 
         for range_file_name in range_queries:
             file_name_prefix = range_file_name.rstrip('.csv')
-            # if is_real_data:
-            #     ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
-            # else:
-            #     ablosute_query_file_name = f"data/real/query/{range_file_name}"
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix + "_zm")
-
             range_query_output_path = ZM_RANGE_QUERY_OUTPUT_PATH.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix,
                 bit_num=bit_num,
             )
-
             execute_range_query(data_file, query_file, range_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
+
+        for join_file_name in spatial_joins:
+            file_name_prefix = join_file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix + "_zm")
+            join_query_output_path = ZM_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
+            )
+            execute_spatial_join(data_file, query_file, join_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
 
         for knn_file_name in knn_queries:
             knn_file_name_prefix = knn_file_name.rstrip('.csv')
@@ -489,6 +547,27 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
             )
             execute_point_query(query_file, data_file, point_query_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
 
+        for file_name in insertions:
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            insert_output_path = ZM_PARTITION_OUTPUT_INSERT_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                insert_prefix=file_name_prefix,
+                bit_num=bit_num
+            )
+            execute_insert(query_file, insert_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
+
+        for file_name in insert_points:
+            insert_point_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            insert_point_output_path = ZM_PARTITION_OUTPUT_INSERT_POINT_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                insert_point_prefix=insert_point_prefix,
+                bit_num=bit_num
+            )
+            execute_insert_point(query_file, insert_point_output_path, test_file="test-learnedindex-ZMQuery", index_name="zm")
+
+
     except subprocess.CalledProcessError as e:
         logger.error(f"fail: {e}")
     
@@ -499,7 +578,14 @@ def run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, in
         safe_remove(z_order_output_default)
         
 
-def run_lisa(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+def run_lisa(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_lisa: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -544,6 +630,15 @@ def run_lisa(data_file_name, point_queries, range_queries, knn_queries, ks_map, 
                 range_query_prefix=file_name_prefix
             )
             execute_range_query(data_file, query_file, range_query_output_path, test_file="test-learnedindex-LISAQuery", index_name="lisa")
+
+        for join_file_name in spatial_joins:
+            file_name_prefix = join_file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            join_query_output_path = LISA_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix
+            )
+            execute_spatial_join(data_file, query_file, join_query_output_path, test_file="test-learnedindex-LISAQuery", index_name="lisa")
 
         for knn_file_name in knn_queries:
             knn_file_name_prefix = knn_file_name.rstrip('.csv')
@@ -592,7 +687,15 @@ def run_lisa(data_file_name, point_queries, range_queries, knn_queries, ks_map, 
         cleanup_intermediate_files(index_name="lisa")
         safe_remove(LISA_DATA)
 
-def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_rankspace(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_rankspace: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -658,6 +761,16 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
             )
             execute_range_query(data_file, query_file, range_query_output_path, index_name="rankspace")
 
+        for file_name in spatial_joins:
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            join_query_output_path = RANK_SPACE_Z_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                bit_num=bit_num,
+            )
+            execute_spatial_join(data_file, query_file, join_query_output_path, index_name="rankspace")
+
         for file_name in knn_queries:
             file_name_prefix = file_name.rstrip('.csv')
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
@@ -711,7 +824,15 @@ def run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_
         safe_remove(RANK_SPACE_Z_ORDER_OUTPUT)
         safe_remove(rank_space_z_order_output_default)
 
-def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_bmtree(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_bmtree: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -762,7 +883,7 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
             data_transfer_command = f"python rl_baseline/bmtree_data_transfer.py {ablosute_data_file_name} {ablosute_query_file_name}"
             execute_command(data_transfer_command)
 
-            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train} {0}"
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train} {0} 2"
             elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
             data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREE_INPUT} --output {BMTREE_OUTPUT}"
@@ -825,6 +946,18 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
                     )
                     execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="bmtree")
 
+            for spatial_join_file_name in spatial_joins:
+                spatial_join_file_name_prefix = spatial_join_file_name.rstrip('.csv')
+                join_output_path = BMTREE_JOIN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=spatial_join_file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size,
+                )
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, spatial_join_file_name_prefix)
+                execute_spatial_join(data_file, query_file, join_output_path, index_name="bmtree")
+
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
@@ -870,10 +1003,18 @@ def run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
     finally:
         # clean up intermediate files
         cleanup_intermediate_files(index_name="bmtree")
-        safe_remove(BMTREE_OUTPUT)
+        # safe_remove(BMTREE_OUTPUT)
         # safe_remove(bmtree_output_default)
 
-def run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_bmtree_impr(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_bmtree-impr: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -925,7 +1066,7 @@ def run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, k
             execute_command(data_transfer_command)
 
             cost_method = 1
-            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train} {cost_method}"
+            learn_bmtree_command = f"bash rl_baseline/learn_bmtree.sh {data_file_prefix} {file_name_prefix} {tree_depth} {sample_size} {bit_num} {ablosute_data_file_name} {is_train} {cost_method} 2"
             elapsed_time_ns_learn = execute_command(learn_bmtree_command)
 
             data_adapter_command = f"python tools/libspatialindex_data_adapter.py --type data --is_scaled --input {BMTREEIMPR_INPUT} --output {BMTREEIMPR_OUTPUT}"
@@ -988,6 +1129,19 @@ def run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, k
                     )
                     execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="bmtree_impr")
 
+            for spatial_join_file_name in spatial_joins:
+                spatial_join_file_name_prefix = spatial_join_file_name.rstrip('.csv')
+                join_output_path = BMTREEIMPR_JOIN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    join_query_prefix=spatial_join_file_name_prefix,
+                    bit_num=bit_num,
+                    tree_depth=tree_depth,
+                    sample_size=sample_size,
+                )
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, spatial_join_file_name_prefix)
+                execute_spatial_join(data_file, query_file, join_output_path, index_name="bmtree_impr")
+
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
@@ -1035,7 +1189,15 @@ def run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, k
         cleanup_intermediate_files(index_name="bmtree_impr")
         safe_remove(BMTREEIMPR_OUTPUT)
 
-def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_rtree(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_rtree: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -1084,6 +1246,16 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
                 variant=rtree_variant
             )
             execute_range_query(data_file, query_file, range_query_output_path, index_name="rtree")
+
+        for file_name in spatial_joins:
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            join_query_output_path = RTREE_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant
+            )
+            execute_spatial_join(data_file, query_file, join_query_output_path, index_name="rtree")
 
         for file_name in knn_queries:
             ks = ks_map.get(file_name)
@@ -1135,8 +1307,16 @@ def run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map,
         cleanup_intermediate_files(index_name="rtree")
         safe_remove(RTREE_DATA)
 
-def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_rstartree(data_file_name, query_maps, ks_map, baseline_config):
     
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
+
     global logger
     logger.info(f"run_rstartree: data_file_name:{data_file_name} baseline_config:{baseline_config}")
 
@@ -1186,6 +1366,16 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
                 variant=rtree_variant
             )
             execute_range_query(data_file, query_file, range_query_output_path, index_name="rstar")
+
+        for file_name in spatial_joins:
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            join_query_output_path = R_STAR_TREE_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant
+            )
+            execute_spatial_join(data_file, query_file, join_query_output_path, index_name="rstar")
 
         for file_name in knn_queries:
             ks = ks_map.get(file_name)
@@ -1237,7 +1427,15 @@ def run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_
         cleanup_intermediate_files(index_name="rstar")
         safe_remove(R_STAR_TREE_DATA)
 
-def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_rlrtree(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_rlrtree: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -1257,6 +1455,11 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
         sample_size = baseline_config.get("sample_size", 10000)
         model_path = baseline_config.get("model_path", RLRTREE_MODEL_PATH)
 
+        learning_rate = baseline_config.get("learning_rate", 0.01)
+        gamma = baseline_config.get("gamma", "0.8")
+        rl_method = baseline_config.get("rl_method", 0)
+
+
         data_file = RLRTREE_DATA
 
         format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
@@ -1273,27 +1476,34 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
 
             logger.info("Prepare RLRTree")
 
-            split_model_name_default = SPLIT_MODEL_NAME_DEFAULT.format(
+            split_model_name_default = SPLIT_MODEL_NAME_DEFAULT_TUNING.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
-                sample_size=sample_size
+                sample_size=sample_size,
+                gamma=gamma,
+                learning_rate=learning_rate,
+                rl_method=rl_method
             )
 
-            choose_subtree_model_name_default = CHOOSE_SUBTREE_MODEL_NAME_DEFAULT.format(
+            choose_subtree_model_name_default = CHOOSE_SUBTREE_MODEL_NAME_DEFAULT_TUNING.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
-                sample_size=sample_size
+                sample_size=sample_size,
+                gamma=gamma,
+                learning_rate=learning_rate,
+                rl_method=rl_method
             )
+
 
             if not os.path.exists(split_model_name_default) or not os.path.exists(choose_subtree_model_name_default):
                 logger.info(f"{split_model_name_default} NOT exists")
                 logger.info(f"{choose_subtree_model_name_default} NOT exists")
                 
-                learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch} {sample_size}"
+                learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch} {sample_size} {learning_rate} {gamma} {rl_method}"
                 elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
 
                 copy_and_rename(SPLIT_MODEL_NAME, split_model_name_default)
@@ -1308,12 +1518,15 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
             result, elapsed_time_ns_build = execute_command_with_err(command)
 
             if point_queries or knn_queries:
-                build_output_path = RLRTREE_BUILD_OUTPUT_PATH.format(
+                build_output_path = RLRTREE_BUILD_OUTPUT_PATH_TUNING.format(
                     data_file_prefix=data_file_prefix,
                     range_query_prefix=file_name_prefix,
                     variant=rtree_variant,
                     epoch=epoch,
-                    sample_size=sample_size
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
                 )
 
                 os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
@@ -1327,67 +1540,98 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
                     f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rlrtree.idx')}\n")
 
             query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
-            range_query_output_path = RLRTREE_RANGE_QUERY_OUTPUT_PATH.format(
+            range_query_output_path = RLRTREE_RANGE_QUERY_OUTPUT_PATH_TUNING.format(
                 data_file_prefix=data_file_prefix,
                 range_query_prefix=file_name_prefix,
                 variant=rtree_variant,
                 epoch=epoch,
-                sample_size=sample_size
+                sample_size=sample_size,
+                gamma=gamma,
+                learning_rate=learning_rate,
+                rl_method=rl_method
             )
             execute_range_query(data_file, query_file, range_query_output_path, index_name="rlrtree")
 
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
-                point_query_output_path = RLRTREE_POINT_QUERY_OUTPUT_PATH.format(
+                point_query_output_path = RLRTREE_POINT_QUERY_OUTPUT_PATH_TUNING.format(
                     data_file_prefix=data_file_prefix,
                     range_query_prefix=file_name_prefix,
                     point_query_prefix=point_file_name_prefix,
                     epoch=epoch,
                     variant=rtree_variant,
-                    sample_size=sample_size
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
                 )
                 execute_point_query(query_file, data_file, point_query_output_path, index_name="rlrtree")
+
+            for file_name in spatial_joins:
+                join_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, join_file_name_prefix)
+                join_query_output_path = RLRTREE_JOIN_QUERY_OUTPUT_PATH_TUNING.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    join_query_prefix=join_file_name_prefix,
+                    variant=rtree_variant,
+                    epoch=epoch,
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
+                )
+                execute_spatial_join(data_file, query_file, join_query_output_path, index_name="rlrtree")
 
             for file_name in knn_queries:
                 ks = ks_map.get(file_name)
                 knn_file_name_prefix = file_name.rstrip('.csv')
                 knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
                 for k in ks:
-                    knn_query_output_path = RLRTREE_KNN_QUERY_OUTPUT_PATH.format(
+                    knn_query_output_path = RLRTREE_KNN_QUERY_OUTPUT_PATH_TUNING.format(
                         data_file_prefix=data_file_prefix,
                         range_query_prefix=file_name_prefix,
                         knn_query_prefix=knn_file_name_prefix,
                         epoch=epoch,
                         k=k,
                         variant=rtree_variant,
-                        sample_size=sample_size
+                        sample_size=sample_size,
+                        gamma=gamma,
+                        learning_rate=learning_rate,
+                        rl_method=rl_method
                     )
                     execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="rlrtree")
 
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_file_name_prefix)
-                insert_output_path = RLRTREE_INSERT_OUTPUT_PATH.format(
+                insert_output_path = RLRTREE_INSERT_OUTPUT_PATH_TUNING.format(
                     data_file_prefix=data_file_prefix,
                     range_query_prefix=file_name_prefix,
                     insert_prefix=insert_file_name_prefix,
                     epoch=epoch,
                     variant=rtree_variant,
-                    sample_size=sample_size
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
                 )
                 execute_insert(query_file, insert_output_path, index_name="rlrtree")
 
             for file_name in insert_points:
                 insert_point_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_point_file_name_prefix)
-                insert_point_output_path = RLRTREE_INSERT_POINT_OUTPUT_PATH.format(
+                insert_point_output_path = RLRTREE_INSERT_POINT_OUTPUT_PATH_TUNING.format(
                     data_file_prefix=data_file_prefix,
                     range_query_prefix=file_name_prefix,
                     insert_point_prefix=insert_point_file_name_prefix,
                     epoch=epoch,
                     variant=rtree_variant,
-                    sample_size=sample_size
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
                 )
                 execute_insert_point(query_file, insert_point_output_path, index_name="rlrtree")
 
@@ -1400,7 +1644,15 @@ def run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_ma
         cleanup_intermediate_files(index_name="rlrtree")
         safe_remove(RLRTREE_DATA)
 
-def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_kdtree(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_kdtree: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -1453,6 +1705,14 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
             )
             execute_range_query(data_file, query_file, range_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
+        for file_name in spatial_joins:
+            file_name_prefix = file_name.rstrip('.csv')
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            join_query_output_path = KDTREE_JOIN_QUERY_OUTPUT_PATH.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix
+            )
+            execute_spatial_join(data_file, query_file, join_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdtree")
 
         for file_name in knn_queries:
             ks = ks_map.get(file_name)
@@ -1501,8 +1761,16 @@ def run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map
         cleanup_intermediate_files(index_name="kdtree")
         safe_remove(KDTREE_DATA)
 
-def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_kdtree_greedy(data_file_name, query_maps, ks_map, baseline_config):
     
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
+
     global logger
     logger.info(f"run_kdtree_greedy: data_file_name:{data_file_name} baseline_config:{baseline_config}")
     try:
@@ -1570,6 +1838,16 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
                     )
                     execute_knn_query(k, query_file, data_file, knn_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
 
+            for file_name in spatial_joins:
+                join_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, join_file_name_prefix)
+                join_query_output_path = KDTREE_GREEDY_JOIN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    join_query_prefix=join_file_name_prefix,
+                )
+                execute_spatial_join(data_file, query_file, join_query_output_path, "test-kdtree-KDTreeQuery", index_name="kdgreedy")
+
             for file_name in point_queries:
                 point_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
@@ -1605,12 +1883,20 @@ def run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries,
     
     finally:
         # clean up intermediate files
-        cleanup_intermediate_files(index_name="kdgreedy")
+        # cleanup_intermediate_files(index_name="kdgreedy")
         safe_remove(KDTREE_GREEDY_DATA)
         # save_remove(KDTREE_GREEDY_QUERY)
 
-def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+
+def run_qdtree_rl(data_file_name, query_maps, ks_map, baseline_config):
     
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
+
     global logger
     logger.info(f"run_qdtree_rl: data_file_name:{data_file_name} baseline_config:{baseline_config}")
     try:
@@ -1653,7 +1939,7 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
             if not os.path.exists(qdtree_model_name_default):
                 logger.info(f"{qdtree_model_name_default} NOT exists") 
 
-                learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size}"
+                learn_qdtree_command = f"bash rl_baseline/learn_qdtree.sh {ablosute_data_file_name} {ablosute_query_file_name} {episode} {sampling_ratio} {action_sampling_size} 2"
                 elapsed_time_ns_learn = execute_command(learn_qdtree_command)
 
                 copy_and_rename(QDTREE_MODEL_NAME, qdtree_model_name_default)
@@ -1729,6 +2015,19 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
                 )
                 execute_point_query(query_file, data_file, point_query_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
 
+            for file_name in spatial_joins:
+                join_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, join_file_name_prefix)
+                join_query_output_path = QDTREE_JOIN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    join_query_prefix=join_file_name_prefix,
+                    episode=episode,
+                    sampling_ratio=sampling_ratio,
+                    action_sampling_size=action_sampling_size,
+                )
+                execute_spatial_join(data_file, query_file, join_query_output_path, "test-kdtree-KDTreeQuery", index_name="qdtree")
+
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_file_name_prefix)
@@ -1765,7 +2064,14 @@ def run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_
         # save_remove(QDTREE_QUERY)
 
 
-def run_platon(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config):
+def run_platon(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
 
     global logger
     logger.info(f"run_platon: data_file_name:{data_file_name} baseline_config:{baseline_config}")
@@ -1868,6 +2174,16 @@ def run_platon(data_file_name, point_queries, range_queries, knn_queries, ks_map
                 )
                 execute_point_query(query_file, data_file, point_query_output_path, index_name="platon")
 
+            for file_name in spatial_joins:
+                join_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, join_file_name_prefix)
+                join_query_output_path = PLATON_JOIN_QUERY_OUTPUT_PATH.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    join_query_prefix=join_file_name_prefix,
+                )
+                execute_spatial_join(data_file, query_file, join_query_output_path, index_name="platon")
+
             for file_name in insertions:
                 insert_file_name_prefix = file_name.rstrip('.csv')
                 query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_file_name_prefix)
@@ -1911,6 +2227,7 @@ def process_experiment(experiment):
     point_queries = []
     insertions = []
     insert_points = []
+    spatial_joins = []
     ks_map = {}
     # Data Section
     data_size = experiment['data'].get('size', '')
@@ -1979,6 +2296,32 @@ def process_experiment(experiment):
                             )
 
                             range_queries.append(file_name)
+                                            
+                            if os.path.exists(os.path.join(SYNTHETIC_QUERY_PATH, file_name)):
+                                logger.info(f"File {file_name} already exists. Skipping command execution.")
+                            else:
+                                query_command = f"python tools/synthetic_query_generator.py --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness} {query_bounds_params} --query_range {query_range_params}"
+                                execute_command(query_command)
+                        
+                    elif query_type == "join":
+
+                        query_ranges = query['query_range']
+
+                        for query_range in query_ranges:
+
+                            query_range_params = ' '.join([str(val) for val in query_range])
+                            range_str = "x".join([str(_) for _ in query_range])
+
+                            file_name = JOIN_QUERY_FILENAME_TEMPLATE.format(
+                                query_type=query_type,
+                                n_queries=query_size,
+                                dimensions=query_dimensions,
+                                distribution=query_distribution,
+                                skewness=query_skewness,
+                                range_str=range_str
+                            )
+
+                            spatial_joins.append(file_name)
                                             
                             if os.path.exists(os.path.join(SYNTHETIC_QUERY_PATH, file_name)):
                                 logger.info(f"File {file_name} already exists. Skipping command execution.")
@@ -2127,6 +2470,33 @@ def process_experiment(experiment):
                                 query_command = f"python tools/real_query_generator.py --data {absolute_data_file_name} --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness} --query_range {query_range_params}"
                                 execute_command(query_command)
 
+                    elif query_type == "join":
+
+                        query_ranges = query['query_range']
+
+                        for query_range in query_ranges:
+
+                            query_range_params = ' '.join([str(val) for val in query_range])
+                            range_str = "x".join([str(_) for _ in query_range])
+
+                            file_name = REAL_JOIN_QUERY_FILENAME_TEMPLATE.format(
+                                data=base_name,
+                                query_type=query_type,
+                                n_queries=query_size,
+                                dimensions=query_dimensions,
+                                distribution=query_distribution,
+                                skewness=query_skewness,
+                                range_str=range_str
+                            )
+                            
+                            spatial_joins.append(file_name)
+
+                            if os.path.exists(os.path.join(REAL_QUERY_PATH, file_name)):
+                                logger.info(f"File {file_name} already exists. Skipping command execution.")
+                            else:
+                                query_command = f"python tools/real_query_generator.py --data {absolute_data_file_name} --query_type {query_type} --n_queries {query_size} --dimensions {query_dimensions} --distribution {query_distribution} --skewness {query_skewness} --query_range {query_range_params}"
+                                execute_command(query_command)
+
                     elif query_type == "knn":
                         ks = [int(k) for k in query['k']]
 
@@ -2225,7 +2595,7 @@ def process_experiment(experiment):
     query_path = REAL_QUERY_PATH if is_real_data else SYNTHETIC_QUERY_PATH
 
     query_maps = {"range_query": range_queries, "knn_query": knn_queries, "point_query": point_queries
-                  , "insert": insertions, "insert_point": insert_points}
+                  , "insert": insertions, "insert_point": insert_points, "join": spatial_joins}
     
     for query_type, file_names in query_maps.items():
         for file_name in file_names:
@@ -2256,31 +2626,31 @@ def process_experiment(experiment):
         logger.info(f"-----------------Baseline config: {baseline_config}-----------------")
 
         if baseline_name == "zorder":
-            run_zorder(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_zorder(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "bmtree":
-            run_bmtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_bmtree(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "rankspace":
-            run_rankspace(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_rankspace(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "rtree":
-            run_rtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_rtree(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "rstar":
-            run_rstartree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_rstartree(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "rlrtree":
-            run_rlrtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_rlrtree(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "kdtree":
-            run_kdtree(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_kdtree(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "kdgreedy":
-            run_kdtree_greedy(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_kdtree_greedy(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "qdtree":
-            run_qdtree_rl(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_qdtree_rl(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "platon":
-            run_platon(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_platon(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "zm":
-            run_zm(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_zm(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "lisa":
-            run_lisa(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_lisa(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "bmtree_impr":
-            run_bmtree_impr(data_file_name, point_queries, range_queries, knn_queries, ks_map, insertions, insert_points, baseline_config)
+            run_bmtree_impr(data_file_name, query_maps, ks_map, baseline_config)
 
 def remove_and_create_directory(directory_path):
 

@@ -3,8 +3,8 @@
 sub_dir="./rl_baseline"
 
 # Check if two arguments are passed
-if [ "$#" -ne 8 ]; then
-    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num> <absolute_file_name> <is_train> <cost_method>"
+if [ "$#" -ne 9 ]; then
+    echo "Usage: $0 <data_file_name> <query_file_name> <depth> <sample_size> <bit_num> <absolute_file_name> <is_train> <cost_method> <dim>"
     exit 1
 fi
 
@@ -17,6 +17,7 @@ bit_num=$5
 absolute_data_file=$6
 is_train=$7
 cost_method=$8
+dim=$9
 
 echo "is_train: $is_train"
 
@@ -24,12 +25,14 @@ echo "is_train: $is_train"
 # Execute the training command
 cd "${sub_dir}/Learned-BMTree" 
 
+bits=$(yes $bit_num | head -n $dim | tr '\n' ' ')
 
 if [ "$is_train" = "True" ]; then
 
+
 learn_bmtree="exp_opt_fast.py"
 
-train_command="python $learn_bmtree --data $data_file --query $query_file --action_depth $tree_depth --data_sample_points $sample_size --cost_method $cost_method --bit_length $bit_num $bit_num"
+train_command="python $learn_bmtree --data $data_file --query $query_file --action_depth $tree_depth --data_sample_points $sample_size --cost_method $cost_method --bit_length $bits "
 
 # Print the full command (optional)
 echo "Train Command: $train_command"
@@ -96,7 +99,7 @@ cd $target_directory
 
 echo $absolute_data_file
 
-python $order_by_bmtree --data $absolute_data_file --bit_length $bit_num $bit_num
+python $order_by_bmtree --data $absolute_data_file --bit_length $bits
 
 # remove data and queries.
 

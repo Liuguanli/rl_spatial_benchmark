@@ -29,7 +29,7 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
     # std = df.std().values
 
     query_range = [query_range[d] * (bounds[d][1] - bounds[d][0]) for d in range(dimensions)]
-    
+
     # Generate query centers based on the specified distribution.
     if distribution == 'uniform':
         # Randomly sample n_queries points from the dataframe to serve as query centers.
@@ -83,8 +83,8 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
     return queries
 
 
-def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None, use_center_from_mbr=False):
-    
+def generate_join_queries(data_file, n_queries, dimensions, query_range, distribution='uniform', skewness=None, use_center_from_mbr=False):
+
     if use_center_from_mbr:
         df = pd.read_csv(data_file)
         df['x'] = (df['minx'] + df['maxx']) / 2
@@ -94,34 +94,205 @@ def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform
     else:
         df = pd.read_csv(data_file, header=None)
 
-    mean = df.mean().values
-    std = df.std().values
-
+    # Initialize an empty list to store the generated queries.
+    queries = []
     bounds = [(df[col].min(), df[col].max()) for col in df.columns]
+    # mean = df.mean().values
+    # std = df.std().values
 
+    query_range = [query_range[d] * (bounds[d][1] - bounds[d][0]) for d in range(dimensions)]
+    
     # Generate query centers based on the specified distribution.
-    queries = np.zeros((n_queries, dimensions))
     if distribution == 'uniform':
         # Randomly sample n_queries points from the dataframe to serve as query centers.
         sample_indices = np.random.choice(df.index, size=n_queries, replace=False)
-        queries = df.iloc[sample_indices].values
+        centers = df.iloc[sample_indices].values
     elif distribution == 'normal':
-        # Use mean and standard deviation of each dimension to generate normally distributed queries.
+        # Calculate the mean and standard deviation for each dimension in the dataframe.
+        centers = np.zeros((n_queries, dimensions))
         for d in range(dimensions):
-            queries[:, d] = np.clip(np.random.normal(loc=mean[d], scale=std[d], size=n_queries), bounds[d][0], bounds[d][1])
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            lower_bound = np.full((n_queries,), bounds[d][0] + query_range[d]/2)
+            upper_bound = np.full((n_queries,), bounds[d][1] - query_range[d]/2)
+            centers[:, d] = np.clip(np.random.normal(loc=mean, scale=std, size=n_queries), lower_bound, upper_bound)
     elif distribution == 'skewed' and skewness is not None:
+        # Apply skewness transformation to the dataframe.
+        # skewed_data = df ** skewness
+        centers = np.zeros((n_queries, dimensions))
         for d in range(dimensions):
-            skewed_data = np.random.normal(loc=mean[d], scale=std[d], size=n_queries) ** skewness
-            queries[:, d] = np.clip(skewed_data, bounds[d][0], bounds[d][1])
+            mean = (bounds[d][1] + bounds[d][0]) / 2
+            std = (bounds[d][1] - bounds[d][0]) / 6
+            skewed_data = np.random.normal(loc=mean, scale=std, size=n_queries) ** skewness
+            lower_bound = np.full((n_queries,), bounds[d][0] + query_range[d]/2)
+            upper_bound = np.full((n_queries,), bounds[d][1] - query_range[d]/2)
+            centers[:, d] = np.clip(skewed_data, lower_bound, upper_bound)
+        # # Randomly sample n_queries points from the skewed dataframe to serve as query centers.
+        # sample_indices = np.random.choice(skewed_data.index, size=n_queries, replace=False)
+        # centers = skewed_data.iloc[sample_indices].values
     else:
         # Raise an error if the distribution type is unsupported.
         raise ValueError("Unsupported distribution type")
 
-    # Ensure queries are within bounds.
-    for dim in range(dimensions):
-        queries[:, dim] = np.clip(queries[:, dim], bounds[dim][0], bounds[dim][1])
+    # Generate query bounds for each center.
+    for center in centers:
+        min_bounds = []
+        max_bounds = []
+        for c, r, b in zip(center, query_range, bounds):
+            # Calculate the minimum and maximum bounds for each dimension.
+            min_bound = max(c - r/2, b[0])
+            min_bound = min(min_bound, b[1] - r)
+            max_bound = min(c + r/2, b[1])
+            max_bound = max(max_bound, min_bound + r)
+            min_bounds.append(min_bound)
+            max_bounds.append(max_bound)
+        # Combine the minimum and maximum bounds to form the query bounds.
+        query_bounds = min_bounds + max_bounds
+        # Append the query bounds to the list of queries.
+        queries.append(query_bounds)
+
+    queries = np.array(queries, dtype=np.float64)
+    return queries
+
+# def generate_knn_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None, use_center_from_mbr=False):
+    
+#     if use_center_from_mbr:
+#         df = pd.read_csv(data_file)
+#         df['x'] = (df['minx'] + df['maxx']) / 2
+#         df['y'] = (df['miny'] + df['maxy']) / 2
+#         df = df[['x', 'y']]
+#         dimensions = 2
+#     else:
+#         df = pd.read_csv(data_file, header=None)
+
+#     mean = df.mean().values
+#     std = df.std().values
+
+#     bounds = [(df[col].min(), df[col].max()) for col in df.columns]
+
+#     # Generate query centers based on the specified distribution.
+#     queries = np.zeros((n_queries, dimensions))
+#     if distribution == 'uniform':
+#         # Randomly sample n_queries points from the dataframe to serve as query centers.
+#         sample_indices = np.random.choice(df.index, size=n_queries, replace=False)
+#         queries = df.iloc[sample_indices].values
+#     elif distribution == 'normal':
+#         # Use mean and standard deviation of each dimension to generate normally distributed queries.
+#         for d in range(dimensions):
+#             queries[:, d] = np.clip(np.random.normal(loc=mean[d], scale=std[d], size=n_queries), bounds[d][0], bounds[d][1])
+#     elif distribution == 'skewed' and skewness is not None:
+#         for d in range(dimensions):
+#             skewed_data = np.random.normal(loc=mean[d], scale=std[d], size=n_queries) ** skewness
+#             queries[:, d] = np.clip(skewed_data, bounds[d][0], bounds[d][1])
+#     else:
+#         # Raise an error if the distribution type is unsupported.
+#         raise ValueError("Unsupported distribution type")
+
+#     # Ensure queries are within bounds.
+#     for dim in range(dimensions):
+#         queries[:, dim] = np.clip(queries[:, dim], bounds[dim][0], bounds[dim][1])
+
+#     return queries
+
+
+def generate_knn_queries(data_file, n_queries, dimensions,
+                         distribution='uniform', skewness=None, use_center_from_mbr=False):
+    """
+    Robust KNN query generator:
+    - Forces numeric dtype (strings coerced to NaN -> filled with 0).
+    - Computes mean/std/bounds on float32 ndarray to avoid mixed-type errors.
+    - Clips queries to bounds.
+    """
+
+    if use_center_from_mbr:
+        # Expecting named columns: minx, miny, maxx, maxy (3D时可按需扩展)
+        raw = pd.read_csv(data_file, low_memory=False)
+        x = (pd.to_numeric(raw['minx'], errors='coerce') +
+             pd.to_numeric(raw['maxx'], errors='coerce')) / 2
+        y = (pd.to_numeric(raw['miny'], errors='coerce') +
+             pd.to_numeric(raw['maxy'], errors='coerce')) / 2
+        df = pd.DataFrame({0: x, 1: y})
+        dimensions = 2
+    else:
+        df = pd.read_csv(data_file, header=None)
+
+        # usecols = list(range(dimensions))
+        # # Read as string first -> coerce -> fill -> float32 (most robust for dirty CSV)
+        # df = pd.read_csv(data_file, header=None, usecols=usecols,
+        #                  dtype={c: "string" for c in usecols}, low_memory=False)
+        # for c in usecols:
+        #     df[c] = pd.to_numeric(df[c], errors='coerce').fillna(0).astype('float32')
+
+    # Work with numpy array to avoid dtype pitfalls
+    arr = df.to_numpy(dtype=np.float32, copy=False)  # shape: (N, D)
+    D = arr.shape[1]
+
+    # Stats (guard zero std)
+    mean = arr.mean(axis=0)
+    std  = arr.std(axis=0)
+    std[std == 0] = 1e-6
+
+    # Bounds
+    mins = arr.min(axis=0)
+    maxs = arr.max(axis=0)
+    bounds = list(zip(mins, maxs))
+
+    # Generate query centers
+    queries = np.empty((n_queries, D), dtype=np.float32)
+
+    if distribution == 'uniform':
+        # If n_queries > N, sample with replacement
+        replace = n_queries > len(arr)
+        idx = np.random.choice(len(arr), size=n_queries, replace=replace)
+        queries[:] = arr[idx]
+    elif distribution == 'normal':
+        for d in range(D):
+            qd = np.random.normal(loc=mean[d], scale=std[d], size=n_queries)
+            queries[:, d] = np.clip(qd, bounds[d][0], bounds[d][1])
+    elif distribution == 'skewed' and skewness is not None:
+        # Simple skew: power transform of a normal sample
+        for d in range(D):
+            base = np.random.normal(loc=mean[d], scale=std[d], size=n_queries)
+            skewed = np.sign(base - mean[d]) * (np.abs(base - mean[d]) ** float(skewness)) + mean[d]
+            queries[:, d] = np.clip(skewed, bounds[d][0], bounds[d][1])
+    else:
+        raise ValueError("Unsupported distribution type")
+
+    # Final safety clip
+    for d in range(D):
+        np.clip(queries[:, d], bounds[d][0], bounds[d][1], out=queries[:, d])
 
     return queries
+
+
+def check_mixed_columns(data_file, nrows=100000):
+    """
+    Check which columns contain mixed types (numbers + non-numeric values).
+    By default only reads the first `nrows` rows to avoid slow parsing on huge files.
+    """
+
+    # Read all columns as strings so we can inspect them safely
+    df = pd.read_csv(data_file, header=None, nrows=nrows, low_memory=False, dtype=str)
+
+    mixed_cols = {}
+    for col in df.columns:
+        # Try converting the column to numeric; invalid entries become NaN
+        numeric = pd.to_numeric(df[col], errors="coerce")
+
+        # Mask for entries that failed conversion (i.e. non-numeric strings)
+        non_numeric_mask = numeric.isna() & df[col].notna()
+        if non_numeric_mask.any():
+            # Collect up to 10 unique bad values for inspection
+            bad_values = df.loc[non_numeric_mask, col].unique()[:10]
+            mixed_cols[col] = bad_values
+
+    if not mixed_cols:
+        print(f"No mixed-type columns found (in first {nrows} rows).")
+    else:
+        for col, bad in mixed_cols.items():
+            print(f"Column {col} has non-numeric values, e.g. {bad}")
+    return mixed_cols
+
 
 
 def generate_point_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None):
@@ -253,7 +424,7 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
 def main():
     parser = argparse.ArgumentParser(description="Generate queries for synthetic data.")
     parser.add_argument("--data", type=str, required=True, help="The real dataset.")
-    parser.add_argument("--query_type", type=str, choices=['range', 'knn', 'point', 'insert', 'insert_point'], required=True, help="Type of query to generate (range or knn).")
+    parser.add_argument("--query_type", type=str, choices=['range', 'knn', 'point', 'insert', 'insert_point', 'join'], required=True, help="Type of query to generate (range or knn).")
     parser.add_argument("--n_queries", type=int, required=True, help="Number of queries to generate.")
     parser.add_argument("--dimensions", type=int, required=True, help="Number of dimensions for the data points.")
     parser.add_argument("--distribution", type=str, required=True, choices=['uniform', 'normal', 'skewed'], help="Distribution of the query centers (uniform, normal, skewed).")
@@ -272,10 +443,17 @@ def main():
 
     is_tiger = "tiger" in args.data
 
+    bad_cols = check_mixed_columns(args.data)
+
+
     if args.query_type == 'range':
         if not args.query_range:
             parser.error("--query_range is required for range queries.")
         queries = generate_range_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, skewness=args.skewness, use_center_from_mbr=is_tiger)
+    elif args.query_type == 'join':
+        if not args.query_range:
+            parser.error("--query_range is required for range queries.")
+        queries = generate_join_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, query_range=args.query_range, skewness=args.skewness, use_center_from_mbr=is_tiger)
     elif args.query_type == 'knn':
         queries = generate_knn_queries(args.data, n_queries=args.n_queries, dimensions=args.dimensions, distribution=args.distribution, skewness=args.skewness, use_center_from_mbr=is_tiger)
     elif args.query_type == 'point':
@@ -291,6 +469,17 @@ def main():
     if args.query_type == 'range':
         range_str = "x".join([str(_) for _ in args.query_range])
         file_name = REAL_RANGE_QUERY_FILENAME_TEMPLATE.format(
+            data=base_name,
+            query_type=args.query_type,
+            n_queries=args.n_queries,
+            dimensions=args.dimensions,
+            distribution=args.distribution,
+            skewness=args.skewness,
+            range_str=range_str
+        )
+    elif args.query_type == 'join':
+        range_str = "x".join([str(_) for _ in args.query_range])
+        file_name = REAL_JOIN_QUERY_FILENAME_TEMPLATE.format(
             data=base_name,
             query_type=args.query_type,
             n_queries=args.n_queries,
@@ -358,7 +547,6 @@ if __name__ == "__main__":
 # python tools/real_query_generator.py --data data/real/dataset/india_10000.csv --query_type knn --n_queries 100 --dimensions 2 --distribution uniform --skewness 1
 # python tools/real_query_generator.py --data data/real/dataset/australia_10000.csv --query_type knn --n_queries 100 --dimensions 2 --distribution normal --skewness 1
 # python tools/real_query_generator.py --data data/real/dataset/us_10000.csv --query_type knn --n_queries 100 --dimensions 2 --distribution skewed --skewness 2
-
 
 # insert
 # python tools/real_query_generator.py --data data/real/dataset/india_10000000.csv --query_type insert --n_queries 10000000 --dimensions 2 --distribution uniform --skewness 1
