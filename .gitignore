@@ -37,3 +37,7 @@ NOTE.md
 .env
 
 TODO.md
+notebook/.jupyter_ystore.db
+
+# Jupyter Y-Store
+**/.jupyter_ystore.db
