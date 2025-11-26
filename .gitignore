@@ -41,3 +41,4 @@ notebook/.jupyter_ystore.db
 
 # Jupyter Y-Store
 **/.jupyter_ystore.db
+.jupyter_ystore.db
