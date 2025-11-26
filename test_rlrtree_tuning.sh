@@ -70,11 +70,11 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_learning_rate_2.json
 # python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_gamma_1.json
 # python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_gamma_2.json
-python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_rl_method.json
+# python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_rl_method.json
 
-python run_exp_from_config3d.py exp_config/3d/test_bmtree.json
+# python run_exp_from_config3d.py exp_config/3d/test_bmtree.json
 
-python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_default_configs.json
-python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_learning_rate_1.json
-python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_learning_rate_2.json
-python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_gamma_1.json
+# python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_default_configs.json
+# python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_learning_rate_1.json
+# python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_learning_rate_2.json
+# python run_exp_from_config.py exp_config/index_tuning/rlrtree_us_revision_gamma_1.json

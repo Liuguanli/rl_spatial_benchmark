@@ -20,7 +20,12 @@ def convert_csv_to_npy(csv_file, target_directory):
     npy_file = os.path.join(target_directory, os.path.splitext(os.path.basename(csv_file))[0] + ".npy")
     
     # Load data from the CSV file without headers
-    data = pd.read_csv(csv_file, header=None)
+    if "tiger" in csv_file and "dataset" in csv_file:
+        data = pd.read_csv(csv_file, header=None, skiprows=1)
+    else:
+        data = pd.read_csv(csv_file, header=None)
+    # data = pd.read_csv(csv_file, header=None)
+    
 
     # Assume the first column is x and the second column is y
     if data.shape[1] >= 2:  # Ensure there are at least two columns

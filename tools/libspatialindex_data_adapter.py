@@ -31,6 +31,7 @@ def transform_data_md(input_file, output_file, is_learned, dim):
     transformed_df.to_csv(output_file, sep=' ', index=False, header=False)
 
 def transform_data(input_file, output_file, is_learned):
+    print(input_file)
     if "tiger" in input_file:
         df = pd.read_csv(input_file, usecols=["minx", "miny", "maxx", "maxy"],
                         dtype={"minx": float, "miny": float, "maxx": float, "maxy": float})

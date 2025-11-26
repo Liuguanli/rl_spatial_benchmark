@@ -61,6 +61,9 @@ class QdtreeEnv(MultiAgentEnv):
             
             points = []
 
+            if "tiger" in dataset_path and "dataset" in dataset_path:
+                next(reader, None)
+            
             for row in reader:
                 point = []
                 for item in row:

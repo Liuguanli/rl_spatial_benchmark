@@ -66,6 +66,7 @@ parser.add_argument('-training_set_size', type=int, help='training set size', de
 parser.add_argument('-dataset_filename', help='data set distribution', required=True, default='')
 parser.add_argument('-sample_size', help='the number of sampled data points that used to train model', type=int, required=False, default=10000)
 parser.add_argument('-queryset_filename', help='data set distribution', required=True, default='')
+parser.add_argument('-model_path', help='path to a pretrained split model to load', default=None)
 
 class DQN(nn.Module):
     def __init__(self, input_dimension, inter_dimension, output_dimension):
@@ -172,8 +173,52 @@ class SplitLearner:
             self.network = DQN2(self.config.action_space * 4, self.config.inter_dim, self.config.action_space)
             self.target_network = DQN2(self.config.action_space * 4, self.config.inter_dim, self.config.action_space)
 
+        model_path = getattr(self.config, 'model_path', None)
+        if model_path:
+            logger.info(f"Loading split model from {model_path}")
 
+            def _load_with_compat(state_dict):
+                try:
+                    self.network.load_state_dict(state_dict)
+                    return True
+                except RuntimeError as err:
+                    remapped = {}
+                    remap_needed = False
+                    for key, value in state_dict.items():
+                        if key.startswith('layer'):
+                            remap_needed = True
+                            remapped[key.replace('layer', 'linear', 1)] = value
+                        else:
+                            remapped[key] = value
+                    bias_fixed = False
+                    for ln in ['linear1', 'linear2']:
+                        bias_key = f'{ln}.bias'
+                        weight_key = f'{ln}.weight'
+                        if bias_key not in remapped and weight_key in remapped:
+                            remapped[bias_key] = torch.zeros_like(self.network.state_dict()[bias_key])
+                            bias_fixed = True
+                    if remap_needed or bias_fixed:
+                        if remap_needed:
+                            logger.info("Remapped layer* keys in pretrained split model")
+                        if bias_fixed:
+                            logger.info("Synthesized missing bias terms for pretrained split model")
+                        self.network.load_state_dict(remapped)
+                        return True
+                    raise err
 
+            loaded = False
+            try:
+                checkpoint = torch.load(model_path, map_location=self.network.device)
+                if hasattr(checkpoint, 'state_dict'):
+                    checkpoint = checkpoint.state_dict()
+                loaded = _load_with_compat(checkpoint)
+            except (RuntimeError, AttributeError) as err:
+                logger.warning(f"State dict load failed ({err}); trying torch.jit.load for {model_path}")
+                script_module = torch.jit.load(model_path, map_location=self.network.device)
+                loaded = _load_with_compat(script_module.state_dict())
+
+            if not loaded:
+                raise RuntimeError(f"Unable to load model from {model_path}")
 
         self.target_network.load_state_dict(self.network.state_dict())
         self.target_network.eval()
@@ -1263,9 +1308,16 @@ if __name__ == '__main__':
     with open(args.dataset_filename, newline='') as csvfile:
         reader = csv.reader(csvfile)
         n = 0
-        for row in reader:
-                model_dataset.append([float(item) for item in row])
-                model_dataset[-1].extend(model_dataset[-1])
+        if "tiger" in csvfile:
+                model_dataset = []
+                next(reader, None)
+                for row in reader:
+                        row_list = [(float(row[0]) + float(row[2])) / 2, (float(row[1]) + float(row[3])) / 2]
+                        model_dataset.append(row_list)
+        else:
+                for row in reader:
+                        model_dataset.append([float(item) for item in row])
+                        model_dataset[-1].extend(model_dataset[-1])
 
     if len(model_dataset) > args.sample_size:
             model_dataset = random.sample(model_dataset, args.sample_size)

@@ -14,11 +14,16 @@ np.random.seed(SEED)
 def generate_range_queries(data_file, n_queries, dimensions, query_range, distribution='uniform', skewness=None, use_center_from_mbr=False):
 
     if use_center_from_mbr:
-        df = pd.read_csv(data_file)
-        df['x'] = (df['minx'] + df['maxx']) / 2
-        df['y'] = (df['miny'] + df['maxy']) / 2
-        df = df[['x', 'y']]
-        dimensions = 2
+        if "tiger" in data_file:
+            # df = pd.read_csv(data_file, header=None, skiprows=1)
+            df = pd.read_csv(data_file)
+            df['x'] = (df['minx'] + df['maxx']) / 2
+            df['y'] = (df['miny'] + df['maxy']) / 2
+            df = df[['x', 'y']]
+            dimensions = 2
+        else:
+            df = pd.read_csv(data_file, header=None)
+       
     else:
         df = pd.read_csv(data_file, header=None)
 
@@ -86,11 +91,15 @@ def generate_range_queries(data_file, n_queries, dimensions, query_range, distri
 def generate_join_queries(data_file, n_queries, dimensions, query_range, distribution='uniform', skewness=None, use_center_from_mbr=False):
 
     if use_center_from_mbr:
-        df = pd.read_csv(data_file)
-        df['x'] = (df['minx'] + df['maxx']) / 2
-        df['y'] = (df['miny'] + df['maxy']) / 2
-        df = df[['x', 'y']]
-        dimensions = 2
+        if "tiger" in data_file:
+            df = pd.read_csv(data_file)
+            df['x'] = (df['minx'] + df['maxx']) / 2
+            df['y'] = (df['miny'] + df['maxy']) / 2
+            df = df[['x', 'y']]
+            dimensions = 2
+        else:
+            df = pd.read_csv(data_file, header=None)
+        
     else:
         df = pd.read_csv(data_file, header=None)
 
@@ -206,13 +215,18 @@ def generate_knn_queries(data_file, n_queries, dimensions,
 
     if use_center_from_mbr:
         # Expecting named columns: minx, miny, maxx, maxy (3D时可按需扩展)
-        raw = pd.read_csv(data_file, low_memory=False)
-        x = (pd.to_numeric(raw['minx'], errors='coerce') +
-             pd.to_numeric(raw['maxx'], errors='coerce')) / 2
-        y = (pd.to_numeric(raw['miny'], errors='coerce') +
-             pd.to_numeric(raw['maxy'], errors='coerce')) / 2
-        df = pd.DataFrame({0: x, 1: y})
-        dimensions = 2
+        if "tiger" in data_file:
+            df = pd.read_csv(data_file)
+            x = (pd.to_numeric(df['minx'], errors='coerce') +
+                pd.to_numeric(df['maxx'], errors='coerce')) / 2
+            y = (pd.to_numeric(df['miny'], errors='coerce') +
+                pd.to_numeric(df['maxy'], errors='coerce')) / 2
+            df = pd.DataFrame({0: x, 1: y})
+            dimensions = 2
+        else:
+            df = pd.read_csv(data_file, header=None)
+
+        
     else:
         df = pd.read_csv(data_file, header=None)
 
@@ -296,7 +310,17 @@ def check_mixed_columns(data_file, nrows=100000):
 
 
 def generate_point_queries(data_file, n_queries, dimensions, distribution='uniform', skewness=None):
-    df = pd.read_csv(data_file, header=None)    
+    if "tiger" in data_file:
+        df = pd.read_csv(data_file)
+        x = (pd.to_numeric(df['minx'], errors='coerce') +
+        pd.to_numeric(df['maxx'], errors='coerce')) / 2
+        y = (pd.to_numeric(df['miny'], errors='coerce') +
+                pd.to_numeric(df['maxy'], errors='coerce')) / 2
+        df = pd.DataFrame({0: x, 1: y})
+        dimensions = 2
+    else:
+        df = pd.read_csv(data_file, header=None)
+
     if distribution == 'uniform':
         # Randomly sample n_queries points from the dataframe to serve as query centers.
         sample_indices = np.random.choice(df.index, size=n_queries, replace=False)
@@ -332,7 +356,11 @@ def generate_insertions(data_file, n_queries, dimensions, distribution='uniform'
     - A numpy array containing the generated unique insertion points.
     """
 
-    df = pd.read_csv(data_file, header=None)
+    # df = pd.read_csv(data_file, header=None)
+    if "tiger" in data_file:
+        df = pd.read_csv(data_file, header=None, skiprows=1)
+    else:
+        df = pd.read_csv(data_file, header=None)
     # mean = df.mean().values
     # std = df.std().values
     # bounds = [(df[col].min(), df[col].max()) for col in df.columns]
@@ -364,7 +392,16 @@ def generate_insertion_points(data_file, n_queries, dimensions, frequency, distr
 
     insertions = generate_insertions(data_file, insertion_num, dimensions, distribution, skewness)
     insertions_df = pd.DataFrame(insertions)
-    df = pd.read_csv(data_file, header=None)
+    # df = pd.read_csv(data_file, header=None)
+    if "tiger" in data_file:
+        df = pd.read_csv(data_file)
+        x = (pd.to_numeric(df['minx'], errors='coerce') +
+        pd.to_numeric(df['maxx'], errors='coerce')) / 2
+        y = (pd.to_numeric(df['miny'], errors='coerce') +
+                pd.to_numeric(df['maxy'], errors='coerce')) / 2
+        df = pd.DataFrame({0: x, 1: y})
+    else:
+        df = pd.read_csv(data_file, header=None)
 
     if distribution == 'uniform':
         shuffled_df = df.sample(frac=1).reset_index(drop=True)
@@ -406,14 +443,15 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
     
     # Determine number of dimensions
     dimensions = queries.shape[1]
+    column_names_base = 'abcxyz'
+
     if query_type == "range":
         # Generate column names based on dimensions
         dimensions = dimensions // 2
-        column_names = [f"{dim}{i}" for i in range(1, 3) for dim in 'xyz'[:dimensions]]
+        column_names = [f"{dim}{i}" for i in range(1, 3) for dim in column_names_base[:dimensions]]
         df = pd.DataFrame(queries, columns=column_names)
     else:
         # For knn, the column names are simply the first 'dimensions' letters of 'xyz'
-        column_names_base = 'xyz'
         column_names = [column_names_base[i % len(column_names_base)] + str(i // len(column_names_base) + 1) for i in range(dimensions)]
         df = pd.DataFrame(queries, columns=column_names)
 

@@ -82,6 +82,7 @@ parser.add_argument('-reference_tree_type', choices=['rtree', 'rrstar'], help='w
 parser.add_argument('-dataset_filename', help='data set', required=True, default='')
 parser.add_argument('-sample_size', help='the number of sampled data points that used to train model', type=int, required=False, default=10000)
 parser.add_argument('-queryset_filename', help='query set', required=True, default='')
+parser.add_argument('-model_path', help='path to a pretrained choose-subtree model to load', default=None)
 
 # one_layer_nn and Agent are for insertion
 class one_layer_nn(nn.Module):
@@ -304,7 +305,14 @@ class SplitLearner:
                 if self.config.network == 'sort_spl_loc': # the final one!
                         self.network = DQN2(self.config.action_space * 4, self.config.inter_dim, self.config.action_space)
                         self.target_network = DQN2(self.config.action_space * 4, self.config.inter_dim, self.config.action_space)
-                        
+
+                model_path = getattr(self.config, 'model_path', None)
+                if model_path:
+                        logger.info(f"Loading choose-subtree model from {model_path}")
+                        checkpoint = torch.load(model_path, map_location=self.network.device)
+                        if isinstance(checkpoint, nn.Module):
+                                checkpoint = checkpoint.state_dict()
+                        self.network.load_state_dict(checkpoint)
 
                 self.target_network.load_state_dict(self.network.state_dict())
                 self.target_network.eval()
@@ -1127,9 +1135,17 @@ if __name__ == '__main__':
         with open(args.dataset_filename, newline='') as csvfile:
                 reader = csv.reader(csvfile)
                 n = 0
-                for row in reader:
-                        model_dataset.append([float(item) for item in row])
-                        model_dataset[-1].extend(model_dataset[-1])
+
+                if "tiger" in csvfile:
+                        model_dataset = []
+                        next(reader, None)
+                        for row in reader:
+                                row_list = [(float(row[0]) + float(row[2])) / 2, (float(row[1]) + float(row[3])) / 2]
+                                model_dataset.append(row_list)
+                else:
+                        for row in reader:
+                                model_dataset.append([float(item) for item in row])
+                                model_dataset[-1].extend(model_dataset[-1])
 
         if len(model_dataset) > args.sample_size:
                 model_dataset = random.sample(model_dataset, args.sample_size)

@@ -206,14 +206,14 @@ def save_queries_to_csv(queries, file_path, query_type="range"):
     
     # Determine number of dimensions
     dimensions = queries.shape[1]
+    column_names_base = 'abcxyz'
     if query_type == "range":
         # Generate column names based on dimensions
         dimensions = dimensions // 2
-        column_names = [f"{dim}{i}" for i in range(1, 3) for dim in 'xyz'[:dimensions]]
+        column_names = [f"{dim}{i}" for i in range(1, 3) for dim in column_names_base[:dimensions]]
         df = pd.DataFrame(queries, columns=column_names)
     else:
         # For knn, point, insertion, the column names are simply the first 'dimensions' letters of 'xyz'
-        column_names_base = 'xyz'
         column_names = [column_names_base[i % len(column_names_base)] + str(i // len(column_names_base) + 1) for i in range(dimensions)]
         df = pd.DataFrame(queries, columns=column_names)
    

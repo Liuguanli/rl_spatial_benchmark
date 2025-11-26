@@ -8,7 +8,10 @@ def calculate_rank(input_file):
     """
     Read the data and independently sort each column, then assign sorted values to the original DataFrame.
     """
-    df = pd.read_csv(input_file, header=None)
+    if "tiger" in input_file:
+        df = pd.read_csv(input_file, header=None, skiprows=1)
+    else:
+        df = pd.read_csv(input_file, header=None)
 
     # Sort each column independently
     sorted_col0 = df[0].sort_values(ascending=True).reset_index(drop=True)

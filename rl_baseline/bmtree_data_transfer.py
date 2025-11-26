@@ -25,7 +25,20 @@ def convert_csv_to_json(csv_file, target_directory, bit_length=20):
 
     json_file = os.path.join(target_directory, os.path.splitext(os.path.basename(csv_file))[0] + ".json")
     
-    df = pd.read_csv(csv_file, header=None)
+    # df = pd.read_csv(csv_file, header=None)
+
+    if "tiger" in csv_file and "dataset" in csv_file:
+        # df = pd.read_csv(data_file, header=None, skiprows=1)
+        df = pd.read_csv(csv_file)
+        # print("csv_file", csv_file)
+        # print(df.iloc[0, 0])
+        df['x'] = (df['minx'] + df['maxx']) / 2
+        df['y'] = (df['miny'] + df['maxy']) / 2
+        df = df[['x', 'y']]
+        dimensions = 2
+    else:
+        df = pd.read_csv(csv_file, header=None)
+       
     df = convert_data_to_int_bits(df, bit_length)
 
     df.to_json(json_file, orient='values', indent=0)

@@ -94,7 +94,7 @@ print_step $YELLOW "Step 3: Start Experiments"
 # python run_exp_from_config.py exp_config/join_only/config_greedy.json
 # python run_exp_from_config.py exp_config/join_only/test_zm.json
 
-python run_exp_from_config.py exp_config/join_only/config_rl.json
+# python run_exp_from_config.py exp_config/join_only/config_rl.json
 
 # python run_exp_from_config.py exp_config/join_only/test_lisa.json
 
@@ -154,7 +154,8 @@ python run_exp_from_config.py exp_config/join_only/config_rl.json
 ####################### Varying Cardinality End ######################################
 
 
-####################### BMTree Improvement Start ######################################
+####################### Improvement Start ######################################
 # python run_exp_from_config.py exp_config/test_bmtree_impr.json
+python run_exp_from_config.py exp_config/test_rlrtree_impr.json
 ####################### Varying Cardinality End ######################################
 

@@ -45,7 +45,9 @@ SYNTHETIC_DATA_FILENAME_TEMPLATE_3D = "data_{size}_{dimensions}_{distribution}_{
 
 REAL_DATA_FILENAME_TEMPLATE = "home/research/datasets/{data_distribution}_{data_size}.csv"
 REAL_DATA_FILENAME_TEMPLATE_3D = "home/research/datasets/{data_distribution}_{data_size}_3d.csv"
+REAL_DATA_FILENAME_TEMPLATE_MD = "home/research/datasets/{data_distribution}_{data_size}_{dimensions}d.csv"
 RELATIVE_REAL_DATA_FILENAME = "{data_distribution}_{data_size}.csv"
+RELATIVE_REAL_DATA_FILENAME_MD = "{data_distribution}_{data_size}_{dimensions}d.csv"
 RELATIVE_REAL_DATA_FILENAME_3D = "{data_distribution}_{data_size}_3d.csv"
 
 DISK_TYPE = "HDD" if IS_HDD else "SSD"
@@ -259,11 +261,18 @@ RLRTREE_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + 
 RLRTREE_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
 RLRTREE_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
 
+RLRTREE_BUILD_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/build/{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+RLRTREE_RANGE_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/range/{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+RLRTREE_JOIN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/join/{data_file_prefix}_{range_query_prefix}_{join_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+RLRTREE_KNN_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/knn/{data_file_prefix}_{range_query_prefix}_{knn_query_prefix}_k_{k}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+RLRTREE_POINT_QUERY_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/point/{data_file_prefix}_{range_query_prefix}_{point_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+RLRTREE_INSERT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+RLRTREE_INSERT_POINT_OUTPUT_PATH = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.txt"
+
 CHOOSE_SUBTREE_MODEL_NAME = "benchmark/model/choose_subtree.pth"
 CHOOSE_SUBTREE_MODEL_NAME_DEFAULT = "benchmark/model/choose_subtree_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.pth"
 SPLIT_MODEL_NAME = "benchmark/model/split.pth"
 SPLIT_MODEL_NAME_DEFAULT = "benchmark/model/split_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}.pth"
-
 
 RLRTREE_BUILD_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/build/{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
 RLRTREE_RANGE_QUERY_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree/range/{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
@@ -275,8 +284,13 @@ RLRTREE_INSERT_POINT_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE 
 CHOOSE_SUBTREE_MODEL_NAME_DEFAULT_TUNING = "benchmark/model/choose_subtree_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.pth"
 SPLIT_MODEL_NAME_DEFAULT_TUNING = "benchmark/model/split_{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.pth"
 
-
-
+RLRTREEIMPR_BUILD_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/build/{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
+RLRTREEIMPR_RANGE_QUERY_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/range/{data_file_prefix}_{range_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
+RLRTREEIMPR_JOIN_QUERY_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/join/{data_file_prefix}_{range_query_prefix}_{join_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
+RLRTREEIMPR_KNN_QUERY_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/knn/{data_file_prefix}_{range_query_prefix}_{knn_query_prefix}_k_{k}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
+RLRTREEIMPR_POINT_QUERY_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/point/{data_file_prefix}_{range_query_prefix}_{point_query_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
+RLRTREEIMPR_INSERT_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/insert/{data_file_prefix}_{range_query_prefix}_{insert_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
+RLRTREEIMPR_INSERT_POINT_OUTPUT_PATH_TUNING = "result/libspatialindex/" + DISK_TYPE + "/" + str(BLOCK_SIZE_SUFFIX) + "K" + "/rlrtree_impr/insert_point/{data_file_prefix}_{range_query_prefix}_{insert_point_prefix}_{variant}_epoch_{epoch}_sample_{sample_size}_gamma_{gamma}_learning_rate_{learning_rate}_rl_method_{rl_method}.txt"
 
 RLRTREE_DATA_3D = "benchmark/libspatialindex/rlrtree_data_3d"
 RLRTREE_TRAINING_DATA_3D = "rl_baseline/RLRTree/"

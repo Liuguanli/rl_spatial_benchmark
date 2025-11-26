@@ -313,7 +313,7 @@ def plot_hist_stack_mirrored(datasets, baseline_names, result, y_label="", is_le
     plt.show()
     plt.close(fig)
 
-def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=False, title="", output_file_paths=None, bottom=None, top=None):
+def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_legend=True, is_log=False, title="", output_file_paths=None, bottom=None, top=None, legend_location="right"):
     label_size = 24
     legend_size = 20
     
@@ -322,13 +322,13 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     
     spacing = 0.02
 
-    markers = ['o', 's', '^', 'D', 'v', 'p', '*', 'x', '+']
-    linestyles = ['-', '--', '-.']
-    combinations = [(m, ls) for m in markers for ls in linestyles]
+    markers = ['o', 's', '^', 'D']
+    linestyles = ['-', '--', ':', '-.']
+    # combinations = [(m, ls) for m in markers for ls in linestyles]
     for i, baseline in enumerate(baseline_names):
         offset = int(i / 4) * spacing
         adjusted_x = x + offset
-        ax.plot(adjusted_x, result[i], label=baseline, marker=markers[i], linestyle=linestyles[i%len(linestyles)], color=colors[i % len(colors)], markersize=10)
+        ax.plot(adjusted_x, result[i], label=baseline, marker=markers[i % len(markers)], linestyle=linestyles[i % len(linestyles)], color=colors[i % len(colors)], markersize=10)
 
     # colors = ['#FF9999', '#66B3FF', '#99FF99', '#FFCC99', '#C2C2F0','#FFA07A', '#B0E0E6', '#FFD700', '#D3D3D3']
 
@@ -350,15 +350,31 @@ def plot_line(datasets, baseline_names, result, x_label="", y_label="", is_log=F
     
     # legend = ax.legend(loc='upper center', bbox_to_anchor=(1.1, 1), fontsize=legend_size, ncol=1)
     
-    legend = ax.legend(
-        loc='upper center',
-        bbox_to_anchor=(1.12, 1.05),
-        fontsize=legend_size,
-        ncol=1,
-        borderaxespad=0.5,  # Border padding
-        handletextpad=0.5,  # Padding between legend marker and text
-        labelspacing=0.3    # Vertical space between legend entries
-    )
+    # legend = ax.legend(
+    #     loc='upper center',
+    #     bbox_to_anchor=(1.12, 1.05),
+    #     fontsize=legend_size,
+    #     ncol=1,
+    #     borderaxespad=0.5,  # Border padding
+    #     handletextpad=0.5,  # Padding between legend marker and text
+    #     labelspacing=0.3    # Vertical space between legend entries
+    # )
+
+    if is_legend:
+        # Use custom handles with markers for the legend
+        legend = ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(1.12, 1.05),
+            fontsize=legend_size,
+            ncol=6,
+            frameon=False,
+                borderaxespad=0.25, handletextpad=0.25, labelspacing=0.25,
+                   handlelength=2.5,
+                    handleheight=1.5
+        )
+      
+    
+    plt.grid(True, linestyle="--")
     
     plt.setp(legend.get_title(), fontsize=legend_size)
     
@@ -394,11 +410,11 @@ def plot_scatter(sizes, baseline_names, x, y, highlight_x=[], highlight_y=[], ax
         for j in range(len(x[i])):
             # marker_size = 40 * np.log(sizes[j] / 1000)
             # marker_size = 100
-            if not marker:
-                marker = markers[i % len(markers)]
-            if not color:
-                color = colors[i % len(colors)]
-            ax.scatter(x[i][j], y[i][j], label=baseline, marker=marker, color=color, facecolors='none', s=marker_size)
+            # if not marker:
+            # marker = markers[i % len(markers)]
+            # if not color:
+            #     color = colors[i % len(colors)]
+            ax.scatter(x[i][j], y[i][j], label=baseline, marker=markers[i % len(markers)], color=colors[i % len(colors)], facecolors='none', s=marker_size)
 
         for j in range(len(highlight_x[i])):
             # marker_size = 40 * np.log(sizes[j] / 1000)
@@ -699,3 +715,241 @@ def plot_percentail(QueryPercentage, baselines, display_baselines, xlabel, ylabe
                 plt.savefig(output_file_path, format='png', bbox_inches='tight')
     
     plt.show()
+
+def plot_sparkline(datasets,
+                   baseline_names,
+                   result,
+                   x_label="Datasets",
+                   metric_label="Normalized score",
+                   normalize=True,
+                   higher_is_better=True,
+                   output_file_paths=None):
+    """
+    Compact sparkline-style summary.
+
+    Parameters
+    ----------
+    datasets : list[str]
+        Names on x-axis (e.g., ["2D", "3D", "4D", "5D"]).
+    baseline_names : list[str]
+        Methods / indices, one sparkline (row) per baseline.
+    result : 2D array-like, shape = (n_baselines, n_datasets)
+        Raw metric values. If `normalize=True`, they will be normalized.
+        If `higher_is_better=False`, values will be inverted for visualization.
+    x_label : str
+        Label under x-axis.
+    metric_label : str
+        Label shown on the right side as a small text.
+    normalize : bool
+        Whether to min-max normalize values across all methods/datasets.
+    higher_is_better : bool
+        If False, we internally flip sign so "better" 显示为更高的 sparkline。
+    output_file_paths : list[str] or None
+        Optional list of output paths for saving as pdf/png.
+    """
+    values = np.array(result, dtype=float)
+    n_methods, n_datasets = values.shape
+
+    # 统一方向：保证“更好”画得更高
+    if not higher_is_better:
+        values = -values
+
+    # 全局归一化到 [0, 1]
+    if normalize:
+        vmin = np.min(values)
+        vmax = np.max(values)
+        if vmax > vmin:
+            values = (values - vmin) / (vmax - vmin)
+        else:
+            values = np.zeros_like(values)
+
+    # 图尺寸：宽度沿用全局 fig_width，高度按 baseline 数量自适应
+    row_h = 0.35  # 每条 sparkline 的高度
+    fig_h = max(1.5, min(4.0, n_methods * row_h + 0.6))
+
+    fig, ax = plt.subplots(figsize=(fig_width, fig_h))
+
+    x = np.arange(len(datasets))
+    # 垂直方向从上到下排 baseline
+    for i, name in enumerate(baseline_names):
+        y = n_methods - 1 - i  # 上方开始
+        row_vals = values[i]
+
+        # baseline 灰线（弱对齐参考）
+        ax.hlines(y, x[0], x[-1],
+                  colors="lightgray", linestyles="-", linewidth=0.6, alpha=0.7)
+
+        # 折线 + 点
+        ax.plot(x, row_vals * 0 + y, alpha=0)  # 占位，确保轴范围
+        ax.plot(x, y + (row_vals - 0.5) * 0.6,  # 在该行上下微小波动，避免全部重叠
+                linewidth=1.5,
+                color=colors[i % len(colors)])
+        ax.scatter(x,
+                   y + (row_vals - 0.5) * 0.6,
+                   s=18,
+                   color=colors[i % len(colors)],
+                   edgecolor="black",
+                   linewidth=0.4)
+
+        # 左侧写方法名
+        ax.text(-0.6, y, name,
+                ha="right", va="center",
+                fontsize=legend_size - 2)
+
+    # x 轴：只保留一行刻度
+    ax.set_xticks(x)
+    ax.set_xticklabels(datasets, fontsize=label_size - 4)
+    ax.set_xlim(-0.5, len(datasets) - 0.5)
+
+    # y 轴：隐藏刻度与标签
+    ax.set_yticks([])
+    ax.set_ylim(-1, n_methods)
+
+    # 去掉边框，让它更像 summary/sparkline
+    for spine in ["top", "left", "right"]:
+        ax.spines[spine].set_visible(False)
+
+    ax.spines["bottom"].set_alpha(0.3)
+
+    ax.set_xlabel(x_label, fontsize=label_size - 2)
+    # 右侧加一个小的 metric label 注释
+    ax.text(1.02, 1.02,
+            metric_label,
+            transform=ax.transAxes,
+            ha="left", va="bottom",
+            fontsize=legend_size - 4)
+
+    ax.grid(axis="x", linestyle=":", alpha=0.15)
+
+    plt.tight_layout()
+
+    if output_file_paths:
+        for output_file_path in output_file_paths:
+            if output_file_path.endswith(".pdf"):
+                plt.savefig(output_file_path, format="pdf", bbox_inches="tight")
+            if output_file_path.endswith(".png"):
+                plt.savefig(output_file_path, format="png", bbox_inches="tight")
+
+    plt.show()
+    plt.close(fig)
+
+
+# def plot_sparkline(datasets,
+#                    baseline_names,
+#                    result,
+#                    x_label="Datasets",
+#                    metric_label="Metric (relative)",
+#                    normalize=True,
+#                    higher_is_better=True,
+#                    output_file_paths=None):
+#     """
+#     Compact sparkline-style summary figure.
+
+#     Parameters
+#     ----------
+#     datasets : list[str]
+#         X 轴标签，例如 ["2D", "3D", "4D", "5D"] 或 ["US", "INDIA", ...].
+#     baseline_names : list[str]
+#         每个 baseline 一行 sparkline.
+#     result : list[list[float]]
+#         形状为 [n_baseline][n_dataset] 的数值矩阵，和你的 plot_hist 一样。
+#     x_label : str
+#     metric_label : str
+#         图右上角的小文字说明，比如 "kNN latency (relative)"。
+#     normalize : bool
+#         是否在全局做 0-1 归一化，用于紧凑展示。
+#     higher_is_better : bool
+#         如果 False，则对数值取反，让“更小更好”的指标在图中显示为更高的线。
+#     output_file_paths : list[str] or None
+#         保存路径列表（pdf/png），风格同你其他函数。
+#     """
+#     values = np.array(result, dtype=float)
+#     n_methods, n_datasets = values.shape
+
+#     # 调整方向：保证图里“更好”在视觉上更高
+#     if not higher_is_better:
+#         values = -values
+
+#     # 全局归一化到 [0,1]
+#     if normalize:
+#         vmin = values.min()
+#         vmax = values.max()
+#         if vmax > vmin:
+#             values = (values - vmin) / (vmax - vmin)
+#         else:
+#             values = np.zeros_like(values)
+
+#     # 高度根据 baseline 数量自适应
+#     row_h = 0.5  # 每条 sparkline 预留高度
+#     fig_h = max(1.8, min(4.0, n_methods * row_h + 0.6))
+
+#     fig, ax = plt.subplots(figsize=(fig_width, fig_h))
+
+#     x = np.arange(len(datasets))
+
+#     for i, name in enumerate(baseline_names):
+#         # 从上往下排
+#         y_base = n_methods - 1 - i
+
+#         row = values[i]
+
+#         # 在 [y_base-0.25, y_base+0.25] 之间画波动
+#         y_span = 0.5
+#         y_vals = y_base - y_span/2 + y_span * row
+
+#         # 灰色参考线
+#         ax.hlines(y_base, x[0], x[-1],
+#                   colors="lightgray", linestyles="-", linewidth=0.5, alpha=0.6)
+
+#         # 折线 + 点
+#         ax.plot(x, y_vals,
+#                 linewidth=1.6,
+#                 color=colors[i % len(colors)])
+#         ax.scatter(x, y_vals,
+#                    s=26,
+#                    color=colors[i % len(colors)],
+#                    edgecolor="black",
+#                    linewidth=0.4)
+
+#         # 左侧 baseline 名字
+#         ax.text(-0.6, y_base,
+#                 name,
+#                 ha="right", va="center",
+#                 fontsize=legend_size - 2)
+
+#     # X 轴：数据集标签
+#     ax.set_xticks(x)
+#     ax.set_xticklabels(datasets, fontsize=label_size - 4)
+#     ax.set_xlim(-0.5, len(datasets) - 0.5)
+
+#     # 去掉 Y 轴刻度，只保留行标签
+#     ax.set_yticks([])
+#     ax.set_ylim(-0.8, n_methods - 0.2)
+
+#     # 简化边框
+#     for spine in ["top", "left", "right"]:
+#         ax.spines[spine].set_visible(False)
+#     ax.spines["bottom"].set_alpha(0.3)
+
+#     ax.set_xlabel(x_label, fontsize=label_size - 2)
+
+#     # 右上角加一个小注释说明这个 sparkline 的含义
+#     ax.text(1.01, 1.02,
+#             metric_label,
+#             transform=ax.transAxes,
+#             ha="left", va="bottom",
+#             fontsize=legend_size - 4)
+
+#     ax.grid(axis="x", linestyle=":", alpha=0.15)
+
+#     plt.tight_layout()
+
+#     if output_file_paths:
+#         for output_file_path in output_file_paths:
+#             if output_file_path.endswith(".pdf"):
+#                 plt.savefig(output_file_path, format='pdf', bbox_inches='tight')
+#             if output_file_path.endswith(".png"):
+#                 plt.savefig(output_file_path, format='png', bbox_inches='tight')
+
+#     plt.show()
+#     plt.close(fig)

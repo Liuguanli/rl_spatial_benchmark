@@ -20,10 +20,12 @@ def interleave_bits(values, bits_per_dimension):
 
 def process_file(input_file, output_file, bits_per_dimension):
     # Load data from the input file
-    df = pd.read_csv(input_file, header=None)
+    if "tiger" in input_file:
+        df = pd.read_csv(input_file, header=None, skiprows=1)
+    else:
+        df = pd.read_csv(input_file, header=None)
     # scaled_df = (df * 10000000).astype(int)
     # df = (df * 1000000).astype(int)
-
     num_columns = df.shape[1]
     rank_columns = []
     for i in range(num_columns):

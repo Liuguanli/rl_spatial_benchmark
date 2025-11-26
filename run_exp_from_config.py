@@ -1644,6 +1644,219 @@ def run_rlrtree(data_file_name, query_maps, ks_map, baseline_config):
         cleanup_intermediate_files(index_name="rlrtree")
         safe_remove(RLRTREE_DATA)
 
+def run_rlrtree_impr(data_file_name, query_maps, ks_map, baseline_config):
+
+    point_queries = query_maps["point_query"]
+    range_queries = query_maps["range_query"]
+    spatial_joins = query_maps["join"]
+    knn_queries = query_maps["knn_query"]
+    insertions = query_maps["insert"]
+    insert_points = query_maps["insert_point"]
+
+    global logger
+    logger.info(f"run_rlrtree: data_file_name:{data_file_name} baseline_config:{baseline_config}")
+
+    try:
+        is_real_data = data_file_name.startswith("data")
+        if is_real_data:
+            ablosute_data_file_name = os.path.join(SYNTHETIC_DATA_PATH, data_file_name)
+        else:
+            ablosute_data_file_name = os.path.join(REAL_DATA_PATH, data_file_name)
+        data_file_prefix = data_file_name.rstrip('.csv')
+
+        page_size = baseline_config.get("page_size", 100)
+        fill_factor = baseline_config.get("fill_factor", 0.4)
+        epoch = baseline_config.get("epoch", 10)
+        rtree_variant = baseline_config.get("rtree_variant", "rlrtree")
+        sample_size = baseline_config.get("sample_size", 10000)
+        model_path = baseline_config.get("model_path", RLRTREE_MODEL_PATH)
+
+        learning_rate = baseline_config.get("learning_rate", 0.01)
+        gamma = baseline_config.get("gamma", "0.8")
+        rl_method = baseline_config.get("rl_method", 0)
+
+
+        data_file = RLRTREE_DATA
+
+        format_data_command = f"python tools/libspatialindex_data_adapter.py --type data --input {ablosute_data_file_name} --output {data_file}"
+        execute_command(format_data_command)
+
+        for range_file_name in range_queries:
+
+            file_name_prefix = range_file_name.rstrip('.csv')
+            
+            if is_real_data:
+                ablosute_query_file_name = f"data/synthetic/query/{range_file_name}"
+            else:
+                ablosute_query_file_name = f"data/real/query/{range_file_name}"
+
+            logger.info("Prepare RLRTree")
+
+            split_model_name_default = SPLIT_MODEL_NAME_DEFAULT_TUNING.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+                sample_size=sample_size,
+                gamma=gamma,
+                learning_rate=learning_rate,
+                rl_method=rl_method
+            )
+
+            choose_subtree_model_name_default = CHOOSE_SUBTREE_MODEL_NAME_DEFAULT_TUNING.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+                sample_size=sample_size,
+                gamma=gamma,
+                learning_rate=learning_rate,
+                rl_method=rl_method
+            )
+
+            if not os.path.exists(split_model_name_default) or not os.path.exists(choose_subtree_model_name_default):
+                logger.info(f"{split_model_name_default} NOT exists")
+                logger.info(f"{choose_subtree_model_name_default} NOT exists")
+
+                learn_rlrtree_command = f"bash rl_baseline/learn_rlrtree_impr.sh {ablosute_data_file_name} {ablosute_query_file_name} {epoch} {sample_size} {learning_rate} {gamma} {rl_method}"
+                elapsed_time_ns_learn = execute_command(learn_rlrtree_command)
+
+                copy_and_rename(SPLIT_MODEL_NAME, split_model_name_default)
+                copy_and_rename(CHOOSE_SUBTREE_MODEL_NAME, choose_subtree_model_name_default)
+            else:
+                copy_and_rename(split_model_name_default, SPLIT_MODEL_NAME)
+                copy_and_rename(choose_subtree_model_name_default, CHOOSE_SUBTREE_MODEL_NAME)
+
+                elapsed_time_ns_learn = 0
+
+            command = f"test-rtree-RTreeLoad {data_file} {INDEX_PATH}/rlrtree {page_size} {fill_factor} {rtree_variant} {model_path} {BLOCK_SIZE} {BUFFER}"
+            result, elapsed_time_ns_build = execute_command_with_err(command)
+
+            if point_queries or knn_queries:
+                build_output_path = RLRTREEIMPR_BUILD_OUTPUT_PATH_TUNING.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    variant=rtree_variant,
+                    epoch=epoch,
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
+                )
+
+                os.makedirs(os.path.dirname(build_output_path), exist_ok=True)
+
+                with open(build_output_path, "w") as f:
+                    if result:
+                        f.write(result.stderr)
+                    f.write(f"Elapsed Learn Time: {elapsed_time_ns_learn}\n")
+                    f.write(f"Elapsed Build Time: {elapsed_time_ns_build}\n")
+                    f.write(f"Tree.dat Size: {os.path.getsize(f'{INDEX_PATH}/rlrtree.dat')}\n")
+                    f.write(f"Tree.idx Size: {os.path.getsize(f'{INDEX_PATH}/rlrtree.idx')}\n")
+
+            query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, file_name_prefix)
+            range_query_output_path = RLRTREEIMPR_RANGE_QUERY_OUTPUT_PATH_TUNING.format(
+                data_file_prefix=data_file_prefix,
+                range_query_prefix=file_name_prefix,
+                variant=rtree_variant,
+                epoch=epoch,
+                sample_size=sample_size,
+                gamma=gamma,
+                learning_rate=learning_rate,
+                rl_method=rl_method
+            )
+            execute_range_query(data_file, query_file, range_query_output_path, index_name="rlrtree")
+
+            for file_name in point_queries:
+                point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, point_file_name_prefix)
+                point_query_output_path = RLRTREEIMPR_POINT_QUERY_OUTPUT_PATH_TUNING.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    point_query_prefix=point_file_name_prefix,
+                    epoch=epoch,
+                    variant=rtree_variant,
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
+                )
+                execute_point_query(query_file, data_file, point_query_output_path, index_name="rlrtree")
+
+            for file_name in spatial_joins:
+                join_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, join_file_name_prefix)
+                join_query_output_path = RLRTREEIMPR_JOIN_QUERY_OUTPUT_PATH_TUNING.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    join_query_prefix=join_file_name_prefix,
+                    variant=rtree_variant,
+                    epoch=epoch,
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
+                )
+                execute_spatial_join(data_file, query_file, join_query_output_path, index_name="rlrtree")
+
+            for file_name in knn_queries:
+                ks = ks_map.get(file_name)
+                knn_file_name_prefix = file_name.rstrip('.csv')
+                knn_query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, knn_file_name_prefix)
+                for k in ks:
+                    knn_query_output_path = RLRTREEIMPR_KNN_QUERY_OUTPUT_PATH_TUNING.format(
+                        data_file_prefix=data_file_prefix,
+                        range_query_prefix=file_name_prefix,
+                        knn_query_prefix=knn_file_name_prefix,
+                        epoch=epoch,
+                        k=k,
+                        variant=rtree_variant,
+                        sample_size=sample_size,
+                        gamma=gamma,
+                        learning_rate=learning_rate,
+                        rl_method=rl_method
+                    )
+                    execute_knn_query(k, knn_query_file, data_file, knn_query_output_path, index_name="rlrtree")
+
+            for file_name in insertions:
+                insert_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_file_name_prefix)
+                insert_output_path = RLRTREEIMPR_INSERT_OUTPUT_PATH_TUNING.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    insert_prefix=insert_file_name_prefix,
+                    epoch=epoch,
+                    variant=rtree_variant,
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
+                )
+                execute_insert(query_file, insert_output_path, index_name="rlrtree")
+
+            for file_name in insert_points:
+                insert_point_file_name_prefix = file_name.rstrip('.csv')
+                query_file = os.path.join(BENCHMARK_LIBSPATIALINDEX, insert_point_file_name_prefix)
+                insert_point_output_path = RLRTREEIMPR_INSERT_POINT_OUTPUT_PATH_TUNING.format(
+                    data_file_prefix=data_file_prefix,
+                    range_query_prefix=file_name_prefix,
+                    insert_point_prefix=insert_point_file_name_prefix,
+                    epoch=epoch,
+                    variant=rtree_variant,
+                    sample_size=sample_size,
+                    gamma=gamma,
+                    learning_rate=learning_rate,
+                    rl_method=rl_method
+                )
+                execute_insert_point(query_file, insert_point_output_path, index_name="rlrtree")
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"fail: {e}")
+
+    finally:
+        # clean up intermediate files
+        cleanup_intermediate_files(index_name="rlrtree")
+        safe_remove(RLRTREE_DATA)
 
 def run_kdtree(data_file_name, query_maps, ks_map, baseline_config):
 
@@ -2651,7 +2864,8 @@ def process_experiment(experiment):
             run_lisa(data_file_name, query_maps, ks_map, baseline_config)
         elif baseline_name == "bmtree_impr":
             run_bmtree_impr(data_file_name, query_maps, ks_map, baseline_config)
-
+        elif baseline_name == "rlrtree_impr":
+            run_rlrtree_impr(data_file_name, query_maps, ks_map, baseline_config)
 def remove_and_create_directory(directory_path):
 
     global logger

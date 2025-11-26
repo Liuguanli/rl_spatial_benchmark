@@ -77,6 +77,15 @@ print_step $YELLOW "Step 3: Start Experiments"
 # done
 ####################### Tuning RLESIs End ########################################
 
+# python run_exp_from_config.py exp_config/point_range_knn_queries/config_spatial_objects.json
+
+
+# python run_exp_from_config.py exp_config/join_only/config_overall.json
+
+
+# python run_exp_from_configmd.py exp_config/md/test_cardinality_1m_4d.json
+python run_exp_from_configmd.py exp_config/md/test_cardinality_overall_skew_4d.json
+python run_exp_from_configmd.py exp_config/md/test_cardinality_overall_skew_5d.json
 
 ####################### RLESI Start ######################################
 # python run_exp_from_config.py exp_config/point_range_knn_queries/config_rl_vary_range.json
